@@ -1,0 +1,94 @@
+# DJ MOVES (0.16.19, a settings page after AUTO FX): the mood rides the sections (Deep: 30 on top of the player's mood) and the scenes follow them
+# (1 groove, 2 breakdown, 3 build, 4 drop, 1 again 8 bars after the drop). Four scenes with different mutes, the auto-DJ on (16 bars of groove), and
+# each section checked as it comes: the scene's mutes, the ride's place. Stopped, the ride is gone.
+seed 0
+wait 3000
+expect ride 0
+expect moodeff 50
+# the page: HOME held opens the settings at SETTINGS; AUTO DJ, AUTO FX, DJ MOVES
+press HOME
+wait 800
+release HOME
+wait 100
+expect fxpage 18
+turn SELECT 3
+wait 100
+expect fxpage 35
+spin K1 2
+spin K2 1
+wait 50
+expect fxs96 2
+expect fxs97 1
+shot djmoves_page.png
+tap FX
+wait 200
+# the scenes (GLO held, C5 .. D#5, held 0.8 s to store): 1 nothing muted, 2 the kick, 3 the kick and the hats, 4 the hats
+press GLO
+wait 100
+key 19 down
+wait 800
+key 19 up
+tapkey 0
+key 20 down
+wait 800
+key 20 up
+tapkey 2
+key 21 down
+wait 800
+key 21 up
+tapkey 0
+key 22 down
+wait 800
+key 22 up
+tapkey 23
+release GLO
+wait 100
+expect scenes 15
+expect trkmute 0
+# the auto-DJ on (F5): nothing moves in the groove
+press GLO
+tapkey 24
+release GLO
+expect djon 1
+wait 4000
+expect sec 0
+expect ride 0
+expect trkmute 0
+# the breakdown: scene 2, the mood sinking to chill (30 steps of 80 ms)
+waitfor sec 1 60000
+wait 100
+expect trkmute 1
+expect ride <0
+wait 3000
+expect ride -30
+expect moodeff 20
+shot djmoves_break.png
+# the build: scene 3, the mood climbing
+waitfor sec 2 60000
+wait 100
+expect trkmute 3
+wait 2500
+expect ride >-30
+# the drop: scene 4, the mood at peak at once
+waitfor sec 0 60000
+wait 100
+expect trkmute 2
+expect ride 30
+expect moodeff 80
+tap HOME
+wait 200
+shot djmoves_drop_perform.png
+tap HOME
+wait 200
+# 8 bars on: scene 1, and the mood settling back
+waitfor trkmute 0 30000
+expect sec 0
+wait 3000
+expect ride <30
+expect ride >0
+# stopped: the ride gone, the mood the player's
+tap PLAY
+wait 500
+expect playing 0
+expect ride 0
+expect moodeff 50

@@ -60,6 +60,16 @@ The screen is drawn in one look (warm black, one colour per voice: the pad bone,
 
 <p align="center"><img src="docs/img/readme-palettes.png" width="760" alt="The home screen in the six palettes: Imp, Synth, Acid, Ice, Ember and Phosphor."></p>
 
+## What's new in 0.16.3
+
+The auto-DJ's release: it now plays a set the way a DJ would.
+
+- **Start a set** with **SEL + PLAY** (or PLAY on the Smart DJ page): from silence at 00:00:00, the tracks coming in one by one, and at the end the parts leaving one by one until the music stops on time: SET OVER.
+- **Smart DJ:** sets of 15, 30, 60 or 90 minutes, or endless, with an energy shape (arc, climb, peak or chill). It listens to the music, breaks when the groove goes stale instead of on a count, holds back while you play, aims its biggest drop at the peak and plans against the clock, so nothing it starts runs over the end.
+- **Smart mix:** real DJ transitions from piece to piece (filter, bass swap, drums first, echo out, loop roll, spinback) and a journey across the genres, chosen by energy, key and tempo.
+- **DJ moves:** the mood rides the breakdowns, builds and drops; your four scenes follow them; genre moves (no break, long break, fake drop, double drop, riddim); and **Layers**, parts taken out and brought back on the 8-bar phrases.
+- The Perform screen shows the set's clock, and parts the DJ has taken out are struck through in blue.
+
 ## What's new in 0.16.2
 
 - **Fix: back to the stock firmware with M-UPGRADE.** M-VAVE's new M-UPGRADE (3.11) said "A USB MIDI device is present but did not answer" to every PERF-1 until now. It finds PERF-1 again, and can take it straight to M-VAVE's new **V16** as well as V15. The Install page's **Back to the stock firmware** takes V15's or V16's file.

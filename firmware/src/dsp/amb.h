@@ -276,13 +276,21 @@ enum {
     EN_FXS_AF_AMT, EN_FXS_AF_EVERY, EN_FXS_AF_LEN, EN_FXS_AF_PICK,       /* (0.16.8) AUTO FX, the UI's (ui.c af_tick; the engine keeps them only): how much (0 off,
                                                                           * 1 gentle, 2 medium, 3 wild), every 4/8/16/32 bars, the longest (a beat, half a bar,
                                                                           * a bar, two bars), the genre's own first or any */
+    EN_FXS_DJ_MOOD, EN_FXS_DJ_SCN,                                       /* (0.16.19) DJ MOVES, the UI's (ui.c ride_tick; the engine keeps them only): the mood rides the
+                                                                          * sections (0 off, 1 gentle, 2 deep), the scenes follow them (0 off, 1 follow) */
+    EN_FXS_DJ_MOVE, EN_FXS_DJ_LAYER,                                     /* (0.16.20) the auto-DJ's genre moves (0 off, 1 some, 2 lots: ui.c mv_*), the groove's layers
+                                                                          * taken out and brought back on the phrase lines (0 off, 1 light, 2 busy: ar_tick) */
+    EN_FXS_SD_ON, EN_FXS_SD_LEN, EN_FXS_SD_SHAPE, EN_FXS_SD_YIELD,       /* (0.16.21) SMART DJ, the UI's (ui.c sm_*): on; the set's length (15, 30, 60, 90 min, endless); its
+                                                                          * energy's shape (arc, climb, peak, chill); it holds back while the player plays (0 off, 1 on) */
+    EN_FXS_SX_JOURNEY, EN_FXS_SX_MIXES, EN_FXS_SX_BLEND,                 /* (0.16.23) SMART MIX, the UI's (ui.c tx_*, jy_*): where the next piece may come from (0 this genre,
+                                                                          * 1 near genres, 2 any); how pieces are mixed (0 auto, 1 blends, 2 cuts, 3 a plain cut); a blend's bars (0 8, 1 16) */
     EN_NFXS
 };
 #define EN_FXS_DEFAULTS {16, 0xF0, 100, 40, 80, 55, 100, 35, 50, 50, 70, 40, 45, 40, 45, \
                          70, 45, 20, 50, 3, 5, 1, 0, 88, 35, 1, 0xF0, 56, 100, 100, 0, \
                          60, 25, 1, 4, 55, 50, 30, 50, 1, 30, 3, 70, 55, 0, \
                          1, 2, 0, 50, 60, 2, 1, 70, 45, 100, 2, 0, 100, 1, 70, 60, 100, 60, 60, 55, 100, 0, 1, 1, 80, \
-                         12, 0, 0, 0, 0, 0, 0, 2, 50, 40, 2, 60, 60, 7, 40, 70, 60, 3, 0, 0, 0, 0, 0, 1, 2, 0}
+                         12, 0, 0, 0, 0, 0, 0, 2, 50, 40, 2, 60, 60, 7, 40, 70, 60, 3, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 2, 0, 1, 1, 0, 0}
 extern const int16_t EN_FXS_DEF[EN_NFXS];
 void en_fxs(int i, int v);
 /* the punch-ins' targets (0.15.19): all, the drums, the synths, the pad, the bass, the acid, the pluck, acid and pluck, pad and pluck, bass and acid */

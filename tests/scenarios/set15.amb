@@ -1,0 +1,53 @@
+# A whole 15-minute SMART DJ set (0.16.24), played through with no hands: START SET from the SMART DJ page, ARC, Journey Near, Mixes Auto.
+# The set's pace is half (shorter grooves and breakdowns), the opening intro 45 s (a twentieth of the set); a drop aimed at the arc's peak (10:30)
+# lands just before it; pieces mix from one to the next; the close begins so that the music stops at 15:00.
+seed 0
+wait 3000
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K2 -2
+wait 50
+expect fxs101 0
+expect smpace 50
+tap PLAY
+wait 1000
+expect playing 1
+expect djon 1
+expect smsec <3
+shot set15_start.png
+tap FX
+wait 200
+# the opening: 45 s of tracks coming in
+waitfor introk 100 60000
+expect smsec >40
+expect smsec <50
+expect smpatience <41
+# a first mix into a new piece
+waitfor tx >0 400000
+waitfor tx 0 60000
+# the peak's drop, aimed: it lands just before 10:30
+waitfor smpeakat >0 700000
+expect smpeakat >595
+expect smpeakat <631
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+shot set15_peak.png
+tap FX
+wait 200
+# the close, timed: the music stops at 15:00
+waitfor ssout >0 400000
+expect smsec >820
+waitfor ssdone 1 120000
+wait 100
+expect playing 0
+expect smsec >885
+expect smsec <915

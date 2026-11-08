@@ -1483,6 +1483,9 @@ The four knobs, **KNOB1** to **KNOB4**, set the four settings on each page:
 | Ring mod (a metallic clang) | Tone: 40-800 Hz | Mix | - | - |
 | Auto DJ (runs the sections for you; section 10) | Scenes: at once, next bar | Groove: 8, 16, 32, 64 bars, sync | Break: short, half, full | Fill: off, on |
 | Auto FX (effects played by themselves; section 10) | Auto FX: off, gentle, medium, wild | Every: 4, 8, 16, 32 bars | Length: a beat, half bar, a bar, 2 bars | Pick: genre, any |
+| DJ moves (the mood, scenes, genre moves and layers; section 10) | Mood: off, gentle, deep | Scenes: off, follow | Moves: off, some, lots | Layers: off, light, busy |
+| Smart DJ (the auto-DJ plans the set; section 10) | Smart: off, on | Set: 15, 30, 60, 90 min, endless | Shape: arc, climb, peak, chill | Yield: off, on |
+| Smart mix (piece to piece, genre to genre; section 10) | Journey: genre, near, any | Mixes: auto, blends, cuts, plain | Blend: 8, 16 bars | - |
 | SET (shapes a longer DJ set; section 10) | Rounds: 1, 2, 4, 8 | Ramp: off, +2, +4, +8, +12 BPM | Intro: off, 1, 2, 4, 8 min | Mix: cut, 4, 8, 16, 32 bars |
 | Settings | Key: same, +2, +3, +5, +7 | Voices: DX, DY | - | - |
 | USB & MIDI | Level: knob, fixed | MIDI out: off, on | MIDI map: GM, M:Samples, MPC Sample, SP-404 | - |
@@ -1624,7 +1627,69 @@ Turn on **DJ new pieces** (**GLO** + `G5`) and the auto-DJ brings in the next pi
 
 The name of each effect shows in the header as it plays. The settings are kept across power-off.
 
-The **SET** settings page shapes a longer set. Hold **HOME** for the settings; it comes after Auto FX on the dial.
+### DJ moves
+
+The **DJ moves** settings page (hold **HOME**, then turn **SELECT**: it comes right after Auto FX) makes a set move more by itself. **Mood** and **Scenes** follow the breakdowns, builds and drops, whether the auto-DJ runs them or you do with **SAVE**.
+
+- **Mood** rides the mood with the sections, on top of the mood you set. **Gentle** moves it up to 15 either way, **Deep** up to 30. In a breakdown it sinks towards chill; through the build it climbs back past the middle to peak by the last bar; the drop lands at peak, stays there for 8 bars, then settles back to your mood over the next 8. Your own Mood dial still works: the ride is added to it. The Perform screen's mood bar keeps showing your setting, with a blue mark and number where the ride has taken it. Stop the music and the ride is gone.
+- **Scenes** set to **Follow** recalls a scene for each section: **scene 1** in the groove, **scene 2** in the breakdown, **scene 3** in the build and **scene 4** on the drop. Eight bars after the drop, scene 1 comes back. If scene 4 is empty, the drop brings scene 1; any other empty scene leaves things as they are. Store the scenes as usual (hold **GLO**, hold `C5` to `D#5`), then let the sections play them. A scene you recall by hand holds until the next section.
+
+- **Moves** lets the auto-DJ play a round the way the genre would. **Some** plays a move in about four rounds out of ten, always one that belongs to the genre; **Lots** plays one in about seven out of ten, and now and then borrows a move from another genre. The header says which move as it happens (`DJ MOVE`), and the page shows the one planned for this round. Moves only happen while the auto-DJ is on.
+  - **No break**: one bar of breakdown, then straight into the build. House, techno, electro, disco, funk, amapiano, industrial.
+  - **Long break**: the breakdown runs twice as long. Psytrance, synthwave, techno, trip-hop, house, lofi.
+  - **Fake drop**: at the end of the build the drop's hit lands, and the music falls straight back into a breakdown for two bars, builds again, and only then really drops. Dubstep, trap, drum and bass, garage, dark forest.
+  - **Double drop**: eight bars into the groove, a fill, one bar of breakdown, and the drop hits again. The round carries on as if nothing happened. Drum and bass, dubstep, breaks, dark forest, trap.
+  - **Riddim**: halfway through the groove, the pad, acid and pluck drop out for four bars and only the drums and bass play, with an echo throw going in. Dub, reggae, dubstep, trip-hop, lofi, amapiano.
+- **Layers** arranges the groove the way a DJ layers a mix. On each 8-bar phrase line a part may drop out for one phrase, then come back on the next line. **Light** does it in about four phrases out of ten, **Busy** in about seven, sometimes two parts at once. The hats and the perc go most often, then the pad, acid and pluck, now and then the bass or the snare; the kick goes out only on Busy. It never takes out a part that's silent anyway or one you've muted, it waits while anything is soloed, the first phrase after a drop always plays full, and with the auto-DJ on, so does the last phrase before its breakdown. In a breakdown or build everything is back. On the Perform screen a part taken out by Layers or a move is struck through in blue (your own mutes stay red). The header says what went out (`LAYERS`). Layers works with or without the auto-DJ.
+
+The page shows the mood now, which scenes are stored and this round's move. The settings are kept across power-off.
+
+### Smart DJ
+
+**Smart DJ** makes the auto-DJ plan a whole set instead of repeating the same round. It has its own settings page right after DJ moves (hold **HOME**, then turn **SELECT**).
+
+**Start a set with SEL + PLAY** (anywhere), or **PLAY on the Smart DJ page**. It starts like a DJ set: from silence, with the clock at 00:00:00. The auto-DJ, Smart and DJ new pieces turn on by themselves, and anything left over from before (moves, layers, a piece waiting) is cleared. It opens on the piece in the bank whose energy suits the start of the set, and the tracks come in one by one: over the SET page's **Intro** time, or over a minute if Intro is off. Throughout the set each new piece glides in from the old tempo (over the SET page's **Mix** bars, or 8 bars if Mix is Cut). The clock shows as hh:mm:ss on the Perform screen and the Smart DJ page; stopping the music pauses it.
+
+**It plans against the clock.** Smart DJ knows how long the set has left and how long things take at the tempo playing. It won't start a breakdown unless the breakdown, the build and a few bars after the drop finish before the close, and won't start a mix unless the mix does. On an **Arc** set it aims the biggest moment at the peak: it times a breakdown and build so the drop lands right on the arc's peak (70 % of the way through, or the top of each wave on Endless). About a minute before that, it stops starting mixes and breakdowns so the groove is free when it's time. Near the end of the set the journey picks the last pieces to suit the ending. The page shows the plan: when the peak drop is due (or when it landed) and when the close will begin.
+
+**The close.** As the set's time comes (not on Endless), Smart DJ stops breaking and moving and plays the set out, starting early enough that the music stops right on time. Two bars apart, the parts leave one by one: the acid, the pluck, the bass, the snare, the kick, the perc, the hats, and the pad last, its tails ringing. Then the music stops and the screen says `SET OVER` with the set's time, within a few seconds of the length you chose. If you press PLAY again afterwards, the auto-DJ carries on without closing again; start a new set to begin again from 00:00:00.
+
+You can also just turn **Smart** on and start the auto-DJ as usual (**GLO** + `F5`): the clock starts then, without the opening, and turning the auto-DJ off ends the set.
+
+### Smart mix
+
+The **Smart mix** settings page (right after Smart DJ) decides how a Smart DJ set goes from one piece to the next, the way a DJ mixes. Each piece gets its rounds (the SET page's **Rounds**, one by default: a groove, a breakdown, a build and the drop). Then, as the groove after its drop starts to tire, Smart DJ mixes into the next piece on an 8-bar phrase line. There's never a breakdown in the middle of a mix.
+
+**Journey** is where the next piece can come from.
+- **Genre** stays in the genre you're in.
+- **Near** (the default) moves to genres close in energy, so the set travels a step at a time: lofi and trip-hop, dub and reggae, synthwave and amapiano, disco, funk, house and garage, electro and trap, techno and breaks, dubstep and industrial, drum and bass and psytrance, dark forest at the top.
+- **Any** can go anywhere.
+
+Whichever you choose, it picks a piece that suits where the set's energy is heading over the next five minutes, in a key close by on the circle of fifths and at a tempo nearby (the tempo glides the rest of the way). It plays two or three pieces in a genre before moving on, and never repeats one of the last three. Start Set also opens in whichever genre suits the start of the set.
+
+**Mixes** is how it gets there.
+- **Filter**: the outgoing piece's low end is filtered away (the DJ filter rising to a high-pass), and the new piece comes in through a closed low-pass that opens up.
+- **Bass swap**: the outgoing bass drops out for the last 8 bars, the new piece plays its first 8 bars without its bass, then the bass comes back, so two basslines never clash.
+- **Drums first**: the new piece starts with only its drums for 8 bars, then the rest comes in on the phrase.
+- **Echo out**: an echo throw on the last beat, into the new piece. Dub, reggae, trip-hop.
+- **Loop roll**: the last bar repeats, tightening from quarters to eighths to sixteenths, into the new piece. Drum and bass, breaks, dubstep.
+- **Spinback**: the last half bar spun back. Only at high energy.
+
+**Auto** uses the smooth blends (filter, bass swap, drums first) low in the set and the sharp cuts (echo, roll, spinback) high, each genre's own favourites more often. **Blends** and **Cuts** keep to one kind; **Plain** just changes on the bar with the tempo glide. **Blend** sets how long a filter blend takes: 8 or 16 bars.
+
+The header says each step (`MIX: FILTER` with the piece it's going to, `NOW PLAYING` as it lands), and the page shows the piece playing, the mix under way and how far through it is, or when the next mix will come. Parts a mix has taken out are struck through in blue on the Perform screen. If you start a breakdown by hand during a mix, the mix stops where it is. With the set list playing, Smart DJ follows its order and still mixes between its pieces.
+
+- **Set** is how long the set is: 15, 30, 60 or 90 minutes, or **endless**. Shorter sets move faster: in a 15-minute set grooves and breakdowns run about half as long as in an hour's set (three-quarters in a 30-minute set), blends are always 8 bars, and the opening intro is shorter.
+- **Shape** is how its energy goes. **Arc** warms up, peaks about 70 % of the way through, then winds down. **Climb** rises and stays high. **Peak** stays high all set. **Chill** stays low. A slow 8-minute swell rides on top of each so it never sits still.
+- **What follows the energy.** Smart DJ takes over **Moves** and **Layers** from the DJ moves page. Low in the set, more parts drop out and long breakdowns come up; at the peak the groove stays full, breakdowns are short, and fake and double drops turn up. It also leans the mood with the set (up to 20 either way, on top of your own mood and the Mood ride).
+- **It listens.** Every bar of the groove it measures what the music has: how many parts are playing, how busy the drums are, the tempo and the mood. It compares that with what the music usually has, then nudges the mood so a stretch that runs hotter than the plan is cooled and a flat one lifted.
+- **It breaks when the groove gets stale, not on a count.** A groove grows stale bar by bar, faster when nothing new happens (no chord change, pattern change, drum drift, or a part dropping out or coming back) and when you've left it alone for a minute. New things make it fresher. When it's stale enough it plays a fill and breaks on the next 8-bar line. It's patient at low energy (up to about 48 bars) and quick at the peak (about 16), and never goes past 64 bars. The Perform screen shows `SMART` and the bar count, and the bar under it fills as the groove gets stale.
+- **It picks the next piece and mixes into it.** With **DJ new pieces** on, once a piece has had its rounds it chooses the next one (from this genre or others: see Smart mix below) and mixes into it with a DJ transition.
+- **Yield** (on by default) makes it hold back while you play: for 8 seconds after you touch a button, key or knob, or play a MIDI note, the groove doesn't get staler, no move starts and no part is taken out.
+
+The page shows the set's clock (`CLOSING` during the close, `SET OVER` after it), the energy it wants and the energy the music has (50 means "as it usually is"), how stale the groove is, and how far the last mix moved round the circle of fifths. The settings are kept across power-off.
+
+The **SET** settings page shapes a longer set. Hold **HOME** for the settings; it comes after Smart DJ on the dial.
 
 - **Rounds** gives each piece 1, 2, 4 or 8 rounds before DJ new pieces moves on. A round is one groove, breakdown, build and drop. The header and the Perform screen count them, like `R2/4`.
 - **Ramp** makes the tempo climb over a piece's rounds of groove, by +2, +4, +8 or +12 BPM, one BPM at a time. If you change the tempo by hand, the climb carries on from there. The next piece starts at its own tempo.

@@ -22,6 +22,9 @@
  *   seed N                       the seed the next boot uses (0: the first piece, exact)
  *   restore OBJ [bad|old|shared] write an object back as a restored backup's (checked first); expect rsvalid, rsstate, storelock
  *   seamless 0/1                 a store without the fade (the sliced erase)
+ *   mvforce N                    the auto-DJ's rounds play genre move N (ui.c MV_*), -1 the dice
+ *   smskip MIN                   SMART DJ's set clock on by MIN minutes
+ *   txforce N                    SMART MIX's transitions as N (ui.c TX_*), -1 chosen
  *   battery N                    the battery divider's reading, 0..1023 (default: none)
  *   storefuzz SEED               fill the project object with random damage (for the sanitizer runs)
  *   bank76 P N                   write a bank as the firmware before styles did (76 settings a piece),
@@ -620,6 +623,65 @@ static int expect(const char *what, const char *val)
         got = ui.scene_q;
     else if (!strcmp(what, "mood"))               /* the mood macro, 0 .. 100 */
         got = ui.mood;
+    else if (!strcmp(what, "ride"))               /* DJ MOVES (0.16.19): the mood's ride now (-30 .. 30), and the mood the engine is given */
+        got = ui.ride;
+    else if (!strcmp(what, "moodeff"))
+        got = mood_eff();
+    else if (!strcmp(what, "arm"))                /* (0.16.20) LAYERS: the tracks the arrangement has out (a bit a track); MOVES: the round's move, a move's mutes,
+                                                    * the auto-DJ's round, the tracks the engine has muted */
+        got = ui.ar_m;
+    else if (!strcmp(what, "mv"))
+        got = ui.mv;
+    else if (!strcmp(what, "mvm"))
+        got = ui.mv_m;
+    else if (!strcmp(what, "djround"))
+        got = ui.dj_round;
+    else if (!strcmp(what, "sme"))                /* (0.16.21) SMART DJ: the energy the arc wants, what the music has, the groove's staleness and its patience
+                                                    * (both in half bars), the set's minutes, its part of the mood, the last mix's steps round the circle of fifths */
+        got = ui.sm_e;
+    else if (!strcmp(what, "smnow"))
+        got = ui.sm_now;
+    else if (!strcmp(what, "smhas"))              /* (against what the music usually has: 50 as usual) */
+        got = sm_has();
+    else if (!strcmp(what, "smbore"))
+        got = ui.sm_bore;
+    else if (!strcmp(what, "smpatience"))
+        got = 2 * sm_patience();
+    else if (!strcmp(what, "smmin"))
+        got = (int)(ui.sm_ms / 60000u);
+    else if (!strcmp(what, "smmood"))
+        got = ui.sm_mood;
+    else if (!strcmp(what, "smdist"))
+        got = ui.sm_dist;
+    else if (!strcmp(what, "smsec"))              /* (0.16.22) THE SET: its clock in seconds; the close's bars (0: not closing); over; the close's mutes */
+        got = (int)(ui.sm_ms / 1000u);
+    else if (!strcmp(what, "ssout"))
+        got = ui.ss_out;
+    else if (!strcmp(what, "ssdone"))
+        got = ui.ss_done;
+    else if (!strcmp(what, "tx"))                 /* (0.16.23) SMART MIX: the transition under way (ui.c TX_*), in its incoming half, its mutes; the pieces in a row
+                                                    * in this genre; the piece playing as genre * 10 + piece */
+        got = ui.tx;
+    else if (!strcmp(what, "txin"))
+        got = ui.tx_in != 0;
+    else if (!strcmp(what, "txbar"))             /* the outgoing bars so far */
+        got = ui.tx_bar;
+    else if (!strcmp(what, "smpeakat"))          /* (0.16.24) THE PLAN: when the peak's drop landed (s, 0 not yet); the close's length now (s); the set's pace (%) */
+        got = ui.sm_peak_at;
+    else if (!strcmp(what, "smclose"))
+        got = (int)(sm_close_ms() / 1000u);
+    else if (!strcmp(what, "smpace"))
+        got = sm_pace();
+    else if (!strcmp(what, "txm"))
+        got = ui.tx_m;
+    else if (!strcmp(what, "gnrun"))
+        got = ui.gn_run;
+    else if (!strcmp(what, "pieceid"))
+        got = proj.genre * NPIECES + proj.piece;
+    else if (!strcmp(what, "ssm"))
+        got = ui.ss_m;
+    else if (!strcmp(what, "introk"))             /* the intro: how far in, percent (100: all in) */
+        got = (int)(en_intro_k * 100.0f);
     else if (!strcmp(what, "flexq"))              /* Flex Beat: quantize, mode, state (0 idle, 1 armed, 2 playing), one shots done, the last pad */
         got = ui.fxs[EN_FXS_FX_QUANT];
     else if (!strcmp(what, "flexmode"))
@@ -1057,6 +1119,14 @@ int main(int argc, char **argv)
                 store[OBJ_PROJ][13] = 0;
         } else if (!strcmp(cmd, "usbpower")) {       /* usbpower 0/1: a USB host powers the unit (a bolt in the battery) */
             host_usb = atoi(a);
+        } else if (!strcmp(cmd, "smskip")) {         /* smskip MIN (0.16.21): SMART DJ's set clock on by MIN minutes (its arc, without the hour) */
+            ui.sm_ms += (uint32_t)atoi(a) * 60000u;
+        } else if (!strcmp(cmd, "txforce")) {        /* txforce N (0.16.23): SMART MIX's transitions as N (ui.c TX_*: 1 cut, 2 filter, 3 bass swap, 4 drums first,
+                                                    * 5 echo out, 6 loop roll, 7 spinback), -1 chosen */
+            ui_tx_force = atoi(a);
+        } else if (!strcmp(cmd, "mvforce")) {        /* mvforce N (0.16.20): the auto-DJ's next rounds play move N (ui.c MV_*: 1 no break, 2 long break, 3 fake drop,
+                                                    * 4 double drop, 5 riddim; 0 none), -1 the dice again */
+            ui_mv_force = atoi(a);
         } else if (!strcmp(cmd, "seamless")) {       /* seamless 0/1: a flash write does not stop the audio (as the unit's sliced erase): no fade around a store */
             host_seamless = atoi(a);
         } else if (!strcmp(cmd, "battery")) {        /* battery N: the divider's ADC reading (0..1023; the indicator shows from about 500) */

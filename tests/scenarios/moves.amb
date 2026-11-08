@@ -1,0 +1,81 @@
+# THE GENRE MOVES (0.16.20, DJ MOVES' third knob): the auto-DJ (16 bars of groove) plays a round its genre's way. The dice are told which move
+# (mvforce), one round each: a double drop (8 bars in, a fill, one bar down, the drop again, the same round), a fake drop (the build's end falls back
+# into a breakdown, two bars, a build, the real drop), a riddim (halfway, four bars of the drums and the bass alone), no breakdown (one bar of it).
+seed 0
+wait 3000
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 3
+wait 100
+expect fxpage 35
+spin K3 2
+wait 50
+expect fxs98 2
+shot moves_page.png
+tap FX
+wait 200
+# DOUBLE DROP
+mvforce 4
+press GLO
+tapkey 24
+release GLO
+expect djon 1
+waitfor mv 4 6000
+expect djround 0
+waitfor sec 1 30000
+wait 300
+expect djround 0
+waitfor sec 0 5000
+wait 300
+expect mv 0
+expect djround 0
+# the groove again (the same round), then its breakdown, build and drop: a round done; the next one a fake drop
+mvforce 3
+waitfor sec 1 60000
+waitfor sec 2 40000
+waitfor sec 0 30000
+wait 300
+expect djround 1
+# FAKE DROP: the build's end falls straight back into a breakdown, the round not done
+waitfor mv 3 6000
+waitfor sec 1 60000
+waitfor sec 2 40000
+waitfor sec 1 30000
+wait 300
+expect djround 1
+expect mv 0
+# two bars down, a build, the real drop; the next round a riddim
+waitfor sec 2 10000
+mvforce 5
+waitfor sec 0 30000
+wait 300
+expect djround 2
+# RIDDIM: halfway through the groove, the pad, the acid and the pluck out for four bars (the throw going in)
+waitfor mv 5 6000
+waitfor mvm 224 40000
+wait 100
+expect entrkmute 224
+tap HOME
+wait 200
+shot moves_riddim.png
+tap HOME
+wait 200
+waitfor mvm 0 15000
+wait 100
+expect entrkmute 0
+# NO BREAK, the next round: a single bar of breakdown, then the build
+mvforce 1
+waitfor sec 1 60000
+waitfor sec 2 40000
+waitfor sec 0 30000
+waitfor mv 1 6000
+waitfor sec 1 60000
+waitfor sec 2 5000
+# stopped: nothing of the moves left
+mvforce -1
+tap PLAY
+wait 500
+expect mv 0
+expect mvm 0

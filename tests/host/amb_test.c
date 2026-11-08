@@ -568,7 +568,8 @@ int main(void)
         for (trial = 0; trial < 16; trial++) {
             en_init();
             en_play(1);
-            for (s = 0; s < EN_NFXS; s++) {
+            for (s = 0; s < EN_FXS_DJ_MOOD; s++) {   /* (0.16.20: DJ MOVES' settings and after are the UI's, the engine only keeps them: not drawn, so the
+                                                       * tests after this one inherit the random state they always have; two of them lean on it) */
                 int lo = 0, hi = 100;
                 switch (s) {
                 case EN_FXS_GX_LEN: lo = 2; hi = 16; break;
@@ -1750,7 +1751,7 @@ int main(void)
             run(0.02f);
             found = en_chord_root % 12 == 4;
         }
-        for (k = 0, mask = 0; k < en_chord_n; k++)
+        for (k = 0, mask = 0; k < EN_NPAD; k++)  /* (all four voices: a triad doubles one tone, and the third may be in the fourth voice) */
             mask |= 1 << (en_chord[k] % 12);
         CHECK(found, "lofi reaches V within 300 chords");
         CHECK(found && (mask & 1 << 8) && !(mask & 1 << 7), "lofi's V in A minor is E major (pcs %03x)", mask);
@@ -1762,7 +1763,7 @@ int main(void)
             run(0.02f);
             found = en_chord_root % 12 == 4;
         }
-        for (k = 0, mask = 0; k < en_chord_n; k++)
+        for (k = 0, mask = 0; k < EN_NPAD; k++)
             mask |= 1 << (en_chord[k] % 12);
         CHECK(found && (mask & 1 << 7) && !(mask & 1 << 8), "house's v in A minor is E minor (pcs %03x)", mask);
         /* no diminished chords: synthwave in C major walked 400 chords lands on B (vii) rarely, and its leading chord is G, not B */

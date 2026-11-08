@@ -1,0 +1,76 @@
+# THE SET (0.16.22): START SET (SEL + PLAY, or PLAY on the SMART DJ page) begins a SMART DJ set from silence at 00:00:00: the auto-DJ, SMART DJ and
+# its new pieces on, the opening piece chosen for the arc, the tracks coming in over a minute (the SET page's intro is off). The clock runs; at the
+# set's end the close takes the parts out one by one and stops: SET OVER, the clock held, the close's mutes let go. Played on, it does not close
+# again. PLAY on the SMART DJ page starts a new set.
+seed 0
+wait 3000
+expect djon 0
+expect fxs100 0
+# a 30-minute set
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K2 -1
+wait 50
+expect fxs101 1
+shot liveset_page_ready.png
+tap FX
+wait 200
+# START SET: SEL + PLAY
+press SEL
+tap PLAY
+release SEL
+wait 1000
+expect playing 1
+expect djon 1
+expect fxs100 1
+expect smsec <3
+expect introk <50
+waitfor introk 100 70000
+expect smsec >55
+tap HOME
+wait 200
+shot liveset_perform.png
+tap HOME
+wait 200
+# the end of the set: the close, the parts out one by one, then the music stops
+smskip 29
+waitfor ssout >0 30000
+expect ssm 0
+waitfor ssm >0 10000
+shot liveset_close.png
+waitfor ssdone 1 90000
+wait 100
+expect playing 0
+expect smsec >1795
+expect smsec <1900
+wait 3000
+expect smsec <1900
+waitfor ssm 0 6000
+wait 100
+expect entrkmute 0
+# played on: the auto-DJ carries on, no second close
+tap PLAY
+wait 20000
+expect playing 1
+expect ssout 0
+# a new set from the SMART DJ page (PLAY there)
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+tap PLAY
+wait 500
+expect playing 1
+expect smsec <3
+expect ssdone 0
+shot liveset_page_new.png
+tap FX
+wait 200

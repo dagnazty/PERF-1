@@ -1,0 +1,123 @@
+# SMART DJ (0.16.21, a settings page after DJ MOVES): the auto-DJ with an energy arc, ears and manners. A 30-minute ARC set from the first piece:
+# low energy to begin with (the mood leaning down), a groove that breaks when it has gone stale (not on a count), the next piece chosen to mix
+# in (a key near on the circle of fifths); the clock moved to the peak: high energy, less patience; the player playing: it holds back; the
+# auto-DJ off: the arc and its mood gone.
+seed 0
+wait 3000
+expect sme 50
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K1 1
+spin K2 -1
+wait 50
+expect fxs100 1
+expect fxs101 1
+expect fxs102 0
+shot smart_page_off.png
+tap FX
+wait 200
+# the auto-DJ (F5) and its new pieces (G5)
+press GLO
+tapkey 24
+tapkey 26
+release GLO
+expect djon 1
+wait 2000
+expect sme <40
+expect smmin 0
+waitfor smmood <0 15000
+# no hands: the groove grows stale and breaks on a phrase line, its patience long at this energy (a 30-minute set at 75 % pace: 30 bars)
+waitfor sec 1 120000
+expect smpace 75
+expect smbore >55
+# its ears: what the music has, against what it usually has (50 as usual)
+expect smhas >30
+expect smhas <70
+# the breakdown long at this energy, the build, the drop: the piece has had its round; as the groove after it tires, the mix into the
+# next (SMART MIX, 0.16.23: a key near, by the journey), and the new piece in
+waitfor sec 2 90000
+waitfor sec 0 30000
+waitfor tx >0 150000
+expect smdist >-1
+expect smdist <3
+waitfor pieceid >0 60000
+waitfor tx 0 60000
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+shot smart_page_on.png
+tap FX
+wait 200
+# twenty minutes on: the peak of the arc, little patience
+smskip 20
+wait 500
+expect sme >80
+expect smpatience <45
+waitfor smmood >0 20000
+tap HOME
+wait 200
+shot smart_perform.png
+tap HOME
+wait 200
+# the player playing (a tap every 3 s for a minute): the groove never grows stale
+waitfor sec 1 120000
+waitfor sec 0 120000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+tap SEL
+wait 3000
+expect sec 0
+expect smbore <10
+# the auto-DJ off: the arc and its mood gone
+press GLO
+tapkey 24
+release GLO
+wait 500
+expect djon 0
+expect sme 50
+waitfor smmood 0 15000

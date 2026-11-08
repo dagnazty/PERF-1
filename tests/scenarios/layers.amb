@@ -1,0 +1,57 @@
+# LAYERS (0.16.20, DJ MOVES' fourth knob): the groove arranged on its 8-bar phrase lines, a part out for a phrase and back on the next. Busy, no
+# auto-DJ: within a few phrases a part goes out (the engine hears it; the player's own mutes stay untouched); a breakdown brings everything back; the
+# first phrase after a drop plays full; Off: nothing out.
+seed 0
+wait 3000
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 3
+wait 100
+expect fxpage 35
+spin K4 2
+wait 50
+expect fxs99 2
+tap FX
+wait 200
+expect arm 0
+# a part out within a few phrases (16 s a phrase at this tempo, seven in ten taken)
+waitfor arm >0 120000
+wait 100
+expect entrkmute >0
+expect trkmute 0
+tap HOME
+wait 200
+shot layers_perform.png
+tap HOME
+wait 200
+# a breakdown by hand: everything back
+tap SAVE
+waitfor sec 1 5000
+wait 100
+expect arm 0
+expect entrkmute 0
+# the build, and its drop
+tap SAVE
+waitfor sec 2 5000
+waitfor sec 0 20000
+# the drop's first phrase plays full (6 bars of it)
+wait 12000
+expect arm 0
+# off: nothing out, however long
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 3
+wait 100
+expect fxpage 35
+spin K4 -2
+wait 50
+expect fxs99 0
+tap FX
+wait 200
+wait 60000
+expect arm 0
+expect entrkmute 0
