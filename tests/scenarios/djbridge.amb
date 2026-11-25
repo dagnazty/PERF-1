@@ -1,0 +1,35 @@
+# A genuinely chosen wide-tempo bridge through Smart DJ, not txforce.
+seed 0
+wait 3000
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K2 2
+spin K3 2
+wait 50
+expect fxs101 4
+expect fxs102 2
+tap FX
+press SEL
+tap PLAY
+release SEL
+wait 500
+expect djon 1
+djpair 90 178
+waitfor tx 8 350000
+expect txin 0
+expect tempo 90
+waitfor txm 240 30000
+waitfor txin 1 30000
+expect txm 240
+expect tempo >177
+expect tempo <181
+waitfor tx 0 30000
+expect txm 0
+wait 1000
+expect entrkmute 0
+expect tempo 178

@@ -35,6 +35,7 @@
  * at once (store_now: playing, the music hushes around the write); the theme, Tune and MIDI out two
  * seconds after a change. */
 #include "../dsp/fastmath.h"
+#include "dj_plan.h"
 
 /* --------------------------------------------------------------- pages --- */
 enum { V_TEMPO, V_PAD, V_PADENV, V_PADLFO, V_CHORDS, V_PROG, V_DRONE, V_DRENV, V_DRLFO, V_DRBASS, V_ACID, V_ACENV, V_ACLINE, V_ACANS, V_ACSTEP, V_CMEL, V_CMEL2, V_CMVU, V_CMSTEP,
@@ -2500,8 +2501,8 @@ static int sm_break_len(void)                  /* a breakdown's bars by the ener
 }
 /* THE SET (0.16.22): START SET (SEL + PLAY anywhere, or PLAY on the SMART DJ page) begins a set as a DJ would, from silence: the clock at
  * 00:00:00, the auto-DJ, SMART DJ and its new pieces on, everything left from before let go; the bank's piece whose energy suits the arc's opening;
- * the tracks coming in one by one (the SET page's intro, or a minute when it is off). Through the set every new piece glides in from the old tempo
- * (mix_start: 8 bars when Mix is Cut). THE CLOSE: when the set's time is up (not Endless), the next groove bar it stops breaking and moving and the
+ * the tracks coming in one by one (the SET page's intro, or a minute when it is off). Close tempos glide; wide jumps use Smart Mix's bridges.
+ * THE CLOSE: when the set's time is up (not Endless), the next groove bar it stops breaking and moving and the
  * parts leave one by one, two bars apart (the acid, the pluck, the bass, the snare, the kick, the perc, the hats; the pad last, its tails ringing),
  * then the music stops: SET OVER, the clock held. Played on after it, the auto-DJ carries on without closing again. */
 static void sm_clock(uint32_t ms, char *t)      /* hh:mm:ss */
@@ -2553,8 +2554,8 @@ static void sm_outro_bar(void)                  /* the close: a bar of it */
     }
 }
 static void set_piece(int i);
-static int sm_penergy(int tempo, const uint16_t *pat0);
-static int jy_pick(int e, int opening);
+static int sm_penergy(const int16_t *par, const uint16_t *pat);
+static int jy_open(int e);
 static void tx_abort(void);
 static void set_start(void)                     /* START SET */
 {
@@ -2609,7 +2610,7 @@ static void set_start(void)                     /* START SET */
         int o;
         if (en_playing)
             en_play(0);                          /* (from silence, as below; before the genre changes under it) */
-        o = jy_pick(e0, 1);
+        o = jy_open(e0);
         if (o >= 0) {
             if (o / NPIECES != proj.genre)
                 genre_step(o / NPIECES - proj.genre);
@@ -2618,7 +2619,8 @@ static void set_start(void)                     /* START SET */
         bs = 0;
     }
     for (i = 0; i < NPIECES && bs; i++) {        /* the opening: the piece whose energy is nearest what the arc wants first */
-        const int pe = i == proj.piece ? sm_penergy(proj.par[P_TEMPO], (const uint16_t *)en_pats[0]) : sm_penergy(proj.slot[i].par[P_TEMPO], proj.slot[i].pats[0]);
+        const int pe = i == proj.piece ? sm_penergy(proj.par, (const uint16_t *)en_pats[en_pat_now % EN_NPAT]) :
+            sm_penergy(proj.slot[i].par, proj.slot[i].pats[proj.slot[i].par[P_PATTERN] % EN_NPAT]);
         const int sc = (pe > e0 ? pe - e0 : e0 - pe) * 2 + (int)(ar_dice() % 24u) + (jy_was(ui.jprev, proj.genre * NPIECES + i) ? 24 : 0);
         if (sc < bs) {
             bs = sc;
@@ -2757,6 +2759,14 @@ static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n cou
         ui.sm_bore = (uint16_t)(ui.sm_bore - 2u * (uint16_t)news);
     {
         const int aim = ui.dj_n % 8u == 7u && sm_aim(), hold = sm_hold(), brk = 1 + sm_break_len() + en_build_len() + (sm_song() ? 4 : 8);
+        /* Honor the fill's promised breakdown before considering another mix,
+           even when the piece has already finished its configured rounds. */
+        if (ui.sm_go && ui.dj_n % 8u == 0u) {
+            ui.sm_go = 0;
+            if (!en_sec_req)
+                en_section(EN_CMD_BREAK);
+            return;
+        }
         if (!sm_song() && (ui.dj_piece || sl_play()) && ui.dj_round >= DJ_ROUNDS[ui.dj_rounds & 3] && !aim) {   /* (0.16.23) the piece has had its rounds: no more
                                                  * breakdowns (but the peak's); on a phrase line, as it nears staleness (a blend's bars ahead), it mixes into the next
                                                  * (SMART MIX), if the mix and 8 bars after it fit before the close (0.16.24) */
@@ -2774,10 +2784,6 @@ static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n cou
                 en_fill_next();
             if (aim)
                 say("SMART DJ", "AIMING AT THE PEAK");
-            } else if (ui.sm_go && ui.dj_n % 8u == 0u) {
-            ui.sm_go = 0;
-            if (!en_sec_req)
-                en_section(EN_CMD_BREAK);        /* the phrase line: the breakdown */
         }
     }
 }
@@ -2786,22 +2792,21 @@ static int sm_key(const int16_t *par, uint16_t pool)   /* a piece's key as its p
     const int root = par[P_ROOT] % 12, minor = (pool >> 3 & 1u) && !(pool >> 4 & 1u);   /* (a minor third and no major one) */
     return ((minor ? root + 3 : root) % 12) * 7 % 12;
 }
-static int sm_penergy(int tempo, const uint16_t *pat0)   /* a piece's own energy, roughly: its tempo and its first pattern's hits */
+static int sm_penergy(const int16_t *par, const uint16_t *pat)
 {
-    int l, hits = 0;
-    for (l = 0; l < EN_NLANE; l++) {
-        uint32_t m = pat0[l];
-        for (; m; m &= m - 1u)
-            hits++;
-    }
-    hits = hits > 40 ? 40 : hits;
-    tempo = tempo < 70 ? 0 : tempo > 190 ? 120 : tempo - 70;
-    return 50 * tempo / 120 + 50 * hits / 40;
+    const int kick = (dj_hits(pat[0]) * par[P_LANE_LVL(0)] + 50) / 100;
+    const int backbeat = (dj_hits(pat[1]) * par[P_LANE_LVL(1)] + dj_hits(pat[2]) * par[P_LANE_LVL(2)]) / 100;
+    const int hats = (dj_hits(pat[3]) * par[P_LANE_LVL(3)] + dj_hits(pat[4]) * par[P_LANE_LVL(4)]) / 100;
+    const int drums = par[P_PULSE] > 0;
+    const int bass = par[P_BASS] * (par[P_BL_MODE] ? 100 : 60) / 100;
+    const int acid = par[P_ACID] * par[P_AC_DENS] / 100;
+    return dj_energy(drums ? kick : 0, drums ? backbeat : 0, drums ? hats : 0,
+                     bass, acid, drums ? par[P_ACCENT] : 0, par[P_DRIVE]);
 }
 static int sm_pick(void)                        /* the bank's piece that mixes in next */
 {
     const int kc = sm_key(proj.par, proj.pool), tc = proj.par[P_TEMPO];
-    const int pc = sm_penergy(tc, (const uint16_t *)en_pats[0]);
+    const int pc = sm_penergy(proj.par, (const uint16_t *)en_pats[en_pat_now % EN_NPAT]);
     const int want = (sm_target(sm_ahead()) - (int)ui.sm_e) / 2;   /* the energy the next minutes ask for, against now */
     int i, best = -1, bs = 1 << 30, bd = 0;
     for (i = 0; i < NPIECES; i++) {
@@ -2819,7 +2824,7 @@ static int sm_pick(void)                        /* the bank's piece that mixes i
         d = d > 6 ? 12 - d : d;                  /* steps round the circle of fifths: 0 the same key, 1 a neighbour */
         dt = sl->par[P_TEMPO] - tc;
         dt = dt < 0 ? -dt : dt;
-        de = sm_penergy(sl->par[P_TEMPO], sl->pats[0]) - pc - want;
+        de = sm_penergy(sl->par, sl->pats[sl->par[P_PATTERN] % EN_NPAT]) - pc - want;
         de = de < 0 ? -de : de;
         sc = 12 * d + 2 * dt + de + (int)(ar_dice() % 24u);   /* (chance among the near-equal: 2026-11-19, it was 6 and every set went the same way) */
         if (jy_was(ui.jplayed, proj.genre * NPIECES + i))
@@ -2838,24 +2843,10 @@ static int sm_pick(void)                        /* the bank's piece that mixes i
     ui.sm_dist = (int8_t)bd;
     return best;
 }
-/* SMART MIX (0.16.23, its page after SMART DJ): how a SMART DJ set goes from piece to piece, as a DJ mixes. Once a piece has had its rounds (the SET
- * page's; one by default: a groove, a breakdown, a build, the drop) the groove after its drop is played until it nears staleness, then on a phrase line
- * the mix begins: never a breakdown in it. THE JOURNEY (Journey: this genre, near genres, any): the next piece from any genre, by its energy against
- * where the next five minutes of the arc go (each genre has its own place, GEN_E: lofi and trip-hop low, dub and reggae, synthwave and amapiano, disco,
- * funk, house and garage, electro, trap, techno and breaks, dubstep and industrial, DnB and psy, dark forest at the top), its key near on the circle
- * of fifths, its tempo near (the mix glides the rest), two or three pieces in a genre before it moves on, none of the last three; Near keeps to the
- * genres within 25 of this one's energy, so the set travels by steps. Another genre's piece is judged by its recipe, and played as it was left.
- * THE TRANSITIONS (Mixes: auto, blends, cuts, plain; Blend: 8 or 16 bars):
- *   FILTER       the outgoing piece's low end filtered away (the FX filter knob up to a high-pass), the new one in from a closed low-pass, opening
- *   BASS SWAP    the outgoing bass out for the last 8 bars, the new piece without its bass for 8, then the bass back: never two basslines
- *   DRUMS FIRST  the new piece's drums alone for 8 bars, then its music on the phrase
- *   ECHO OUT     an echo throw on the last beat into the new piece (dub, reggae, trip-hop)
- *   LOOP ROLL    the last bar a beat repeat tightening, quarters, eighths, sixteenths, into the new piece (DnB, breaks, dubstep)
- *   SPINBACK     the last half bar spun back (high energy only)
- * Auto takes the blends low in the set and the cuts high, each genre's own (either piece's) four times as likely. The new piece comes in on the bar
- * line, its tempo gliding from the old (mix_start), a new round of its own. A breakdown asked by hand ends a transition where it is. */
-enum { TX_NONE, TX_PLAIN, TX_FILTER, TX_BASS, TX_DRUMS, TX_ECHO, TX_ROLL, TX_SPIN, TX_N };
-static const char *const TX_NAME[TX_N] = {"", "CUT", "FILTER", "BASS SWAP", "DRUMS FIRST", "ECHO OUT", "LOOP ROLL", "SPINBACK"};
+/* SMART MIX: rank piece + transition together, then give the best first moves
+ * a second leg toward the energy arc. Commit only the first move; the next
+ * phrase can account for live edits. The single synth changes piece on the bar. */
+static const char *const TX_NAME[TX_N] = {"", "CUT", "FILTER", "BASS SWAP", "DRUMS FIRST", "ECHO OUT", "LOOP ROLL", "SPINBACK", "HALF-TIME"};
 static const uint32_t TX_FAV[TX_N] = {0, 0,
     MG(2) | MG(0) | MG(10) | MG(7) | MG(17) | MG(13) | MG(8) | MG(16) | MG(14) | MG(19) | MG(20),
     MG(2) | MG(0) | MG(5) | MG(7) | MG(6) | MG(3) | MG(18) | MG(17) | MG(19) | MG(20) | MG(21),
@@ -2867,110 +2858,165 @@ static const uint8_t GEN_E[EN_NGENRE] = {70, 20, 60, 75, 30, 85, 70, 60, 65, 65,
 #ifdef EN_HOST
 int ui_tx_force = -1;                           /* the tests: the transitions as told (TX_*, -1: chosen) */
 #endif
-static void jy_eval(int g, int p, int *tempo, int *key, int *pe)   /* a piece's tempo, key and energy: this genre's as left, another's by its recipe */
+static dj_profile_t jy_profile(const int16_t *par, uint16_t pool, const uint16_t *pat, int g)
 {
-    static int16_t par[P_NPARAMS];
-    static uint16_t pats[EN_NPAT][EN_NLANE];
-    uint16_t pool;
+    dj_profile_t p;
+    /* Don't promise a shared pulse when the kick can change its grid or skip
+       bars. These pieces still get the usual drums-first/echo bridges. */
+    p.kick = par[P_PULSE] && par[P_LANE_LVL(0)] && !par[P_TIME] && !par[P_SLICE] &&
+             !par[P_CHAIN] && !par[P_COND] && par[P_LLEN] == 16 &&
+             par[P_DENS] == 50 && par[P_PROB] == 100 ? pat[0] : 0;
+    p.bpm = (uint8_t)par[P_TEMPO];
+    p.key = (uint8_t)sm_key(par, pool);
+    p.energy = (uint8_t)((3 * sm_penergy(par, pat) + GEN_E[g]) / 4);
+    p.weight = (uint8_t)((2 * par[P_BASS] + par[P_ACID]) / 3);
+    p.bass = par[P_BASS] > 0;
+    p.drums = par[P_PULSE] > 0 && ((pat[0] && par[P_LANE_LVL(0)]) || (pat[1] && par[P_LANE_LVL(1)]) ||
+             (pat[2] && par[P_LANE_LVL(2)]) || (pat[3] && par[P_LANE_LVL(3)]) ||
+             (pat[4] && par[P_LANE_LVL(4)]) || (pat[5] && par[P_LANE_LVL(5)]));
+    return p;
+}
+
+static dj_profile_t jy_eval(int id)
+{
+    const int g = id / NPIECES, p = id % NPIECES;
     if (g == proj.genre && p == proj.piece) {
-        *tempo = proj.par[P_TEMPO];
-        *key = sm_key(proj.par, proj.pool);
-        *pe = sm_penergy(*tempo, (const uint16_t *)en_pats[0]);
-    } else if (g == proj.genre) {
+        uint16_t pat[EN_NLANE];
+        int l;
+        for (l = 0; l < EN_NLANE; l++)
+            pat[l] = en_lane_mask(l, en_lane_src[l], proj.par[P_DENS + l]);
+        {
+            dj_profile_t profile = jy_profile(proj.par, proj.pool, pat, g);
+            if (ui.trk_m & (1u << EN_TR_DRONE))
+                profile.bass = 0;
+            if (ui.trk_m & (1u << EN_TR_KICK))
+                profile.kick = 0;
+            return profile;
+        }
+    }
+    if (g == proj.genre) {
         const slot_t *sl = &proj.slot[p];
-        *tempo = sl->par[P_TEMPO];
-        *key = sm_key(sl->par, sl->pool);
-        *pe = sm_penergy(*tempo, sl->pats[0]);
-    } else {
+        return jy_profile(sl->par, sl->pool, sl->pats[sl->par[P_PATTERN] % EN_NPAT], g);
+    }
+    {
+        int16_t par[P_NPARAMS];
+        uint16_t pats[EN_NPAT][EN_NLANE], pool;
         en_piece_g(g, p, par, &pool);
         en_piece_pats_g(g, p, pats);
-        *tempo = par[P_TEMPO];
-        *key = sm_key(par, pool);
-        *pe = sm_penergy(*tempo, pats[0]);
+        return jy_profile(par, pool, pats[par[P_PATTERN] % EN_NPAT], g);
     }
-    *pe = (*pe + GEN_E[g % EN_NGENRE]) / 2;
 }
-static int jy_pick(int e, int opening)          /* the next piece (genre * 10 + piece), for energy e: -1 none */
+
+static int jy_allowed(int a, int b, int mode)
 {
-    const int mode = ui.fxs[EN_FXS_SX_JOURNEY] % 3u, gc = proj.genre;
-    int tc, kc, pc, g, p, best = -1, bs = 1 << 30, bd = 0, pass;
-    jy_eval(gc, proj.piece, &tc, &kc, &pc);
-    for (pass = 0; pass < 2 && best < 0; pass++) {   /* (a second pass, the set's pieces forgotten, when it has played every one it may go to) */
-    if (pass) {
-        int b;
-        for (b = 0; b < (int)sizeof ui.jplayed; b++)
-            ui.jplayed[b] = 0;
-        jy_mark(gc * NPIECES + proj.piece);
+    return mode == 0 ? a == b : mode == 1 ? dj_abs(GEN_E[b] - GEN_E[a]) <= 25 : 1;
+}
+
+static unsigned tx_favored(int g, int next)
+{
+    const uint32_t genres = MG(g) | MG(next);
+    unsigned mask = 0;
+    int t;
+    for (t = TX_FILTER; t < TX_N; t++)
+        if (TX_FAV[t] & genres)
+            mask |= 1u << t;
+    return mask;
+}
+
+static int jy_open(int e)
+{
+    int i, best = -1, bs = 999;
+    for (i = 0; i < EN_NGENRE * NPIECES; i++) {
+        const dj_profile_t p = jy_eval(i);
+        const int cost = 2 * dj_abs(p.energy - e) + (int)(ar_dice() % 24u) + (jy_was(ui.jprev, i) ? 24 : 0);
+        if (cost < bs) {
+            bs = cost;
+            best = i;
+        }
     }
-    for (g = 0; g < EN_NGENRE; g++) {
-        const int ge = GEN_E[g] - GEN_E[gc];
-        if ((mode == 0 && g != gc) || (mode == 1 && !opening && (ge < -25 || ge > 25)))
-            continue;
-        for (p = 0; p < NPIECES; p++) {
-            const int id = g * NPIECES + p;
-            int t, k, pe, sc, r, d = 0, dt;
-            if (!opening && id == gc * NPIECES + proj.piece)
+    return best;
+}
+
+static int tx_out_bars(int style)
+{
+    return style == TX_FILTER && (ui.fxs[EN_FXS_SX_BLEND] & 1u) && sm_pace() == 100 ? 16 : 8;
+}
+
+static int tx_fits(int style, int bpm)
+{
+    const uint32_t len = sm_len_ms();
+    const int out = tx_out_bars(style);
+    const int in = style == TX_FILTER ? out : style == TX_BASS || style == TX_DRUMS || style == TX_HALF ? 8 : 0;
+    const int entry = dj_handoff_tempo(proj.par[P_TEMPO], bpm, style, en_ext);
+    const int slow = en_ext ? proj.par[P_TEMPO] : dj_min(entry, bpm);
+    /* Reserve the outgoing and incoming durations and time to close even
+       with all tracks audible. A slower piece cannot consume the outro. */
+    return !len || ui.sm_ms + (uint32_t)(out + 1) * sm_bar_ms() +
+                   (uint32_t)(in + 8 + 2 * (EN_NTRACK + 1)) * (240000u / (uint32_t)slow) <= len;
+}
+
+static dj_option_t jy_plan(int e, int later)
+{
+    enum { COUNT = EN_NGENRE * NPIECES };
+    static dj_profile_t profiles[COUNT];          /* small bounded scratch, shared by both legs */
+    static uint8_t eligible[COUNT];
+    const int mode = ui.fxs[EN_FXS_SX_JOURNEY] % 3u, mix = ui.fxs[EN_FXS_SX_MIXES] & 3u, clocked = en_ext;
+    const int gc = proj.genre, cur = gc * NPIECES + proj.piece;
+    dj_option_t beam[DJ_BEAM], routes[DJ_BEAM];
+    int pass, i, j, chosen, upcoming = 0;
+    profiles[cur] = jy_eval(cur);
+    for (i = 0; i < DJ_BEAM; i++)
+        beam[i] = routes[i] = (dj_option_t){-1, 0, TX_NONE};
+    for (pass = 0; pass < 2 && !upcoming; pass++) {
+        for (i = 0; i < COUNT; i++) {
+            const int g = i / NPIECES;
+            int r;
+            eligible[i] = 0;
+            if (i == cur || (mode == 0 && g != gc) || (!pass && jy_was(ui.jplayed, i)))
                 continue;
-            for (r = 0; r < 3 && ui.jrecent[r] != id + 1; r++)
+            for (r = 0; r < 3 && ui.jrecent[r] != i + 1; r++)
                 ;
-            if (r < 3 || jy_was(ui.jplayed, id))
-                continue;                        /* (one of the last three; 2026-11-19: or any this set has played) */
-            jy_eval(g, p, &t, &k, &pe);
-            sc = 2 * (pe > e ? pe - e : e - pe) + (int)(ar_dice() % 24u) + (jy_was(ui.jprev, id) ? 24 : 0);   /* (chance among the near-equal, 24: it was 6
-                                                 * and every set took the same road; the last set's pieces kept away from) */
-            if (!opening) {
-                d = k - kc;
-                d = d < 0 ? -d : d;
-                d = d > 6 ? 12 - d : d;          /* steps round the circle of fifths */
-                dt = t - tc;
-                dt = dt < 0 ? -dt : dt;
-                sc += 12 * d + (dt > 6 ? 2 * (dt - 6) : 0);
-                if (g == gc)
-                    sc += ui.gn_run >= 3 ? 25 : ui.gn_run <= 1 ? -15 : 0;   /* two or three in a genre, then on */
-            }
-            if (sc < bs) {
-                bs = sc;
-                best = id;
-                bd = d;
+            if (r < 3)
+                continue;
+            eligible[i] = 1;
+            profiles[i] = jy_eval(i);
+            if (jy_allowed(gc, g, mode)) {
+                const dj_edge_t edge = dj_edge(profiles[cur], profiles[i], mix, clocked, ui.tx_last, ui.sm_e, tx_favored(gc, g));
+                const int genre = g == gc ? ui.gn_run >= 3 ? 25 : ui.gn_run <= 1 ? -15 : 0 : 0;
+                upcoming++;
+                if (tx_fits(edge.style, profiles[i].bpm))
+                    dj_offer(beam, (dj_option_t){i, edge.cost + 2 * dj_abs(profiles[i].energy - e) + genre +
+                                                 (jy_was(ui.jprev, i) ? 24 : 0), edge.style});
             }
         }
     }
+    for (i = 0; i < DJ_BEAM && beam[i].id >= 0; i++) {
+        const int id = beam[i].id, g = id / NPIECES;
+        int exit = -1;
+        for (j = 0; j < COUNT; j++) {
+            const int to = j / NPIECES;
+            int cost;
+            if (!eligible[j] || j == id || !jy_allowed(g, to, mode))
+                continue;
+            cost = dj_edge(profiles[id], profiles[j], mix, clocked, beam[i].style, e, tx_favored(g, to)).cost +
+                   2 * dj_abs(profiles[j].energy - later) + (jy_was(ui.jprev, j) ? 12 : 0);
+            if (exit < 0 || cost < exit)
+                exit = cost;
+        }
+        dj_offer(routes, (dj_option_t){id, dj_route_cost(beam[i].cost, exit), beam[i].style});
     }
-    if (best >= 0 && !opening)
-        ui.sm_dist = (int8_t)bd;
-    return best;
-}
-static int tx_pick(int g_in)                    /* how to mix into a piece of genre g_in */
-{
-    const int mode = ui.fxs[EN_FXS_SX_MIXES] & 3u, e = ui.sm_e;
-    uint8_t w[TX_N];
-    int t, tot = 0, pick;
-#ifdef EN_HOST
-    if (ui_tx_force >= 0)
-        return ui_tx_force % TX_N;
-#endif
-    if (mode == 3)
-        return TX_PLAIN;
-    for (t = TX_FILTER; t < TX_N; t++) {
-        const int blend = t <= TX_DRUMS, own = (TX_FAV[t] >> (proj.genre % 32u) & 1u) || (TX_FAV[t] >> (g_in % 32) & 1u);
-        int x = own ? 4 : 1;
-        if ((mode == 1 && !blend) || (mode == 2 && blend))
-            x = 0;
-        else if (mode == 0)
-            x *= blend ? (e < 60 ? 3 : 1) : t == TX_SPIN ? (e >= 70 ? 2 : 0) : e >= 70 ? 3 : e >= 50 || (own && t == TX_ECHO) ? 1 : 0;
-        if (t == ui.tx_last && x > 1)
-            x = 1;                               /* (the same twice running: rarely) */
-        if (t == TX_BASS && !ar_audible(EN_TR_DRONE))
-            x = 0;
-        w[t] = (uint8_t)x;
-        tot += x;
+    chosen = dj_choose(routes, ar_dice());
+    if (chosen < 0)
+        return (dj_option_t){-1, 0, TX_NONE};
+    if (pass > 1) {                               /* restart the set's played pool, still excluding the last three */
+        for (i = 0; i < (int)sizeof ui.jplayed; i++)
+            ui.jplayed[i] = 0;
+        jy_mark(cur);
     }
-    if (!tot)
-        return TX_PLAIN;
-    for (pick = (int)(ar_dice() % (uint32_t)tot), t = TX_FILTER; t < TX_N - 1 && pick >= w[t]; t++)
-        pick -= w[t];
-    return t;
+    ui.sm_dist = (int8_t)dj_key_dist(profiles[cur].key, profiles[routes[chosen].id].key);
+    return routes[chosen];
 }
+
 static void tx_glide(int k, int v)              /* an FX knob there, eased (glide_tick) */
 {
     ui.glide_t[k] = (int8_t)v;
@@ -2990,26 +3036,38 @@ static void tx_title(int id, char *u)           /* "HOUSE 05" */
 }
 static void tx_start(void)                      /* the mix begins, on a phrase line */
 {
-    int nx;
+    const int cur = proj.genre * NPIECES + proj.piece;
+    const int sl = sl_play() ? sl_step(ui.sl_pos, 1) : -1;
+    const uint32_t len = sm_len_ms(), ahead = sm_ahead(), then = ahead + 120000u;
+    dj_option_t move;
+    dj_profile_t next;
+    int nx, style;
     char u[16], h[20];
     if (sm_song())
         return;
-    if (sl_play()) {                             /* the set list's next slot: its order, SMART MIX's way of getting there */
-        const int sl = sl_step(ui.sl_pos, 1);
-        if (sl < 0)
-            return;
-        ui.tx_sl = (uint8_t)(sl + 1);
+    if (sl >= 0) {                              /* explicit set list keeps its order */
         nx = glob.sl[sl] - 1;
+        next = jy_eval(nx);
+        style = dj_edge(jy_eval(cur), next, ui.fxs[EN_FXS_SX_MIXES] & 3u, en_ext, ui.tx_last,
+                        ui.sm_e, tx_favored(proj.genre, nx / NPIECES)).style;
     } else {
-        nx = jy_pick(sm_target(sm_ahead()), 0);   /* (0.16.24: a sixth of a short set ahead; near the end, the end's) */
-        if (nx < 0)
-            nx = proj.genre * NPIECES + (proj.piece + 1) % NPIECES;
-        ui.tx_sl = 0;
+        move = jy_plan(sm_target(ahead), sm_target(len && then > len ? len : then));
+        if (move.id < 0)
+            return;
+        nx = move.id;
+        style = move.style;
+        next = jy_eval(nx);
     }
+#ifdef EN_HOST
+    if (ui_tx_force > TX_NONE && ui_tx_force < TX_N)
+        style = ui_tx_force;
+#endif
+    if (!tx_fits(style, next.bpm))
+        return;
+    ui.tx_sl = (uint8_t)(sl + 1);
     ui.tx_next = (uint8_t)(nx + 1);
-    ui.tx = (uint8_t)tx_pick(nx / NPIECES);
-    ui.tx_last = ui.tx;
-    ui.tx_out = (uint8_t)(ui.tx == TX_FILTER ? ((ui.fxs[EN_FXS_SX_BLEND] & 1u) && sm_pace() == 100 ? 16 : 8) : 8);   /* (a short set: 8 always) */
+    ui.tx = ui.tx_last = (uint8_t)style;
+    ui.tx_out = (uint8_t)tx_out_bars(style);
     ui.tx_bar = ui.tx_in = ui.tx_k = ui.tx_q = 0;
     ui.mv = MV_NONE;
     tx_title(nx, u);
@@ -3035,6 +3093,10 @@ static void tx_bar_step(void)                   /* a groove bar of the mix */
             ui.tx_m |= (uint8_t)(1u << EN_TR_DRONE);
             trk_send();
             say("BASS SWAP", "BASS OUT");
+        }
+        if (ui.tx == TX_HALF && ui.tx_bar + 1u >= ui.tx_out && !ui.tx_m) {
+            ui.tx_m = (uint8_t)(1u << EN_TR_DRONE | 1u << EN_TR_ACID | 1u << EN_TR_PAD | 1u << EN_TR_PLUCK);
+            trk_send();                         /* leave the shared drum pulse for the handoff */
         }
         if (ui.tx_bar >= ui.tx_out && !ui.tx_q) {   /* the last bar: the new piece on its last step */
             ui.tx_q = 1;
@@ -3089,6 +3151,7 @@ static void tx_swapped(int old)                 /* the new piece is in (on the b
         ui.tx_m = (uint8_t)(1u << EN_TR_DRONE);
         ui.tx_in = 8;
         break;
+    case TX_HALF:
     case TX_DRUMS:
         ui.tx_m = (uint8_t)(1u << EN_TR_DRONE | 1u << EN_TR_ACID | 1u << EN_TR_PAD | 1u << EN_TR_PLUCK);
         ui.tx_in = 8;
@@ -5086,7 +5149,7 @@ static void input(void)
         ui.sl_q = 0;
         sl_go(s);
         if (pl)
-            mix_start(t0);
+            mix_start(ui.tx_q ? dj_handoff_tempo(t0, proj.par[P_TEMPO], ui.tx, en_ext) : t0);
         if (ui.tx_q)
             tx_swapped(old);
     }
@@ -5099,7 +5162,7 @@ static void input(void)
             set_piece(pc);
         jy_mark(proj.genre * NPIECES + proj.piece);
         if (pl)
-            mix_start(t0);
+            mix_start(ui.tx_q ? dj_handoff_tempo(t0, proj.par[P_TEMPO], ui.tx, en_ext) : t0);
         if (ui.tx_q)
             tx_swapped(old);
     }
