@@ -1,0 +1,36 @@
+  ok fxpage == 36
+  ok fxs101 == 4
+  ok fxs102 == 2
+  ok fxpage == 37
+  ok fxs104 == 2
+  ok djon == 1
+  ok tx == 2
+  ok txin == 0
+  ok fxk0 == 16 (>5)
+  ok fxpage == 37
+  ok txin == 1
+  ok fxk0 == -43 (<0)
+  ok tx == 0
+  ok fxk0 == 0
+  ok gnrun == 1 (>0)
+  ok tx == 3
+  ok txm == 16
+  ok entrkmute == 16
+  ok txin == 1
+  ok txm == 16
+  ok tx == 0
+  ok txm == 0
+  ok entrkmute == 0
+  ok tx == 4
+  ok txin == 1
+  ok txm == 240
+  ok entrkmute == 240
+  ok tx == 0
+  ok entrkmute == 0
+  ok tx == 6
+  ok fxbit1 == 1
+  ok tx == 0
+  ok fxbit1 == 0
+  ok tx == 0
+  ok txm == 0
+host: 380096 ms simulated, 22017 blits, render 1.0% of real time (host CPU)

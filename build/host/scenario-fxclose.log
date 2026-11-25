@@ -1,0 +1,7 @@
+  ok fxpage == 0
+  ok fxpage == -1
+  ok fxpage == 0
+  ok fxbank == 0
+  ok fxpage == 0
+  ok saved == 1
+host: 3588 ms simulated, 222 blits, render 0.7% of real time (host CPU)

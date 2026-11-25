@@ -1,0 +1,11 @@
+  ok playing == 1
+  ok fxpage == 25
+  ok mix == 1
+  ok tempo == 108
+  ok piece == 1
+  ok mixbars == 4
+  ok tempo == 111 (>108)
+  ok tempo == 111 (<116)
+  ok mixbars == 0
+  ok tempo == 124
+host: 16375 ms simulated, 1022 blits, render 0.8% of real time (host CPU)

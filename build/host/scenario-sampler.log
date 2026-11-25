@@ -1,0 +1,8 @@
+  ok fxbank == 3
+  ok smp == 1
+  ok smp == 2
+  ok smp == 0
+  ok fxpage == 20
+  ok smp == 1
+  ok smp == 0
+host: 8889 ms simulated, 444 blits, render 0.9% of real time (host CPU)

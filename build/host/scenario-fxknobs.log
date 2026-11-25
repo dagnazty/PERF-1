@@ -1,0 +1,4 @@
+  ok fxk2 == 60
+  ok fxs0 == 16
+  ok fxk3 == 70
+host: 33570 ms simulated, 1187 blits, render 0.8% of real time (host CPU)

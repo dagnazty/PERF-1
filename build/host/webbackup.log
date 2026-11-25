@@ -1,0 +1,21 @@
+  ok   the firmware's frame parses
+  ok   a damaged frame does not
+  ok   a short frame does not
+  ok   a chunk is F0 7D 50 42 03 .. F7, all 7-bit between
+  ok   a chunk of 256 is 12 + 512 + 1 bytes longer than F0 .. F7's two
+  ok   its n, idx and len
+  ok   its bytes come out
+  ok   its checksum (the data bytes plus it add up to 0 modulo 128)
+  ok   the short messages
+  ok   an answer
+  ok   the objects: 27, no panel, none twice
+  ok   their names
+  ok   a backup file comes back as it went
+  ok   a damaged file is refused
+  ok   a file that is not a backup is refused
+  ok   a map is 152 bytes, MAP1, its count
+  ok   an entry: channel, CC, how it counts; the number; the control
+  ok   it comes back as it went (MASTER aside)
+  ok   48 at most
+  ok   not a map: null
+web backup: ok

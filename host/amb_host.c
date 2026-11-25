@@ -24,6 +24,7 @@
  *   seamless 0/1                 a store without the fade (the sliced erase)
  *   mvforce N                    the auto-DJ's rounds play genre move N (ui.c MV_*), -1 the dice
  *   smskip MIN                   SMART DJ's set clock on by MIN minutes
+ *   usbrec 0/1                   a computer recording the USB audio (automatic flash writes wait while the music plays)
  *   txforce N                    SMART MIX's transitions as N (ui.c TX_*), -1 chosen
  *   battery N                    the battery divider's reading, 0..1023 (default: none)
  *   storefuzz SEED               fill the project object with random damage (for the sanitizer runs)
@@ -156,6 +157,16 @@ void plat_usb_host(int on)
     host_uh_want = on;
 }
 void plat_usb_host_diag(char *b) { b[0] = 0; }
+void plat_usb_host_vb(char *b) { b[0] = 0; }
+static int host_usb_rec;                         /* (2026-11-09) a recording over USB, as the script says (usbrec) */
+int plat_usb_recording(void) { return host_usb_rec; }
+static int host_usb_audio, host_usb_reconnects;     /* (0.16.25) the USB audio's layout as last asked, and how many times the port was let go for it */
+void plat_usb_audio(int mode)
+{
+    if (mode != host_usb_audio)
+        host_usb_reconnects++;
+    host_usb_audio = mode;
+}
 int plat_usb_host_state(void) { return host_uh_want; }
 int plat_usb_host_msg(void)
 {
@@ -653,6 +664,20 @@ static int expect(const char *what, const char *val)
         got = ui.sm_mood;
     else if (!strcmp(what, "smdist"))
         got = ui.sm_dist;
+    else if (!strcmp(what, "jplayed") || !strcmp(what, "jovl")) {   /* (2026-11-19) the pieces this set has played; of them, the ones the last set played too */
+        int b, k;
+        got = 0;
+        for (b = 0; b < (int)sizeof ui.jplayed; b++)
+            for (k = 0; k < 8; k++)
+                got += (ui.jplayed[b] >> k & 1) && (what[1] == 'p' || (ui.jprev[b] >> k & 1));
+    } else if (!strcmp(what, "smpkp"))
+        got = ui.sm_pkp;
+    else if (!strcmp(what, "usbaudio"))           /* (0.16.25) the USB audio's layout as stored, as last sent to the port, and the reconnects for it */
+        got = glob.sl_rsv[2];
+    else if (!strcmp(what, "usbaudioport"))
+        got = host_usb_audio;
+    else if (!strcmp(what, "usbreconnects"))
+        got = host_usb_reconnects;
     else if (!strcmp(what, "smsec"))              /* (0.16.22) THE SET: its clock in seconds; the close's bars (0: not closing); over; the close's mutes */
         got = (int)(ui.sm_ms / 1000u);
     else if (!strcmp(what, "ssout"))
@@ -1119,6 +1144,8 @@ int main(int argc, char **argv)
                 store[OBJ_PROJ][13] = 0;
         } else if (!strcmp(cmd, "usbpower")) {       /* usbpower 0/1: a USB host powers the unit (a bolt in the battery) */
             host_usb = atoi(a);
+        } else if (!strcmp(cmd, "usbrec")) {         /* usbrec 0/1 (2026-11-09): a computer recording the USB audio, or not */
+            host_usb_rec = atoi(a);
         } else if (!strcmp(cmd, "smskip")) {         /* smskip MIN (0.16.21): SMART DJ's set clock on by MIN minutes (its arc, without the hour) */
             ui.sm_ms += (uint32_t)atoi(a) * 60000u;
         } else if (!strcmp(cmd, "txforce")) {        /* txforce N (0.16.23): SMART MIX's transitions as N (ui.c TX_*: 1 cut, 2 filter, 3 bass swap, 4 drums first,

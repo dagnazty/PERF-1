@@ -1,0 +1,11 @@
+  ok fxpage == 27
+  ok fxs74 == 0
+  ok fxs75 == 0
+  ok fxs76 == 0
+  ok fxs74 == 4
+  ok fxs75 == 1
+  ok fxs76 == 2
+  ok fxs74 == 4
+  ok fxs75 == 1
+  ok fxs76 == 2
+host: 15287 ms simulated, 746 blits, render 0.7% of real time (host CPU)

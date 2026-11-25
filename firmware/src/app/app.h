@@ -54,6 +54,7 @@ int project_pending(void);               /* the bank has changes not yet in flas
 int project_flush(void);                 /* and into flash (call while stopped): 0 = written */
 int project_pending_globals(void);       /* the theme, Tune or MIDI out changed, not yet in flash */
 int project_flush_globals(void);         /* those alone into flash (while playing too): 0 = written */
+int project_usb_audio(void);             /* (0.16.25) the USB audio's layout as it was left: 0 Mix, 1 Parts, 2 Parts 2, 3 Parts 3, 4 Set (the global record's) */
 
 void ui_init(void);
 int ui_restore_valid(uint32_t obj, const uint8_t *b, uint32_t len);   /* a backup's object, as its loader would take it (1) */

@@ -38,6 +38,8 @@ static inline int32_t clamp(int32_t v, int32_t lo, int32_t hi) { return v < lo ?
 #define EN_UAC 1                  /* USB audio input: the master output, recordable over the cable */
 #endif
 #define FELUCCA_UAC EN_UAC
+#define UA_RING1_SEC __attribute__((section(".noinit.uac")))   /* (0.16.25) the stems' rings (4 KB each) outside the 96 KB RAM: NOINIT, and RAMTEXT after */
+#define UA_RING2_SEC __attribute__((section(".rt_bss.uac")))   /* CPU1's stacks (app.ld) */
 #ifndef FELUCCA_ID
 #define FELUCCA_ID "FM-1_700"     /* package identity (tools/build.py) */
 #endif

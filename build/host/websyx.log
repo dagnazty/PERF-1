@@ -1,0 +1,13 @@
+  ok   a bank is 4104 bytes
+  ok   32 voices found in a bank
+  ok   the names: VOICE 01 .. VOICE 32
+  ok   each voice is its 128 bytes
+  ok   a bare 4096-byte bank is read too
+  ok   a single voice is 163 bytes
+  ok   a single voice: its name, its bytes kept whole
+  ok   a bank then a single voice: 33 voices
+  ok   nothing found in noise
+  ok   the message for the firmware: F0 7D 50 56, slot, 128 bytes, a checksum, F7 (135 bytes)
+  ok   its checksum: (sum + checksum) & 0x7F == 0, as the firmware checks
+  ok   every byte between F0 and F7 is 7-bit clean
+web syx: ok

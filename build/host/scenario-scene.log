@@ -1,0 +1,17 @@
+  ok scenes == 0
+  ok trkmute == 0
+  ok trkmute == 3
+  ok fxk1 == 40
+  ok fxk0 == -20
+  ok scenes == 2
+  ok trkmute == 0
+  ok fxk1 == 0
+  ok fxk0 == 0
+  ok sceneq == 0
+  ok trkmute == 3
+  ok fxk1 == 40
+  ok fxk0 == -20
+  ok trkmute == 3
+  ok scenes == 2
+  ok trkmute == 1
+host: 13198 ms simulated, 591 blits, render 0.8% of real time (host CPU)

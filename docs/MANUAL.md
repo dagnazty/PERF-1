@@ -60,7 +60,7 @@ Only a few. The rest can wait.
 
 **4. Turn PRESETS one click.** A new piece starts: a new key, a new tempo, new sounds. There are ten pieces in each style.
 
-**5. Hold GLO and turn PRESETS.** Now you are changing the style itself. There are nineteen: techno, lofi, house, dubstep, dub, drum and bass, breaks, garage, electro, trap, disco, funk, reggae, synthwave, amapiano, trip-hop, industrial, psytrance and dark forest. Let go of GLO when you find one you like.
+**5. Hold GLO and turn PRESETS.** Now you are changing the style itself. There are twenty-two: hypnotic techno, lofi, house, dubstep, dub, drum and bass, breaks, garage, electro, trap, disco, funk, reggae, synthwave, amapiano, trip-hop, industrial, psytrance, dark forest, techno, Detroit techno and hard techno. Let go of GLO when you find one you like.
 
 ### Make it move
 
@@ -128,7 +128,7 @@ You don't need any of this to have fun, but it is there.
 | Word | Means |
 |---|---|
 | **Piece** | One song: its key, tempo, sounds and drum patterns. Ten in each style. |
-| **Genre** | A style of music, with its own drums, sounds and habits. Nineteen of them. |
+| **Genre** | A style of music, with its own drums, sounds and habits. Twenty-two of them. |
 | **Pad** | The soft, long chords in the background. |
 | **Bass** | The low notes. |
 | **Acid** | The squelchy, twisting line, after the classic Roland TB-303. |
@@ -438,8 +438,8 @@ columns are **KNOB1** to **KNOB4**.
 | Acid answer | **ARP** x4 | Answer (off, octave, fifth, third, mirror, reverse, rotate, sparse, accents) | Every (the 2nd to the 8th time round the line, or Drift: the bar before the drums change) | Direction (down 2, down, same, up, up 2) | Sync (bar, or the whole loop) |
 | Acid steps | **ARP** x5 | Step (pick one with a white key: rest, note, accent, slide, accent + slide) | Note (0-11 scale steps above the chord) | Octave (0-3) | Frozen (free, frozen) |
 | Pluck | **ARP** x6 | Level | Sound (12 + 30 DX7 + yours) | Density | Octave (-2 to +2) |
-| Pluck 2 | **ARP** x7 | Decay | Style (up, down, up-down, random, skip, thirds) | Rate (1/4, 3/16, 1/8, 1/16, slow to fast) | Range (1-3 octaves) |
-| Deja vu | **ARP** x8 | Pluck vu (0 always new notes, 100 locked) | Loop (4, 8, 16, 32 notes) | Leaps (notes jumping an octave) | Motif (0 off to 100: how often a bar reworks the phrase's first bar) |
+| Pluck 2 | **ARP** x7 | Decay | Style (up, down, up-down, random, skip, thirds, call, long, run, riff) | Rate (1/4, 3/16, 1/8, 1/16, slow to fast) | Range (1-3 octaves) |
+| Deja vu | **ARP** x8 | Pluck vu (0 always new notes, 100 locked) | Loop (4, 8, 16, 32 notes) | Leaps (notes jumping an octave) | Motif (0 to 100: how often a bar reworks the piece's theme) |
 | Pluck steps | **ARP** x9 | Step (pick a step with a white key: rest, soft, note, accent) | Note (1-12: the chord's notes, low to high) | Octave (the pluck's, -2 to +2) | Frozen (free, frozen) |
 | Drums | **SEQ** | Level | Drive | Swing (50-75 %) | Pattern (1-6, changes on the bar) |
 | Links | **SEQ** x2 | K>Bass | S>Pad | H>Acid | P>Clock (off, clock) |
@@ -630,7 +630,9 @@ genre takes over again, with your slots kept for later. The progression is store
 
 ![Storing a piece on Global](img/perf-screen-store.png)
 
-PERF-1 has nineteen **genres**. Each is a bank of ten **pieces**, ready-made songs to play and change.
+PERF-1 has twenty-two **genres**. Each is a bank of ten **pieces**, ready-made songs to play and change.
+
+Each genre also plays its melody its own way: how busy the pluck is, how long its notes ring, how far it ranges and leaps, how often it repeats its idea, and how the lead slides and accents. Synthwave's pluck is a non-stop sixteenth arpeggio under a singing lead; industrial's strikes metal in a repeating figure under a hard, relentless sequence; trap's is a bell figure up high; dub's and reggae's are a few long notes. These are ordinary settings on the Pluck and Acid pages, so you can change them and store the piece.
 
 - Turn **PRESETS** for another piece in the bank. It goes from 01 to 10 and wraps round.
 - Hold **GLO** and turn **PRESETS** for another bank (it wraps round too), or use the Genre knob on the Global
@@ -666,6 +668,9 @@ a made-up title, such as `VELVET RAIN`, the same one every time.
 | INDUS | I01-I10 | 118-145 | Industrial techno, EBM and industrial breakbeat. Driven, harsh drums tuned against each other (the snare a tritone up, the perc a semitone off), the Hard kit with the Break kit's chops in some pieces, broken and off-beat kicks, an EBM stomp, perc in threes against the beat. Phrygian and minor, suspended and fourths chords, a grinding bass, metal and bell sounds, a gated reverb and hard tape. Fills roll on the off-beats and in triplets. |
 | PSY | Y01-Y10 | 92-146 | Psytrance: progressive, full-on and goa (132-146), the kick on every beat with the rolling bass between (K-B-B-B), soft 16th hats, the open hat off the beat, the acid as the squelching lead, a dotted (3/16) echo, phrygian and minor, a chord held for 8 bars. Y01, Y02 and Y10 are psy-ambient and psychill (92-112): a downtempo beat, a held bass, a wide shimmer reverb. With the set list and the SET page's Mix you can go from the cosmic into the trance and back. |
 | FOREST | O01-O10 | 148-165 | Dark forest and dark psy: the same rolling bass under every-16th hats and a glitching percussion in threes against the four, hat rolls, triplets, the Hard kit, phrygian and fourths, the chord barely moving. |
+| TECHNO | K01-K10 | 128-138 | Peak-time techno: the kick on every beat with a rumble between, the open hat off the beat, 16th hats, a short stab or bleep going round in place of a melody, sus and fourths chords held eight bars, a 3/16 echo, the pump. The kick drops out before every eighth bar. |
+| DETROIT | M01-M10 | 122-132 | Detroit techno: the 909 with a little shuffle, minor 7ths and 9ths stabbed on strings and poly pads, an FM or pulse bass figure, an electric piano or bell line, warm and roomy. |
+| HARD | X01-X10 | 145-160 | Hard techno: the Hard kick driven and accented, the bass on the off-beats or galloping, rave stabs, a screaming accented acid, hat rolls, phrygian, the tape driven and the pump on. |
 
 The sections follow each genre's habits too. House, dubstep, DnB, trap, disco and synthwave cut everything for the
 last beat before the drop. Lofi, dub, reggae, amapiano and trip-hop build on the perc instead of a snare roll. Breaks
@@ -823,6 +828,18 @@ sixteenths either side of the "and". So "and-of-2" is halfway between beats 2 an
 | Big beat | 1, e-of-2, 3, 4 |
 | Dub | 1, 3, and-of-3 |
 | Gallop | Three sixteenths a beat |
+| Deep | 1, a-of-1, and-of-2, and-of-3, and-of-4, touching the fifth and the octave (deep house) |
+| Jack | The off-beats with an octave pickup on the a-of-2 (house) |
+| Bounce | 1, a-of-1, 3, a-of-3: root and octave, root and fifth (garage's organ bass) |
+| Log roll | Every third sixteenth, 3-3-3-3-4 (amapiano) |
+| Log skip | 1, a-of-1, and-of-2, and-of-3, and the last sixteenth up an octave into the next bar (amapiano) |
+| Roller | 1, a-of-1, and-of-2, and-of-3, 4 (a rolling drum and bass line) |
+| Stepper | 1, then 3, and-of-3, a-of-3 climbing: the answer to the snare (drum and bass) |
+| Tresillo | 3-3-2 twice a bar, each note a new wobble (dubstep) |
+| 808 run | 1, a-of-1, a-of-2, e-of-4: the 808 off the kick, with its glide (trap) |
+| Rave | 1, and-of-1, and-of-2, e-of-3, a-of-3 (breaks) |
+
+House, dubstep, drum and bass, breaks, garage, trap and amapiano pieces take three of these lines in turn (piece 1, 4, 7, 10 the first; 2, 5, 8 the second; 3, 6, 9 the third), so the pieces of a genre don't all share one bass line.
 
 The named figures work in any genre. Each is a rhythm with up to four notes, so it sounds the same every bar.
 "The fifth" is the fifth above the root when the chord has one. A 9th, Dub or
@@ -912,7 +929,7 @@ It sits under the other parts by default (Level 50, Density 45). Turn Level to 0
 
 | Setting | Does |
 |---|---|
-| Style | The order of the notes: up, down, up-down, random, skip (every second chord note), or thirds |
+| Style | How the line is made. Six arpeggios, which set the order of the notes: up, down, up-down, random, skip (every second chord note), thirds. Four written themes: **Call** (a few notes and a rest, then an answer that comes back down), **Long** (four bars of a note or two each, ringing 2.2 times as long), **Run** (a bar up the scale and a bar back, with the scale's notes between the chord's), **Riff** (one syncopated bar on two or three notes, repeated) |
 | Rate | How fast: 1/4, 3/16 (a dotted eighth), 1/8 or 1/16 |
 | Range | How many octaves the arpeggio spans, 1-3 |
 | Decay | How long a note rings. For the DX sounds it sets how long the key is held down (0.12 s to 1.7 s), and the note fades out a while after the key comes up. |
@@ -1013,17 +1030,29 @@ phrases come back.
 | Pluck vu | Each time a note comes round again, the chance it's the same note, rest or leap as last time. 0: every note is new. 100: the loop is locked and repeats exactly. |
 | Loop | How many notes it remembers: 4, 8, 16 or 32 |
 | Leaps | How often a new note jumps an octave |
-| Motif | How often a bar develops the phrase's opening idea (0 off, 100 always; 60 by default) |
+| Motif | How often a bar develops the piece's theme between its statements (0 never, 100 always; 60 by default) |
 
 A locked phrase is always played over the chord of the moment, so it follows the harmony. Changing the Loop length,
 or starting a new piece, forgets the loop.
 
-**Motif** makes the pluck think in phrases. The first bar of every eight is kept as an idea: which sixteenths played
-and how far each note stepped up or down the chord from the one before. Each bar after it then develops the idea,
-as often as the knob says. It plays the same shape starting from wherever the line is (so it follows the chords),
-sometimes upside down, or with a new last step. The fifth bar plays the idea again at its first pitch, as an answer
-to the first bar. Most phrases start a new idea. Some open with the old one again. At 0, the pluck
-makes up every bar fresh. Deja vu wins over Motif: a note that Deja vu replays is replayed whatever the motif says.
+**The theme.** Every piece has a hook: a theme the pluck keeps for as long as the piece plays. A theme is one, two
+or four bars: which sixteenths play, and how far each note steps up or down from the one before. With an arpeggio
+Style, the theme is whatever the first bar or two of the piece played. With Call, Long, Run or Riff, PERF-1 writes
+one, on the Rate's grid and as full as Density says.
+
+The theme opens every phrase of eight bars and comes back at its first pitch after the half. A piece has a second
+theme too, which takes the third phrase of every four, so 32 bars go A A B A. In a breakdown the theme all but
+disappears (about three notes in ten sound), and the drop brings the first theme back from its first bar.
+
+**Motif** is how often the bars between the statements develop the theme: the same shape from wherever the line
+is (so it follows the chords), sometimes upside down, or with a new last step. With an arpeggio Style, a bar that
+doesn't develop the theme is made up fresh, and at 0 every bar is. With a written Style, a bar that doesn't
+develop it plays it as it is; a Riff only ever changes its ending, each fourth bar.
+
+A new piece, a regrow, or another Style writes new themes. With a written Style, so does turning Rate or Density.
+Themes aren't saved with a piece: load it again and it gets a new hook. Deja vu wins over the theme: a note that
+Deja vu replays is replayed whatever the theme says. Each genre's ten pieces use three Styles in turn, and most
+genres now have one or two written ones among them.
 
 The acid has its own version of this, **Mutate** on the Acid line page, which rewrites a few steps each time round.
 Hold **SEL** and turn the Mutate knob on that page to choose what a rewrite changes:
@@ -1484,12 +1513,12 @@ The four knobs, **KNOB1** to **KNOB4**, set the four settings on each page:
 | Auto DJ (runs the sections for you; section 10) | Scenes: at once, next bar | Groove: 8, 16, 32, 64 bars, sync | Break: short, half, full | Fill: off, on |
 | Auto FX (effects played by themselves; section 10) | Auto FX: off, gentle, medium, wild | Every: 4, 8, 16, 32 bars | Length: a beat, half bar, a bar, 2 bars | Pick: genre, any |
 | DJ moves (the mood, scenes, genre moves and layers; section 10) | Mood: off, gentle, deep | Scenes: off, follow | Moves: off, some, lots | Layers: off, light, busy |
-| Smart DJ (the auto-DJ plans the set; section 10) | Smart: off, on | Set: 15, 30, 60, 90 min, endless | Shape: arc, climb, peak, chill | Yield: off, on |
+| Smart DJ (the auto-DJ plans the set; section 10) | Smart: off, on | Length: 15, 30, 60, 90 min, endless; Song 3, 4, 5, 6, 8 min | Shape: arc, climb, peak, chill | Yield: off, on |
 | Smart mix (piece to piece, genre to genre; section 10) | Journey: genre, near, any | Mixes: auto, blends, cuts, plain | Blend: 8, 16 bars | - |
 | SET (shapes a longer DJ set; section 10) | Rounds: 1, 2, 4, 8 | Ramp: off, +2, +4, +8, +12 BPM | Intro: off, 1, 2, 4, 8 min | Mix: cut, 4, 8, 16, 32 bars |
 | Settings | Key: same, +2, +3, +5, +7 | Voices: DX, DY | - | - |
-| USB & MIDI | Level: knob, fixed | MIDI out: off, on | MIDI map: GM, M:Samples, MPC Sample, SP-404 | - |
-| MIDI IN | Notes: scale, pads, M:S, MPK | Channel: all, 1-16 | USB host: off, on (never kept) | Knob CCs: off, in, out, in+out |
+| USB & MIDI | Level: knob, fixed | MIDI out: off, on | MIDI map: GM, M:Samples, MPC Sample, SP-404 | Audio: mix, parts, set |
+| MIDI IN | Notes: scale, pads, M:S, MPK, SMC | Channel: all, 1-16 | USB host: off, on (never kept) | Knob CCs: off, in, out, in+out |
 | FILTERS | Pad: low, high, band, notch, peak | Bass: the same | Acid: the same | - |
 | SCREAM | Drive: 0-100 | Scream: 0-100 | Wow: 0-100 | Target: acid, bass, both |
 | SCREEN | Zoom: off, on | Saver: off, 1, 3, 10 min | Lights: off, show | Scanlines: off, on |
@@ -1511,7 +1540,7 @@ What some of these mean:
 - **Riser.** Time is how long it takes to climb. Filter, Wash and Echo set how much of each it builds up.
 - **Settings page.** Key is the drop's key change (section 13). Voices chooses which set of thirty built-in DX7 voices the pluck's `DX` sounds use (section 7).
 - **SCREEN page.** Zoom shows a knob's name and value large as you turn it. Saver is the screensaver. Lights makes the key lights follow the music. Scanlines darkens every other row of the screen by a quarter, like an old CRT TV.
-- **USB & MIDI page.** Level chooses whether the USB audio follows the **MASTER** knob or stays at a fixed level, so a recording doesn't change when you turn the volume. MIDI out sends notes out over USB. MIDI map chooses where the notes go (section 14).
+- **USB & MIDI page.** Level chooses whether the USB audio follows the **MASTER** knob or stays at a fixed level, so a recording doesn't change when you turn the volume. MIDI out sends notes out over USB. MIDI map chooses where the notes go (section 14). **Audio** chooses what the USB audio carries: the stereo mix, or the parts on six channels (below).
 - **Repeat page.** Pitch makes each repeat step toward that pitch over four beats while you hold the key, which sounds like a build. Every repeat still starts on the beat grid. Decay makes each repeat quieter than the last, for a dub-style tail. Gate sets how much of each slice sounds: all of it, 3/4, half or 1/4. Refresh grabs a fresh slice of the newest music every beat or bar, which DJs call a slip roll. It only works where there's enough recent music held to do it.
 
 **The Gate page.** The white keys show the pattern's steps. They're lit where the gate opens, and the step that's playing is marked. Press a key to edit a step, and the pattern becomes "custom". A pattern of 12 or 10 steps against the bar of 16 drifts against the beat and comes back around, which is called a polymeter. **Gate 16** and **Gate 8** share this page.
@@ -1648,6 +1677,8 @@ The page shows the mood now, which scenes are stored and this round's move. The 
 
 **Smart DJ** makes the auto-DJ plan a whole set instead of repeating the same round. It has its own settings page right after DJ moves (hold **HOME**, then turn **SELECT**).
 
+**Song mode** arranges the current piece into one finished song. On the Smart DJ page, turn **Length** (KNOB2) past Endless to **SONG 3M**, **4M**, **5M**, **6M** or **8M**, then press **PLAY** there (or **SEL + PLAY** anywhere). It keeps the selected piece and your unsaved edits, brings its tracks in over the first tenth of the song, plays grooves, breakdowns, builds and drops, then takes the parts out and stops: `SONG OVER`. **Shape** and **Yield** still apply; Arc aims its peak drop at 70 % of the song. Song grooves and breakdowns use the short-set pace; the close removes one part per bar so even a short song at a slow tempo has room for its build and drop. Automatic piece changes, the set list's automatic advance, and extra genre moves are suspended during a song; layers and the mood still follow its energy. PLAY outside this page pauses/resumes; PLAY on this page starts again from 00:00:00. Choose a normal set length to return to set mode. Existing saved set lengths keep their meaning.
+
 **Start a set with SEL + PLAY** (anywhere), or **PLAY on the Smart DJ page**. It starts like a DJ set: from silence, with the clock at 00:00:00. The auto-DJ, Smart and DJ new pieces turn on by themselves, and anything left over from before (moves, layers, a piece waiting) is cleared. It opens on the piece in the bank whose energy suits the start of the set, and the tracks come in one by one: over the SET page's **Intro** time, or over a minute if Intro is off. Throughout the set each new piece glides in from the old tempo (over the SET page's **Mix** bars, or 8 bars if Mix is Cut). The clock shows as hh:mm:ss on the Perform screen and the Smart DJ page; stopping the music pauses it.
 
 **It plans against the clock.** Smart DJ knows how long the set has left and how long things take at the tempo playing. It won't start a breakdown unless the breakdown, the build and a few bars after the drop finish before the close, and won't start a mix unless the mix does. On an **Arc** set it aims the biggest moment at the peak: it times a breakdown and build so the drop lands right on the arc's peak (70 % of the way through, or the top of each wave on Endless). About a minute before that, it stops starting mixes and breakdowns so the groove is free when it's time. Near the end of the set the journey picks the last pieces to suit the ending. The page shows the plan: when the peak drop is due (or when it landed) and when the close will begin.
@@ -1665,7 +1696,7 @@ The **Smart mix** settings page (right after Smart DJ) decides how a Smart DJ se
 - **Near** (the default) moves to genres close in energy, so the set travels a step at a time: lofi and trip-hop, dub and reggae, synthwave and amapiano, disco, funk, house and garage, electro and trap, techno and breaks, dubstep and industrial, drum and bass and psytrance, dark forest at the top.
 - **Any** can go anywhere.
 
-Whichever you choose, it picks a piece that suits where the set's energy is heading over the next five minutes, in a key close by on the circle of fifths and at a tempo nearby (the tempo glides the rest of the way). It plays two or three pieces in a genre before moving on, and never repeats one of the last three. Start Set also opens in whichever genre suits the start of the set.
+Whichever you choose, it picks a piece that suits where the set's energy is heading over the next five minutes, in a key close by on the circle of fifths and at a tempo nearby (the tempo glides the rest of the way). It plays two or three pieces in a genre before moving on. A set never plays the same piece twice (with Journey on Genre, only once it has played all ten), and it keeps away from the pieces the last set played. Among the pieces that mix in about equally well it chooses by chance, so every set takes its own route. Start Set also opens in whichever genre suits the start of the set. The last set's pieces are forgotten when the FM-1 is switched off.
 
 **Mixes** is how it gets there.
 - **Filter**: the outgoing piece's low end is filtered away (the DJ filter rising to a high-pass), and the new piece comes in through a closed low-pass that opens up.
@@ -1679,8 +1710,8 @@ Whichever you choose, it picks a piece that suits where the set's energy is head
 
 The header says each step (`MIX: FILTER` with the piece it's going to, `NOW PLAYING` as it lands), and the page shows the piece playing, the mix under way and how far through it is, or when the next mix will come. Parts a mix has taken out are struck through in blue on the Perform screen. If you start a breakdown by hand during a mix, the mix stops where it is. With the set list playing, Smart DJ follows its order and still mixes between its pieces.
 
-- **Set** is how long the set is: 15, 30, 60 or 90 minutes, or **endless**. Shorter sets move faster: in a 15-minute set grooves and breakdowns run about half as long as in an hour's set (three-quarters in a 30-minute set), blends are always 8 bars, and the opening intro is shorter.
-- **Shape** is how its energy goes. **Arc** warms up, peaks about 70 % of the way through, then winds down. **Climb** rises and stays high. **Peak** stays high all set. **Chill** stays low. A slow 8-minute swell rides on top of each so it never sits still.
+- **Length** is how long the set or song is: 15, 30, 60 or 90 minutes, or **endless**; the five **Song** choices keep one piece for 3, 4, 5, 6 or 8 minutes. Shorter sets move faster: in a 15-minute set grooves and breakdowns run about half as long as in an hour's set (three-quarters in a 30-minute set), blends are always 8 bars, and the opening intro is shorter.
+- **Shape** is how its energy goes. **Arc** warms up, peaks somewhere between 62 % and 78 % of the way through (each set draws its own), then winds down. **Climb** rises and stays high. **Peak** stays high all set. **Chill** stays low. A slow 8-minute swell rides on top of each so it never sits still, starting at a different point each set.
 - **What follows the energy.** Smart DJ takes over **Moves** and **Layers** from the DJ moves page. Low in the set, more parts drop out and long breakdowns come up; at the peak the groove stays full, breakdowns are short, and fake and double drops turn up. It also leans the mood with the set (up to 20 either way, on top of your own mood and the Mood ride).
 - **It listens.** Every bar of the groove it measures what the music has: how many parts are playing, how busy the drums are, the tempo and the mood. It compares that with what the music usually has, then nudges the mood so a stretch that runs hotter than the plan is cooled and a flat one lifted.
 - **It breaks when the groove gets stale, not on a count.** A groove grows stale bar by bar, faster when nothing new happens (no chord change, pattern change, drum drift, or a part dropping out or coming back) and when you've left it alone for a minute. New things make it fresher. When it's stale enough it plays a fill and breaks on the next 8-bar line. It's patient at low energy (up to about 48 bars) and quick at the peak (about 16), and never goes past 64 bars. The Perform screen shows `SMART` and the bar count, and the bar under it fills as the groove gets stale.
@@ -1922,7 +1953,7 @@ While a visualizer is up, the knobs are still the FX knobs, **ALGORITHM** still 
 |---|---|
 | The pieces you stored (Global, **SAVE**), in any genre | Straight away (section 6). |
 | Theme, Tune, MIDI out, the set list, Zoom, the SET page's Mix | A couple of seconds after your last change. |
-| Every effect's settings, the gate's pattern and targets, the Auto DJ settings (scenes timing, groove, break, fill), the SET page (rounds, ramp, intro), the Settings page (key, voices), the SCREEN page (saver, lights, scanlines), the USB & MIDI page's USB level and MIDI map, the MIDI IN page, the FILTERS and SCREAM pages, the Jam page's settings and your visualizer | A couple of seconds after you stop changing them. |
+| Every effect's settings, the gate's pattern and targets, the Auto DJ settings (scenes timing, groove, break, fill), the SET page (rounds, ramp, intro), the Settings page (key, voices), the SCREEN page (saver, lights, scanlines), the USB & MIDI page's USB level and MIDI map (its Audio layout is kept with the global settings, at once), the MIDI IN page, the FILTERS and SCREAM pages, the Jam page's settings and your visualizer | A couple of seconds after you stop changing them. |
 | Your DX7 voices | The same. |
 | The panel calibration (if you ran it) | When you finish it. |
 
@@ -2029,6 +2060,17 @@ This is Melodee's USB host (by Kerem Kilic). Receiving from a device has been tr
 
 The sections and pieces wait for the bar, as they do from the pads. Connect its MIDI out to the FM-1's TRS MIDI input. On the Model:Samples, turn on MIDI out for the tracks you want to use as triggers and leave it off for the ones you play yourself. Its trigs still play their own samples, so a trigger track can be a quiet one, or one you like hearing with the change.
 
+**An M-VAVE SMC-Mixer as the mixer.** Set **Notes** to **SMC**. Plug the SMC-Mixer's USB into the FM-1 with **USB host** on (below; tried through a powered USB-C splitter, which is how the maker's connects). Bluetooth isn't possible: PERF-1 never turns the FM-1's radio on. The mixer must be in its plain MIDI mode, sending control changes on one channel (set **Channel** to it, or leave it on All).
+
+| SMC-Mixer | Sends | PERF-1 |
+|---|---|---|
+| Faders 1-8 | CC 40-47 | The tracks' levels: kick, hats (closed and open), snare (and clap), perc, bass, acid, pad, pluck. The level goes to where the fader is as soon as you move it. |
+| Top button of each strip | CC 20-27 | Mutes that track, or brings it back. |
+| Knobs | CC 32-39 | 1 Crush, 2 Throw, 3 the mood, 4 Filter, 5 Wash, 6-7 the acid's cutoff and resonance, 8 the bass's cutoff. |
+| Bottom row, left to right | CC 52-62 | Breakdown, build, drop, fill, auto-DJ on or off, freeze, the piece before, the next piece, stop, play, **START SET** (a new Smart DJ set, as SEL + PLAY). |
+
+The second and third buttons of each strip do nothing: the mixer sends them on numbers its knobs and faders also use. This layout is from one SMC-Mixer's messages (2026-11-14); only two of its knobs were seen, so the knob order may differ on yours.
+
 **An Akai MPK mini as the keyboard.** Set **Notes** to **MPK**. Connect its MIDI out to the FM-1's TRS MIDI input (the MPK mini MK4's DIN MIDI out, with a TRS type A to DIN cable or adapter), or over USB through a computer. It expects the MPK's factory program: keys on channel 1, pads on channel 10 from note 36, knobs on CC 24-31 (the MK4's; an older MPK mini's CC 70-77 work too). The MK4's knobs turn endlessly and send steps, so PERF-1 moves each setting from where it is, about fifty clicks from one end to the other; an older MPK's knobs (CC 70-77) set the value straight to where the knob points.
 
 | MPK | PERF-1 |
@@ -2064,7 +2106,27 @@ The keys play over the song from any page. On the Jam page the voice is all your
 
 What the FM-1 can't do here: its TRS jack is an input, so nothing goes back to the Model:Samples over TRS. PERF-1's notes and knob CCs reach it only over USB, through a computer, a USB MIDI host box, or the FM-1's own USB host (above; not yet tried with a Model:Samples). Clock works both ways: PERF-1 follows the Model:Samples' clock over TRS, or sends its own over USB.
 
-**USB audio:** the FM-1 also shows up on a computer as a stereo USB audio input (16-bit, 44.1 kHz). It carries the master output, so you can record the FM-1 over the same cable. On the USB & MIDI settings page, the level can follow the **MASTER** knob (KNOB) or stay at a fixed level (FIXED, about the same as the knob at three quarters). With FIXED you can turn your speakers down without changing the recording.
+**USB audio:** the FM-1 also shows up on a computer or an iPad as a USB audio input (16-bit, 44.1 kHz), so you can record it over the same cable. On the USB & MIDI settings page, the level can follow the **MASTER** knob (KNOB) or stay at a fixed level (FIXED, about the same as the knob at three quarters). With FIXED you can turn your speakers down without changing the recording.
+
+**Recording the parts on their own tracks.** The **Audio** knob on the USB & MIDI page chooses what the cable carries:
+
+| Audio | Channels | What each carries |
+|---|---|---|
+| **Mix** (the default) | 2 | 1-2: the master output, exactly as the speakers play it |
+| **Parts** | 6 | 1 drums, 2 bass, 3 acid, 4 pluck, 5-6 pad (stereo) |
+| **Parts 2** | 6 | 1 bass, 2 acid, 3 pluck, 4 pad, 5-6 the synths' echo and reverb (stereo). No drums |
+| **Parts 3** | 6 | 1 kick, 2 snare, 3 clap, 4 hats (closed and open), 5 perc, 6 the drums' echo and reverb. No synths |
+| **Set** | 6 | 1-2 the mix as heard, 3 drums, 4 bass, 5 acid and pluck together, 6 pad |
+
+Use **Parts** to rebuild a piece in GarageBand or any recorder with each part on its own track; use **Set** to record a live set (Smart DJ, say) with the finished mix on one stereo track and four parts beside it, so you can rebalance or fix it afterwards. Use **Parts 2** when the drums will come from somewhere else (a drum machine, a sampler, a beat you program in the recorder): you get the synths and their own effects, with no drums anywhere in the recording. Use **Parts 3** the other way round, to record PERF-1's drums under synths from another instrument.
+
+The parts are **dry**: each one after its level, its mutes, the kick's duck and the gate, but before its pan, the echo, the reverb, the performance effects and the master compressor and limiter, which belong to the mix as a whole. So in Parts you add your own reverb and effects in the recorder; in Set they're on the mix tracks. Everything that mutes a part shows on its track: the mute map, Layers, the genre moves, Smart mix's bass swap and drums-first, the close. The vinyl noise goes with the pad, the DX voices with the pluck. The separate drum stems are taken before the kit's shared crush processing; the combined drum stem in Set includes it. Snare and clap have separate recording channels and share the instrument's snare mute. The DJ snips are only in the mix.
+
+Parts 2 and Parts 3 carry the effects too, on their own channels: the echo and reverb return, before the performance effects and the master. To keep the other side out of it, while a computer or iPad records in **Parts 2** the drums send nothing to the echo and reverb, and in **Parts 3** the synths send nothing. You hear that on the FM-1's own output while it records (the drums dry in Parts 2, the synths dry in Parts 3); everything goes back to normal when the recording stops. The effect throws and the wash follow the same rule.
+
+A new Audio setting makes the FM-1 disconnect from the computer or iPad for a moment and come back with the new channels (a recording that's running stops; start it again). In GarageBand on iPad, add an Audio Recorder track for each input and turn on multitrack recording; on a Mac, every layout but Mix shows six inputs in Audio MIDI Setup. The setting is kept through power-off.
+
+While a computer or iPad is recording the USB audio and the music plays, the FM-1 holds back the settings it would normally save in the background (a save to the FM-1's memory briefly pauses the USB audio, and would crackle in the recording). They're saved as soon as the recording or the music stops; a piece you save with SAVE is still written at once, so save pieces before or after a recording.
 
 ---
 

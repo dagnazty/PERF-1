@@ -1,0 +1,52 @@
+  ok par10 == 1
+  ok par10 == 2
+  ok edited == 1
+  ok par10 == 3
+  ok par84 == 23
+  ok par84 == 20
+  ok view == 11
+  ok par40 == 2
+  ok view == 21
+  ok par85 == 1
+  ok par86 == 0
+  ok par85 == 3
+  ok par86 == 3
+  ok par87 == 3
+  ok par88 == 3
+  ok par10 == 3
+  ok par84 == 20
+  ok held == 0
+  ok pool == 1449 (<0x5AD)
+  ok pool == 1453
+  ok par90 == 1
+  ok par89 == 0
+  ok view == 6
+  ok bass_level == 0 (<5)
+  ok held == 1
+  ok pool == 1453
+  ok bass_level == 99 (>50)
+  ok held == 0
+  ok par90 == 0
+  ok bass_level == 91 (>50)
+  ok par89 == 1
+  ok view == 2
+  ok held == 2
+  ok held == 0
+  ok pool == 1453
+  ok par89 == 0
+  ok par89 == 0
+  ok par90 == 0
+  ok par91 == 0
+  ok view == 0
+  ok par91 == 1
+  ok playing == 0
+  ok held == 1
+  ok peak -14.8 dBFS (max -0.5)
+  ok peak -14.8 dBFS (min -40)
+  ok held == 0
+  ok held == 0
+  ok pool == 429
+  ok held == 1
+  ok par91 == 0
+  ok held == 0
+host: 14488 ms simulated, 743 blits, render 0.8% of real time (host CPU)

@@ -1,0 +1,7 @@
+  ok playing == 1
+  ok view == 22
+  ok dd_changes == 4 (>2)
+  ok dd_mutations == 4 (>2)
+  ok pattern_synced == 1
+  ok dd_left == -1
+host: 34825 ms simulated, 2167 blits, render 0.8% of real time (host CPU)

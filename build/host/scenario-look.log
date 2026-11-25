@@ -1,0 +1,3 @@
+  ok fxpage == 18
+  ok fxpage == 31
+host: 14970 ms simulated, 471 blits, render 0.7% of real time (host CPU)

@@ -200,9 +200,9 @@ def build_loader():
 def build_app():
     os.environ.setdefault("EN_CORE2", "1")      # the reverb on the second core (fallback to one core built in); EN_CORE2=0 for single core
     flags = [*CFLAGS, *FPU, "-Ifirmware/hal", "-Ifirmware/src", "-Ibuild/gen"]
-    for flag in ("EN_CDC", "EN_CORE2", "EN_DIAG"):
+    for flag in ("EN_CDC", "EN_CORE2", "EN_DIAG", "EN_UAC_POLL_TICKS"):
         v = os.environ.get(flag)    # unset: the default in firmware/src/main.c (EN_DIAG: firmware/src/dsp/amb.h)
-        if v in ("0", "1"):
+        if v is not None and v.isdigit():       # (0 / 1; EN_STEMS a channel count)
             flags.append(f"-D{flag}={v}")
     flags.append(f'-DFELUCCA_ID="{PRODUCT}"')
     if VERSION:
@@ -235,6 +235,7 @@ def build_app():
                                ("common/bin/objdump", "-d", elf),
                                ("common/bin/objdump", "-d", "-j", ".ram_text", elf))
     (OUT / "amb.dis").write_text(dis)
+    (OUT / "amb.syms").write_text(syms)          # (the symbol table, for a look at where things sit)
 
     def symv(name):
         return int(re.search(r"^([0-9a-f]+) .*\s" + name + r"$", syms, re.M).group(1), 16)

@@ -1,0 +1,32 @@
+  ok ride == 0
+  ok moodeff == 50
+  ok fxpage == 18
+  ok fxpage == 35
+  ok fxs96 == 2
+  ok fxs97 == 1
+  ok scenes == 15
+  ok trkmute == 0
+  ok djon == 1
+  ok sec == 0
+  ok ride == 0
+  ok trkmute == 0
+  ok sec == 1
+  ok trkmute == 1
+  ok ride == -1 (<0)
+  ok ride == -30
+  ok moodeff == 20
+  ok sec == 2
+  ok trkmute == 3
+  ok ride == -10 (>-30)
+  ok sec == 0
+  ok trkmute == 2
+  ok ride == 30
+  ok moodeff == 80
+  ok trkmute == 0
+  ok sec == 0
+  ok ride == 24 (<30)
+  ok ride == 24 (>0)
+  ok playing == 0
+  ok ride == 0
+  ok moodeff == 50
+host: 87970 ms simulated, 4967 blits, render 0.8% of real time (host CPU)

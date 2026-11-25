@@ -1,0 +1,8 @@
+  ok theme == 0
+  ok view == 15
+  ok view == 23
+  ok view == 27
+  ok view == 30
+  ok theme == 1
+  ok theme == 5
+host: 16529 ms simulated, 997 blits, render 0.8% of real time (host CPU)

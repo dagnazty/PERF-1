@@ -1,0 +1,9 @@
+  ok view == 9
+  ok par152 == 0
+  ok par152 == 2
+  ok par153 == 60
+  ok par154 == 40
+  ok par155 == 10
+  ok par152 == 25
+  ok par152 == 0
+host: 4406 ms simulated, 280 blits, render 0.7% of real time (host CPU)

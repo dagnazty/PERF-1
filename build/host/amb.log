@@ -1,0 +1,8 @@
+tests/host/amb_test.c:1720:41: error: variable 'sample' set but not used [-Werror,-Wunused-but-set-variable]
+ 1720 |         uint32_t since_change = 99999u, sample = 0;
+      |                                         ^
+1 error generated.
+firmware/src/dsp/amb.c:7222:21: error: unused function 'nz_white' [-Werror,-Wunused-function]
+ 7222 | static inline float nz_white(nz_t *z)
+      |                     ^~~~~~~~
+1 error generated.

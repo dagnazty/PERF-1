@@ -1,0 +1,6 @@
+  ok saved == 1
+  ok dirty == 0
+  ok storewait == 0
+  ok hushed == 0
+  ok playing == 1
+host: 3220 ms simulated, 205 blits, render 0.8% of real time (host CPU)

@@ -1,0 +1,5 @@
+  ok fxmask == 4194304
+  ok fxmask == 8388608
+  ok fxmask == 16777216
+  ok fxmask == 33554432
+host: 25276 ms simulated, 914 blits, render 0.8% of real time (host CPU)

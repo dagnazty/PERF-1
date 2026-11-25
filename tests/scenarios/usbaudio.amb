@@ -1,0 +1,49 @@
+# The USB audio's layout (0.16.25, the USB & MIDI page's fourth knob, Audio): Mix (2 channels, as before), Parts (drums, bass, acid, pluck, pad L, pad R),
+# Parts 2 (bass, acid, pluck, pad, the synths' effects L R), Parts 3 (kick, snare, clap, hats, perc, the drums' effects; 2026-11-11) and Set (the mix, drums, bass, acid + pluck, pad). A new layout is stored in the global record at once and sent to the port (which lets go and comes
+# back so the host reads it); the page says what each channel carries; it comes back after a power cycle.
+seed 0
+wait 3000
+expect usbaudio 0
+expect usbaudioport 0
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 7
+wait 100
+expect fxpage 24
+shot usbaudio_mix.png
+spin K4 1
+wait 100
+expect usbaudio 1
+expect usbaudioport 1
+expect usbreconnects 1
+shot usbaudio_parts.png
+spin K4 1
+wait 100
+expect usbaudio 2
+expect usbaudioport 2
+expect usbreconnects 2
+shot usbaudio_parts2.png
+spin K4 1
+wait 100
+expect usbaudio 3
+expect usbaudioport 3
+expect usbreconnects 3
+shot usbaudio_parts3.png
+spin K4 1
+wait 100
+expect usbaudio 4
+expect usbaudioport 4
+expect usbreconnects 4
+shot usbaudio_set.png
+spin K4 1
+wait 100
+expect usbaudio 4
+expect usbreconnects 4
+tap FX
+wait 2000
+# kept through a power cycle
+reboot
+wait 3000
+expect usbaudio 4

@@ -1,0 +1,3 @@
+  ok view == 18
+  ok par175 == 1
+host: 7104 ms simulated, 408 blits, render 0.8% of real time (host CPU)

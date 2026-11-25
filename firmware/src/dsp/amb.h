@@ -39,7 +39,7 @@
 #define EN_NUSER 16                     /* and the ones the player loads (SysEx, en_user_voice), after them */
 #define EN_NCMFM (EN_NFMFACT + EN_NUSER)   /* the counter-melody's six-operator FM sounds: after the plain ones */
 #define EN_NCMSND (12 + EN_NCMFM)      /* the counter-melody's sounds */
-#define EN_NCMSTYLE 6                  /* its styles */
+#define EN_NCMSTYLE 10                 /* its styles */
 #define EN_NKIT 14                      /* the sounds each drum (kick, snare + clap, hats, perc) can play */
 enum { EN_V_PAD, EN_V_DRONE, EN_V_ACID, EN_V_SAMPLE, EN_V_PLUCK };   /* the voices the keys can play (en_note) */
 
@@ -280,7 +280,7 @@ enum {
                                                                           * sections (0 off, 1 gentle, 2 deep), the scenes follow them (0 off, 1 follow) */
     EN_FXS_DJ_MOVE, EN_FXS_DJ_LAYER,                                     /* (0.16.20) the auto-DJ's genre moves (0 off, 1 some, 2 lots: ui.c mv_*), the groove's layers
                                                                           * taken out and brought back on the phrase lines (0 off, 1 light, 2 busy: ar_tick) */
-    EN_FXS_SD_ON, EN_FXS_SD_LEN, EN_FXS_SD_SHAPE, EN_FXS_SD_YIELD,       /* (0.16.21) SMART DJ, the UI's (ui.c sm_*): on; the set's length (15, 30, 60, 90 min, endless); its
+    EN_FXS_SD_ON, EN_FXS_SD_LEN, EN_FXS_SD_SHAPE, EN_FXS_SD_YIELD,       /* (0.16.21) SMART DJ, the UI's (ui.c sm_*): on; length (0..4: sets 15/30/60/90 min/endless; 5..9: songs 3/4/5/6/8 min); its
                                                                           * energy's shape (arc, climb, peak, chill); it holds back while the player plays (0 off, 1 on) */
     EN_FXS_SX_JOURNEY, EN_FXS_SX_MIXES, EN_FXS_SX_BLEND,                 /* (0.16.23) SMART MIX, the UI's (ui.c tx_*, jy_*): where the next piece may come from (0 this genre,
                                                                           * 1 near genres, 2 any); how pieces are mixed (0 auto, 1 blends, 2 cuts, 3 a plain cut); a blend's bars (0 8, 1 16) */
@@ -367,6 +367,16 @@ extern volatile uint8_t en_usb_fixed;          /* 1: the USB audio is rendered a
 extern volatile uint8_t en_fm_dy;              /* 1: the DY voices (human-made DX7 voices) stand in for the thirty DX voices */
 void en_fm_set_dy(int on);                     /* sets it, and the sound names (the engine reloads the patch between chunks) */
 extern int16_t *en_usb_out;                    /* where en_render writes that second output (stereo 16-bit frames, the USB stream's scale), or NULL for none this render */
+/* THE STEMS (0.16.25, the USB & MIDI page's Audio: Parts, Set): where en_render writes the parts apart, thirteen 16-bit samples a frame (EN_ST_*), or NULL for
+ * none this render. Each at the USB stream's scale, dry: after its level, mutes, the kick's duck and the gate, before its pan, the echo, the reverb, the
+ * performance effects and the master bus (those are the mix's alone). The pad keeps its stereo; the vinyl goes with it, the DX voices with the pluck. */
+/* (2026-11-11, Parts 2 and Parts 3) FX L/R: the echo's and the reverb's return, at the same scale, before the performance effects and the master. */
+enum { EN_ST_DRUMS, EN_ST_BASS, EN_ST_ACID, EN_ST_PLUCK, EN_ST_PADL, EN_ST_PADR, EN_ST_KICK, EN_ST_SNARE, EN_ST_CLAP, EN_ST_HATS, EN_ST_PERC,
+       EN_ST_FXL, EN_ST_FXR, EN_NST };
+extern int16_t *en_usb_stems;
+/* What feeds the echo and the reverb while the stems are taken (en_usb_stems set; else ignored): 0 everything, as always; 1 all but the drums (Parts 2:
+ * the synths' effects alone, the drums dry); 2 the drums alone (Parts 3: the others dry). The speakers hear it so too while a computer records. */
+extern volatile uint8_t en_usb_fxsrc;
 extern volatile uint8_t en_chorus_c0;          /* 1: the pad's chorus runs on the first core (it decides, from its waits); */
 void en_fm_float_path(int v);                  /* tests: the DX voices' MARK I on float buses (1), or integer (0, as the firmware runs it) */
 void en_balance_force(int v);                  /* tests: -1 it decides, 0 / 1 as told */
@@ -423,7 +433,7 @@ const char *en_piece_name(int i);
 void en_piece(int i, int16_t *par, uint16_t *pool);
 /* genres: banks of ten pieces, each with its own recipes and drum patterns (the first, 0, is the original techno and acid
  * set; the others are factory sets, kept in RAM while the power is on). */
-#define EN_NGENRE 19
+#define EN_NGENRE 22
 const char *en_genre_name(int g);
 void en_genre(int g);                          /* the genre playing: its chords move in its own habits (the first bank keeps the original walk) */
 const char *en_piece_name_g(int g, int i);

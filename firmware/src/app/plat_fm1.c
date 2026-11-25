@@ -121,6 +121,41 @@ static volatile uint32_t tel_stores, tel_store_us;       /* telemetry: flash wri
 static uint8_t store_lock;                               /* a backup was restored: what is in RAM is out of date, so nothing more is written until the restart */
 int plat_store_locked(void) { return store_lock; }
 int plat_store_seamless(void) { return flash_ok && !susp_bad; }
+int plat_usb_recording(void)                            /* (2026-11-09) the USB audio is being read: a flash write would black its packets out */
+{
+#if FELUCCA_UAC
+    return usb.up && uac.alt && uac.flowing;
+#else
+    return 0;
+#endif
+}
+void plat_usb_audio(int mode)                           /* (0.16.25) a new layout: the port off (the host sees it unplugged), the descriptors set, and usb_retry
+                                                         * plugs it in again a second later; while the port is a host (the MIDI IN page), the layout waits for it */
+{
+#if FELUCCA_UAC
+    const uint32_t f = irq_save();
+    if ((uint32_t)mode == uac.mode) {
+        irq_restore(f);
+        return;
+    }
+#if PERF_USB_HOST
+    if (uh.on) {
+        uac_mode_set((uint32_t)mode);
+        irq_restore(f);
+        return;
+    }
+#endif
+    usb.up = 0;                                         /* (TIMER5 leaves the port alone from now) */
+    usb.config = 0;                                     /* (MIDI out queues nothing for a port that is not there) */
+    uac.alt = 0;
+    fm1_usb_off();
+    uac_mode_set((uint32_t)mode);
+    usb_retry_t = fm1_ms;                               /* (usb_retry: a second from now) */
+    irq_restore(f);
+#else
+    (void)mode;
+#endif
+}
 #if PERF_USB_HOST
 void plat_usb_host(int on) { uh.want = (uint8_t)(on != 0); }   /* uh_task (the main loop) switches the port */
 int plat_usb_host_state(void) { return !uh.on ? 0 : uh.run ? 2 : uh.tried ? 3 : 1; }

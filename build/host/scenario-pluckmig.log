@@ -1,0 +1,5 @@
+  ok par99 == 34
+  ok saved == 1
+  ok par99 == 34
+  ok par99 == 42
+host: 5420 ms simulated, 348 blits, render 0.8% of real time (host CPU)

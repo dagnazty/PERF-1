@@ -1,0 +1,6 @@
+  ok view == 34
+  ok lane0 == 4369
+  ok lane0 == 21845
+  ok lane0 == 43690
+  ok par106 == 80
+host: 3670 ms simulated, 236 blits, render 0.7% of real time (host CPU)

@@ -1,0 +1,11 @@
+  ok sec == 0
+  ok sec == 0
+  ok sec == 0
+  ok sec == 1
+  ok sec == 1
+  ok sec == 2
+  ok sec == 0
+  ok sec == 1
+  ok sec == 0
+  ok sec == 0
+host: 93154 ms simulated, 5721 blits, render 0.7% of real time (host CPU)

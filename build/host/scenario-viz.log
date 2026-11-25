@@ -1,0 +1,24 @@
+  ok view == 36
+  ok fxk0 == 10
+  ok mood == 60
+  ok view == 36
+  ok view == 36
+  ok view == 36
+  ok view == 36
+  ok view == 36
+  ok view == 36
+  ok view == 36
+  ok viz == 7
+  ok view == 36
+  ok viz == 8
+  ok view == 36
+  ok viz == 9
+  ok view == 36
+  ok view == 35
+  ok view == 36
+  ok viz == 8
+  ok viz == 8
+  ok view == 36
+  ok viz == 7
+  ok viz == 7
+host: 33734 ms simulated, 1612 blits, render 0.7% of real time (host CPU)

@@ -1,0 +1,33 @@
+  ok sme == 50
+  ok fxpage == 36
+  ok fxs100 == 1
+  ok fxs101 == 1
+  ok fxs102 == 0
+  ok djon == 1
+  ok sme == 24 (<40)
+  ok smmin == 0
+  ok smmood == -9 (<0)
+  ok sec == 1
+  ok smpace == 75
+  ok smbore == 60 (>55)
+  ok smhas == 49 (>30)
+  ok smhas == 49 (<70)
+  ok sec == 2
+  ok sec == 0
+  ok tx == 2 (>0)
+  ok smdist == 0 (>-1)
+  ok smdist == 0 (<3)
+  ok pieceid == 4 (>0)
+  ok tx == 0
+  ok fxpage == 36
+  ok sme == 92 (>80)
+  ok smpatience == 26 (<45)
+  ok smmood == 1 (>0)
+  ok sec == 1
+  ok sec == 0
+  ok sec == 0
+  ok smbore == 0 (<10)
+  ok djon == 0
+  ok sme == 50
+  ok smmood == 0
+host: 261778 ms simulated, 14274 blits, render 0.8% of real time (host CPU)

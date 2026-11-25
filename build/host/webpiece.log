@@ -1,0 +1,42 @@
+  ok   a bank is checked
+  ok   a bank with the old pluck numbering is old
+  ok   the saved pieces
+  ok   an unsaved piece is not shared
+  ok   a piece out of its bank: its record and progression
+  ok   a setting
+  ok   a file comes back as it went
+  ok   a file is 585 bytes
+  ok   a damaged file is refused
+  ok   a piece without its own voice
+  ok   a code is P1. and URL-safe (409 characters)
+  ok   a code comes back, found in a link or a sentence
+  ok   a code cut short is refused
+  ok   into an empty bank: a valid bank with only it saved
+  ok   and it comes out the same
+  ok   over a saved piece: said, the other kept
+  ok   a piece from a firmware with fewer settings: the missing ones are the recipe's
+  ok   a bank saved by a firmware with fewer: its other pieces' new settings are the recipe's
+  ok   into an older firmware: the settings it lacks are dropped (and said)
+  ok   into an older bank layout: refused
+  ok   the piece's voice slot
+  ok   a built-in sound is no slot
+  ok   the voices' object
+  ok   a voice already loaded: nothing to write
+  ok   another voice in its slot: a conflict, with a free slot offered
+  ok   its slot empty: the next free one
+  ok   all sixteen in use: no free slot
+  ok   a slot past the next free one is refused
+  ok   a set comes back as it went (996 bytes)
+  ok   a damaged set is refused
+  ok   a set through a code (447 characters), told from a piece
+  ok   its places
+  ok   into an empty player's record: the defaults, the list, Play and Mix
+  ok   into one with the player's tuning, theme and Zoom: kept
+  ok   a set's voices: one loaded, two to the next empty slots
+  ok   no room: said, nothing written
+  ok   the firmware's about answer
+  ok   something else is not
+  ok   the simulator saves 01
+  ok   the simulator plays it as 04, with its voice, the settings it predates its recipe's
+  ok   the simulator reads a shared set list: its places, Play and Mix
+web piece: ok

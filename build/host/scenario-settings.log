@@ -1,0 +1,8 @@
+  ok fxpage == 1
+  ok fxpage == -1
+  ok fxpage == 6
+  ok fxpage == 18
+  ok view == 31
+  ok genre == 1
+  ok genre == 0
+host: 6996 ms simulated, 422 blits, render 0.8% of real time (host CPU)

@@ -1,0 +1,10 @@
+  ok fxpage == 18
+  ok keyset == 1
+  ok keyon == 0
+  ok sec == 1
+  ok keyon == 0
+  ok sec == 0
+  ok keyon == 1
+  ok sec == 1
+  ok keyon == 0
+host: 21375 ms simulated, 1322 blits, render 0.7% of real time (host CPU)

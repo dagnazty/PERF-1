@@ -1,0 +1,9 @@
+  ok fxpage == 1
+  ok fxpage == 2
+  ok fxpage == 0
+  ok fxpage == 9
+  ok fxbank == 2
+  ok fxpage == 19
+  ok flexlast == 3
+  ok fxpage == 20
+host: 5687 ms simulated, 331 blits, render 0.7% of real time (host CPU)

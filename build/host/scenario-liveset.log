@@ -1,0 +1,28 @@
+  ok djon == 0
+  ok fxs100 == 0
+  ok fxpage == 36
+  ok fxs101 == 1
+  ok playing == 1
+  ok djon == 1
+  ok fxs100 == 1
+  ok smsec == 1 (<3)
+  ok introk == 1 (<50)
+  ok introk == 100
+  ok smsec == 59 (>55)
+  ok ssout == 1 (>0)
+  ok ssm == 0
+  ok ssm == 32 (>0)
+  ok ssdone == 1
+  ok playing == 0
+  ok smsec == 1848 (>1795)
+  ok smsec == 1848 (<1900)
+  ok smsec == 1848 (<1900)
+  ok ssm == 0
+  ok entrkmute == 0
+  ok playing == 1
+  ok ssout == 0
+  ok fxpage == 36
+  ok playing == 1
+  ok smsec == 0 (<3)
+  ok ssdone == 0
+host: 139873 ms simulated, 7168 blits, render 0.9% of real time (host CPU)

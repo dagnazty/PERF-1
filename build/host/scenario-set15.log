@@ -1,0 +1,22 @@
+  ok fxpage == 36
+  ok fxs101 == 0
+  ok smpace == 50
+  ok playing == 1
+  ok djon == 1
+  ok smsec == 1 (<3)
+  ok introk == 100
+  ok smsec == 45 (>40)
+  ok smsec == 45 (<50)
+  ok smpatience == 36 (<41)
+  ok tx == 4 (>0)
+  ok tx == 0
+  ok smpeakat == 603 (>0)
+  ok smpeakat == 603 (>595)
+  ok smpeakat == 603 (<631)
+  ok ssout == 1 (>0)
+  ok smsec == 862 (>820)
+  ok ssdone == 1
+  ok playing == 0
+  ok smsec == 898 (>885)
+  ok smsec == 898 (<915)
+host: 902919 ms simulated, 53517 blits, render 0.9% of real time (host CPU)

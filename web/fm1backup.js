@@ -5,17 +5,18 @@
 export const BK_CHUNK = 256, BK_FRAME = 64, BK_MAX = 3840;
 
 // the flash objects worth keeping (plat.h OBJ_*; the panel's calibration, 1, is the unit's own and is never saved), in the order they are read and written
-const BK_GENRES = ["HYPNO", "LOFI", "HOUSE", "DUBSTEP", "DUB", "DNB", "BREAKS", "GARAGE", "ELECTRO", "TRAP", "DISCO", "FUNK", "REGGAE", "SYNTHWAVE", "AMAPIANO", "TRIPHOP", "INDUS", "PSY", "FOREST"];
+const BK_GENRES = ["HYPNO", "LOFI", "HOUSE", "DUBSTEP", "DUB", "DNB", "BREAKS", "GARAGE", "ELECTRO", "TRAP", "DISCO", "FUNK", "REGGAE", "SYNTHWAVE", "AMAPIANO", "TRIPHOP", "INDUS", "PSY", "FOREST", "TECHNO", "DETROIT", "HARD"];
 export const BK_OBJECTS = [
   { id: 2, name: "settings" }, { id: 3, name: "voices" }, { id: 4, name: "globals" }, { id: 0, name: BK_GENRES[0] },
-  ...BK_GENRES.slice(1).map((n, i) => ({ id: 5 + i, name: n })), { id: 5 + BK_GENRES.length - 1, name: "chord types" },   // (0.16.6: the progression slots' types, plat.h OBJ_KINDS)
-  { id: 5 + BK_GENRES.length, name: "MIDI map" },                // (0.16.11: the player's MIDI map, plat.h OBJ_MMAP)
+  ...BK_GENRES.slice(1, 19).map((n, i) => ({ id: 5 + i, name: n })), { id: 23, name: "chord types" },   // (0.16.6: the progression slots' types, plat.h OBJ_KINDS)
+  { id: 24, name: "MIDI map" },                // (0.16.11: the player's MIDI map, plat.h OBJ_MMAP)
+  ...BK_GENRES.slice(19).map((n, i) => ({ id: 25 + i, name: n })),   // (2026-11-15: techno, detroit, hard, plat.h OBJ_G19 on: after the MIDI map, the older numbers as they were)
 ];
 
 // the player's MIDI map (0.16.11, ui.c mm_*): the emulator's learned controls ({"c:ch:cc" | "n:ch:note": {t: "b<button>" | "k<key>" | "e<knob>" | "m", mode}})
 // as the firmware keeps them: "MAP1", the count, 3 pad bytes, then 48 entries of 3 bytes (the channel | 0x10 a CC | how a knob counts << 5, the number,
 // the control: a button 0-13, 32 + a key, 64 + a knob). MASTER is the hardware's alone: not sent. The .perfmap file is the learned list as JSON.
-export const MM_OBJ = 5 + BK_GENRES.length, MM_MAX = 48, MM_LEN = 8 + 3 * MM_MAX;
+export const MM_OBJ = 24, MM_MAX = 48, MM_LEN = 8 + 3 * MM_MAX;
 const MM_MODE = { abs: 0, rel64: 1, rel2c: 2 };
 export function mmEncode(maps) {                                     // the bytes, and how many controls went in (and how many were left out)
   const out = new Uint8Array(MM_LEN);

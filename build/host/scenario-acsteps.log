@@ -1,0 +1,15 @@
+  ok view == 14
+  ok par173 == 0
+  ok acidkind2 == 0
+  ok acidkind2 == 2
+  ok acidoff2 == 5
+  ok acidoct2 == 2
+  ok par173 == 1
+  ok par173 == 1
+  ok acidkind2 == 2
+  ok acidoff2 == 5
+  ok acidoct2 == 2
+  ok view == 12
+  ok acidkind2 == 2
+  ok acidoff2 == 5
+host: 17257 ms simulated, 1074 blits, render 0.8% of real time (host CPU)

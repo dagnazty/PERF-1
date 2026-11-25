@@ -1,0 +1,11 @@
+  ok fxpage == 31
+  ok zoom == 0
+  ok zoom == 1
+  ok zoomknob == 0
+  ok zoomknob == -1
+  ok view == 0
+  ok zoomknob == 0
+  ok zoomknob == 2
+  ok zoomknob == -1
+  ok zoom == 1
+host: 17767 ms simulated, 1034 blits, render 0.7% of real time (host CPU)

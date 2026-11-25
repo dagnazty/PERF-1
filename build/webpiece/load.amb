@@ -1,0 +1,14 @@
+loadobj 0 build/webpiece/bank_new.bin
+loadobj 3 build/webpiece/vox_new.bin
+seed 0
+reboot
+wait 2000
+expect saved 8
+expect uservoices 1
+turn PRESET 3
+wait 1500
+expect piece 3
+expect tempo 132
+expect par6 43
+expect par99 42
+expect parsbad 0

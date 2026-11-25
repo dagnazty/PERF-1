@@ -1,0 +1,15 @@
+  ok view == 24
+  ok mod0_2 == 0
+  ok mod0_2 == 3
+  ok mod0_2 == 19
+  ok mod0_2 == 83
+  ok edited == 1
+  ok mod1_12 == 5
+  ok mod0_2 == 83
+  ok mod1_12 == 255
+  ok mod1_12 == 0
+  ok saved == 1
+  ok dirty == 0
+  ok mod0_2 == 83
+  ok mod1_12 == 0
+host: 7351 ms simulated, 462 blits, render 0.8% of real time (host CPU)

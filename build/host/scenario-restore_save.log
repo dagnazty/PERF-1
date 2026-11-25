@@ -1,0 +1,5 @@
+  ok saved == 1
+  ok rsstate == 1
+  ok rsstate == 2
+  ok storelock == 1
+host: 6040 ms simulated, 380 blits, render 0.8% of real time (host CPU)

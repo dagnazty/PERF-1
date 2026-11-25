@@ -1,0 +1,12 @@
+  ok view == 33
+  ok jamv == 0
+  ok par156 == 0
+  ok par156 == 100
+  ok par157 == 2
+  ok jamv == 2
+  ok par173 == 0
+  ok par173 == 1
+  ok acidgate == 16913 (>0)
+  ok jamv == 1
+  ok par173 == 1
+host: 15560 ms simulated, 721 blits, render 0.7% of real time (host CPU)

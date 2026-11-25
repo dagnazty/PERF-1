@@ -1,0 +1,11 @@
+  ok view == 22
+  ok par94 == 1
+  ok par94 == 1
+  ok par94 == 1
+  ok enpar122 == 0
+  ok view == 33
+  ok jamv == 0
+  ok enpar122 == 1
+  ok par122 == 0
+  ok enpar122 == 0
+host: 6907 ms simulated, 425 blits, render 0.8% of real time (host CPU)

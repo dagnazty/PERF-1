@@ -1,0 +1,16 @@
+  ok fxpage == 34
+  ok fxs92 == 3
+  ok fxs93 == 0
+  ok fxs94 == 2
+  ok afplanned == 0
+  ok view == 0
+  ok afplanned == 1
+  ok afline == 1
+  ok aflive == 1
+  ok fxmask == 1073741824 (>0)
+  ok aflive == 0
+  ok fxpage == 34
+  ok fxs92 == 0
+  ok afplanned == 0
+  ok aflive == 0
+host: 44231 ms simulated, 2556 blits, render 0.8% of real time (host CPU)

@@ -1,0 +1,19 @@
+  ok fxpage == 1
+  ok fxpage == 2
+  ok fxpage == 3
+  ok fxpage == 21
+  ok fxpage == 22
+  ok fxpage == 4
+  ok fxpage == 5
+  ok fxpage == 6
+  ok fxpage == 7
+  ok fxpage == 8
+  ok fxpage == 9
+  ok fxpage == 10
+  ok fxpage == 11
+  ok fxpage == 23
+  ok fxpage == 12
+  ok fxpage == 13
+  ok fxpage == 14
+  ok fxpage == 15
+host: 9701 ms simulated, 502 blits, render 0.8% of real time (host CPU)

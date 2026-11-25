@@ -1,0 +1,26 @@
+  ok playing == 1
+  ok pool == 1453
+  ok pad_level == 82 (>20)
+  ok sixteenths == 309 (>40)
+  ok acidnotes == 10 (>0)
+  ok peak -11.6 dBFS (max -0.5)
+  ok peak -11.6 dBFS (min -30)
+  ok view == 1
+  ok view == 2
+  ok view == 3
+  ok view == 4
+  ok view == 5
+  ok view == 1
+  ok view == 6
+  ok view == 8
+  ok view == 10
+  ok view == 12
+  ok view == 19
+  ok view == 31
+  ok view == 30
+  ok view == 29
+  ok view == 28
+  ok view == 27
+  ok view == 6
+  ok view == 0
+host: 40800 ms simulated, 2543 blits, render 0.7% of real time (host CPU)

@@ -133,7 +133,7 @@ static uint16_t rd16(const uint8_t *b) { return (uint16_t)(b[0] | b[1] << 8); }
 static uint32_t rd32(const uint8_t *b) { return (uint32_t)rd16(b) | (uint32_t)rd16(b + 2) << 16; }
 static void wr16(uint8_t *b, uint32_t v) { b[0] = (uint8_t)v; b[1] = (uint8_t)(v >> 8); }
 static void wr32(uint8_t *b, uint32_t v) { wr16(b, v); wr16(b + 2, v >> 16); }
-static uint32_t obj_of(int g) { return g <= 0 ? (uint32_t)OBJ_PROJ : (uint32_t)OBJ_G1 + (uint32_t)g - 1u; }
+static uint32_t obj_of(int g) { return g <= 0 ? (uint32_t)OBJ_PROJ : g <= 18 ? (uint32_t)OBJ_G1 + (uint32_t)g - 1u : (uint32_t)OBJ_G19 + (uint32_t)g - 19u; }   /* (genres 19 on: after the MIDI map's, 2026-11-15) */
 
 static void glob_sync(void)                  /* the player's three, from play */
 {
@@ -466,6 +466,7 @@ void project_globals(void)
 }
 
 int project_saved(int i) { return (unsigned)i < NPIECES && (saved >> i & 1u); }
+int project_usb_audio(void) { return glob.sl_rsv[2] % 5u; }   /* (0.16.25: the global record's third spare byte) */
 int project_pending(void) { return pending || pending_glob || pending_knd; }
 int project_pending_globals(void) { return pending_glob; }
 

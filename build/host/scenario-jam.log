@@ -1,0 +1,18 @@
+  ok view == 31
+  ok view == 33
+  ok jamv == 0
+  ok jamv == 1
+  ok held == 1
+  ok pool == 1453
+  ok held == 0
+  ok jamm == 1
+  ok held == 3
+  ok held == 0
+  ok jamm == 2
+  ok held == 1
+  ok pool == 1453
+  ok jamv == 0
+  ok anscnt == 3
+  ok anscnt == 0
+  ok ansplay == 0
+host: 12362 ms simulated, 512 blits, render 0.7% of real time (host CPU)

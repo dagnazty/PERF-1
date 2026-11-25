@@ -1,0 +1,19 @@
+  ok view == 0
+  ok par82 == 1
+  ok par45 == 0
+  ok par82 == -3
+  ok par82 == -3
+  ok par82 == 0
+  ok par83 == 1
+  ok par83 == 2
+  ok chord0 == 81 (>70)
+  ok par23 == -2
+  ok par45 == 3
+  ok par82 == 1
+  ok seqlane == 1
+  ok par82 == 1
+  ok par82 == 1
+  ok par83 == 2
+  ok par23 == -2
+  ok par45 == 3
+host: 10784 ms simulated, 482 blits, render 0.8% of real time (host CPU)

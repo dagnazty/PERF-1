@@ -1,0 +1,7 @@
+  ok fxpage == 26
+  ok usbhost == 0
+  ok usbhost == 1
+  ok usbhost == 0
+  ok usbhost == 1
+  ok usbhost == 0
+host: 13507 ms simulated, 623 blits, render 0.8% of real time (host CPU)

@@ -1,0 +1,17 @@
+handshake answered                                   ok
+the plain query gets the model and family only (M-UPGRADE 3.11 takes NAME_ + 1-3 digits) ok
+asked with 01: answered                              ok
+asked with 01: the whole identity FM-1_9001613       ok
+  20 requests
+session commits                                      ok
+headers + loader + confirm, no head reads            ok
+staged body == the package's loader                  ok
+LOADER.BIN head CRC                                  ok
+record at 0xE4F00 == RAM record                      ok
+record CRC / type / magic / ota_addr                 ok
+nothing written outside 0xE0000..0xE4FFF             ok
+boot cleanup erases the area                         ok
+second boot: nothing to do                           ok
+host gone -> no commit, area clean                   ok
+no 'success' -> -13, no commit, area clean           ok
+ota test passed

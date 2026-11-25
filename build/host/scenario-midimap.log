@@ -1,0 +1,8 @@
+  ok fxpage == 18
+  ok fxpage == 24
+  ok midimap == 0
+  ok midimap == 1
+  ok midimap == 3
+  ok midimap == 2
+  ok midimap == 2
+host: 13527 ms simulated, 624 blits, render 0.7% of real time (host CPU)

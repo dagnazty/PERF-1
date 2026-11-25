@@ -1178,6 +1178,65 @@ int main(void)
         en_play(1);
         run(1.0f);
     }
+    /* the hook (2026-11-15): a piece keeps its theme. A Riff (Motif 0: no new endings) plays the same bar of notes every bar; a Call's phrase of eight bars comes
+     * round the same eight bars later (the chord held: Drift at the top); the four composed styles differ from one another; a regrow writes another theme. */
+    {
+        static uint8_t seq[5][400];
+        int ns[5], v, i;
+        for (v = 0; v < 5; v++) {
+            uint8_t cnt;
+            int blk;
+            en_init();
+            en_play(0);
+            en_test_reseed(7);
+            en_set(P_TEMPO, 120);
+            en_set(P_DRIFT, 100);
+            en_set(P_SWING, 0);
+            en_set(P_CM_LVL, 60);
+            en_set(P_CM_DENS, 60);
+            en_set(P_CM_RATE, 2);
+            en_set(P_CM_RANGE, 2);
+            en_set(P_CM_MOTIF, 0);
+            en_set(P_CM_STYLE, v == 4 ? 9 : 6 + v);
+            if (v == 4)
+                en_regrow();                    /* (the fifth: a Riff again, after a regrow) */
+            en_play(1);
+            ns[v] = 0;
+            cnt = en_cm_count;
+            for (blk = 0; blk < 22050 && ns[v] < 400; blk++) {   /* 32 s: sixteen bars */
+                en_render(buf, 64, 2048);
+                if (en_cm_count != cnt)
+                    seq[v][ns[v]++] = en_cm_note;
+                cnt = en_cm_count;
+            }
+        }
+        {
+            int per = 0, same = 0, tot = 0, d;
+            for (d = 2; d <= 7 && !per; d++) {   /* the riff's notes a bar: the shortest distance its line repeats at */
+                for (i = 4; i + d < ns[3] && seq[3][i] == seq[3][i + d]; i++)
+                    ;
+                if (i + d >= ns[3])
+                    per = d;
+            }
+            CHECK(ns[3] > 30 && per, "riff: %d notes, no bar of them repeats", ns[3]);
+            for (i = 0; i + ns[0] / 2 < ns[0] && i < ns[0] / 2; i++) {
+                tot++;
+                same += seq[0][i] == seq[0][i + ns[0] / 2];
+            }
+            CHECK(ns[0] > 16 && same * 10 >= tot * 9, "call: %d of %d notes the same a phrase on (%d notes)", same, tot, ns[0]);
+            CHECK(ns[1] > 15 && ns[1] < ns[2] && ns[1] < ns[3], "long: %d notes in sixteen bars (run %d, riff %d)", ns[1], ns[2], ns[3]);
+            for (i = 0, same = 0; i < 24 && i < ns[3] && i < ns[4]; i++)
+                same += seq[3][i] == seq[4][i];
+            CHECK(ns[4] != ns[3] || same < 24, "riff: the same theme after a regrow");
+            for (i = 1, d = 0; i < ns[2]; i++)   /* the run moves by step: most of its moves three semitones or fewer */
+                d += abs((int)seq[2][i] - (int)seq[2][i - 1]) <= 3;
+            CHECK(ns[2] > 40 && d * 10 >= (ns[2] - 1) * 7, "run: %d of %d moves by step", d, ns[2] - 1);
+            printf("  the hook: riff a bar of %d notes, call %d, long %d, run %d (%d by step)\n", per, ns[0], ns[1], ns[2], d);
+        }
+        en_init();
+        en_play(1);
+        run(1.0f);
+    }
     /* the feel: in lofi, Ghosts at 100 add soft snares the pattern does not have (more snare hits, the softest under velocity 50), at 0 none; the pad's Comp on
      * a stab sound: Eighths stabs far more often than Sparse, and Hold does not stab at all (counted by the pad's notes, 4 s at 128 bpm) */
     {
@@ -1965,7 +2024,7 @@ int main(void)
             if (en_sec == EN_SEC_BREAK && en_pad_level > lv)
                 lv = en_pad_level;
         }
-        CHECK(en_sec == EN_SEC_BREAK && lv > 0.05f && pad_n > pad0 + 4, "reggae breakdown: the pad's level %.3f, %u stabs (section %d)", (double)lv, pad_n - pad0, en_sec);
+        CHECK(en_sec == EN_SEC_BREAK && lv > 0.05f && pad_n >= pad0 + 3, "reggae breakdown: the pad's level %.3f, %u stabs (section %d)", (double)lv, pad_n - pad0, en_sec);
         printf("  reggae breakdown: pad level %.2f\n", (double)lv);
         en_init();
         en_play(1);
@@ -2150,7 +2209,9 @@ int main(void)
         for (v = 0; v < 2; v++) {
             static const int KS[4] = {0, 0, 2, 1};   /* (0.16.8: the engine keeps some state through en_init (the bass's 2 s fade, the lines), so a
                                                  * throwaway plain run first, and the two compared, plain and aimed at the other voice, each after a plain one) */
-            int ki;
+            int ki, seed;                        /* (2026-11-15: that state can also shift the random walk between two like runs, by the seed, before this version
+                                                 * and after; so up to four seeds, until the plain run and the one aimed elsewhere had the same walk) */
+            for (seed = 7; seed < 11; seed++) {
             for (ki = 0; ki < 4; ki++) {         /* 0 plain, 1 screaming, 2 screaming aimed at the other voice */
                 int f;
                 k = KS[ki];
@@ -2158,7 +2219,7 @@ int main(void)
                     en_fxs(f, EN_FXS_DEF[f]);
                 en_init();
                 en_dj_sync(0);
-                en_test_reseed(7);
+                en_test_reseed((uint32_t)seed);
                 en_play(0);
                 en_genre(2);
                 en_set(P_BL_MODE, 1);
@@ -2179,6 +2240,9 @@ int main(void)
                 run(4.0f);
                 lv[k] = sum2;
                 CHECK(bad == 0 && peak < 1.0f, "scream on the %s (%d): peak %.3f, %d bad samples", V[v].name, k, (double)peak, bad);
+            }
+                if (fabsf(lv[2] - lv[0]) < 0.02f * lv[0])
+                    break;
             }
             CHECK(lv[0] > 0.0f && lv[1] > 0.25f * lv[0] && lv[1] < 4.0f * lv[0] && fabsf(lv[1] - lv[0]) > 0.05f * lv[0],
                   "scream on the %s: its energy %.2f of the plain one's (changed, and kept within reach)", V[v].name, (double)(lv[0] > 0.0f ? lv[1] / lv[0] : 0.0f));

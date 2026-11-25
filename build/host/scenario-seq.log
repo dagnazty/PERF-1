@@ -1,0 +1,32 @@
+  ok pat == 0
+  ok lane0 == 4369
+  ok view == 34
+  ok seqlane == 0
+  ok lane0 == 4373
+  ok lane0 == 4369
+  ok lane0 == 4373
+  ok lane0 == 4373
+  ok seqlane == 1
+  ok lane1 == 4096
+  ok lane1 == 4096
+  ok seqlane == 0
+  ok seqlane == 5
+  ok seqlane == 1
+  ok par52 == 50
+  ok par48 == 2
+  ok patnext == 2
+  ok pat == 2
+  ok view == 34
+  ok view == 20
+  ok view == 34
+  ok view == 19
+  ok theme == 2
+  ok dirty == 1
+  ok dirty == 0
+  ok store_writes == 2 (>0)
+  ok theme == 2
+  ok par48 == 2
+  ok pats0_0 == 4373
+  ok pats0_1 == 4096
+  ok par52 == 50
+host: 9681 ms simulated, 461 blits, render 0.7% of real time (host CPU)

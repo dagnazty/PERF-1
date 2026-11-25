@@ -45,6 +45,9 @@ int plat_usb_host_msg(void);           /* what the host has to say since the las
 int plat_usb_host_state(void);         /* 0 off, 1 a host looking for a device, 2 a device connected, 3 a device found with no MIDI (or no answer) */
 void plat_usb_host_diag(char *b);      /* what its last search found, in a few words (up to 24 characters): "HUB 4 PORTS, HUB INSIDE" */
 enum { PLAT_UH_NONE, PLAT_UH_ON, PLAT_UH_OFF, PLAT_UH_MIDI, PLAT_UH_NOMIDI, PLAT_UH_LOW, PLAT_UH_LOST };   /* (usb_host.c's UH_MSG_*) */
+int plat_usb_recording(void);          /* (2026-11-09) a computer or an iPad is taking the USB audio now (it set the stream going and reads it) */
+void plat_usb_audio(int mode);         /* (0.16.25) the USB audio's layout: 0 Mix (2 ch), 1 Parts, 2 Parts 2, 3 Parts 3, 4 Set (6 ch); the port lets go and comes back a second
+                                        * later so the host reads the new one (a recording going stops) */
 
 /* persistent storage (Felucca storage.c objects: A/B sectors, CRC, torn-write safe) */
 int plat_store_load(uint32_t obj, void *dst, uint32_t max);   /* bytes loaded, < 0 = none / bad */
@@ -53,7 +56,7 @@ int plat_store_restore(uint32_t obj, const void *src, uint32_t len);   /* a rest
 int plat_store_locked(void);
 int plat_store_seamless(void);        /* a flash write does not stop the audio (the erase goes in slices with the interrupts on between): no fade around it */
 #define PLAT_STORE_MAX 3840u           /* bytes per object */
-enum { OBJ_PROJ, OBJ_PANEL, OBJ_SET, OBJ_VOICES, OBJ_GLOB, OBJ_G1, OBJ_G2, OBJ_G3, OBJ_G4, OBJ_G5, OBJ_G6, OBJ_G7, OBJ_G8, OBJ_G9, OBJ_G10, OBJ_G11, OBJ_G12, OBJ_G13, OBJ_G14, OBJ_G15, OBJ_G16, OBJ_G17, OBJ_G18, OBJ_KINDS, OBJ_MMAP, OBJ_NOBJ };   /* (OBJ_G16: industrial, 0.15.14: 0xB9000; G17 psy, G18 dark forest, 0.16.2: 0xBB000, 0xBD000) */   /* OBJ_GLOB: Tune, MIDI out, the theme (0x99000); OBJ_G1 .. G9: genres 1 to 9's saved pieces (0x9B000 on, 2 sectors each; the original genre's is OBJ_PROJ) */   /* OBJ_SET: the effects' settings and the performing settings (0xDE000, 2 sectors); OBJ_VOICES: the player's DX7 voices (0x97000, 2 sectors) */
+enum { OBJ_PROJ, OBJ_PANEL, OBJ_SET, OBJ_VOICES, OBJ_GLOB, OBJ_G1, OBJ_G2, OBJ_G3, OBJ_G4, OBJ_G5, OBJ_G6, OBJ_G7, OBJ_G8, OBJ_G9, OBJ_G10, OBJ_G11, OBJ_G12, OBJ_G13, OBJ_G14, OBJ_G15, OBJ_G16, OBJ_G17, OBJ_G18, OBJ_KINDS, OBJ_MMAP, OBJ_G19, OBJ_G20, OBJ_G21, OBJ_NOBJ };   /* (OBJ_G19 .. G21: techno, detroit, hard, 2026-11-15: 0xC3000, 0xC5000, 0xC7000, after the MIDI map: the numbers before them stay as backups have them) */   /* (OBJ_G16: industrial, 0.15.14: 0xB9000; G17 psy, G18 dark forest, 0.16.2: 0xBB000, 0xBD000) */   /* OBJ_GLOB: Tune, MIDI out, the theme (0x99000); OBJ_G1 .. G9: genres 1 to 9's saved pieces (0x9B000 on, 2 sectors each; the original genre's is OBJ_PROJ) */   /* OBJ_SET: the effects' settings and the performing settings (0xDE000, 2 sectors); OBJ_VOICES: the player's DX7 voices (0x97000, 2 sectors) */
 /* flash: OBJ_PROJ 0xFC000, OBJ_PANEL 0xDC000 (2 sectors each, inside Felucca's data area); OBJ_KINDS (0.16.6: the progression slots' chord types
  * of every genre's pieces, project.c) 0xBF000, after the last genre's; OBJ_MMAP (0.16.11: the player's MIDI map, ui.c) 0xC1000 */
 

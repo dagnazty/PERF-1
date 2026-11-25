@@ -323,6 +323,10 @@ static void uh_session_end(void)
     RING_PUBLISH();
 }
 
+/* (2026-11-14) THE SESSION ALONE. The host starts with DEVCTL = 1 (session), not 3 (session + host request) as the SDK's usb_h_sie_init does: with
+ * the host request set, the maker's unit detected the device (FSDev) but its first SETUP got no handshake, with or without 5 V on the port; with the
+ * session bit alone an M-VAVE SMC-Mixer on a powered USB-C splitter answered and enumerated. Found by trying six set-ups on the unit (the SDK's;
+ * this one; CON0's TM1; the pads' slew rate bit; POWER 0x60; POWER 0): only this one answered. POWER is 0x40 as the SDK's, kept through the reset. */
 /* the controller's port as a host with nothing attached yet */
 static void uh_host_up(void)
 {
@@ -338,7 +342,8 @@ static void uh_host_up(void)
     sie_wr(S_INTRRX2E, 0);
     fm1_usb_ep_enable(0x1Fu);
     sie_wr(S_FADDR, 0);
-    sie_wr(S_DEVCTL, 0x03u);                            /* session + host request */
+    sie_wr(S_POWER, 0x40u);
+    sie_wr(S_DEVCTL, 0x01u);
     uh.seen = 0;
     uh.line_idle = 0;
     uh.hub_addr = 0;
@@ -348,17 +353,24 @@ static void uh_host_up(void)
 static void uh_connect(void)
 {
     uh_midi_t m;
-    const uint8_t line = (uint8_t)fm1_usb_line(), devctl = (uint8_t)sie_rd(S_DEVCTL);
-    if (sie_rd(S_DEVCTL) & 0x20u) {                     /* low speed (FSDev is bit 6, LSDev bit 5) */
+    const uint8_t line = (uint8_t)fm1_usb_line();
+    uint8_t devctl = (uint8_t)sie_rd(S_DEVCTL);
+    uint32_t t0 = fm1_ms;
+    /* as the SDK's usb_h_chirp_and_reset: the bus is reset only once DEVCTL says a full- or low-speed device is there, waited for up to a second */
+    while (!(devctl & 0x60u) && fm1_ms - t0 < 1000u) {
+        fm1_wdt_feed();
+        devctl = (uint8_t)sie_rd(S_DEVCTL);
+    }
+    if (devctl & 0x20u) {                               /* low speed (FSDev is bit 6, LSDev bit 5) */
         if (!uh.tried)
             uh.msg = UH_MSG_LOW;                        /* said once per attach, as NO MIDI is */
         uh.tried = 1;
         return;
     }
-    sie_wr(S_POWER, 0x08u);                             /* bus reset */
-    uh_wait(30);
-    sie_wr(S_POWER, 0);
-    uh_wait(30);
+    sie_wr(S_POWER, 0x48u);                             /* bus reset */
+    uh_wait(60);
+    sie_wr(S_POWER, 0x40u);
+    uh_wait(60);
     uh.next_addr = UH_FIRST_ADDR;
     uh_d = (__typeof__(uh_d)){0};
     uh_d.line = line;

@@ -1,0 +1,11 @@
+  ok   a USB-MIDI pad box: its streaming interface found
+  ok   its IN and OUT endpoints (bulk, 64 bytes)
+  ok   an audio-only device: no MIDI
+  ok   a configuration cut short before the endpoints: nothing
+  ok   a note on passes
+  ok   a note on from cable 1 passes as cable 0
+  ok   clock, start and stop pass
+  ok   active sensing does not
+  ok   SysEx does not
+  ok   a status that does not match its CIN does not
+usbhost: ok

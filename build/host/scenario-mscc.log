@@ -1,0 +1,16 @@
+  ok fxpage == 26
+  ok minpads == 2
+  ok ccmode == 3
+  ok sec == 1
+  ok piece == 1
+  ok fxk0 == -50
+  ok fxk2 == 100
+  ok mood == 100
+  ok ccout74 == 0
+  ok ccout12 == 0
+  ok ccout74 == 5
+  ok frozen == 1
+  ok frozen == 0
+  ok minpads == 2
+  ok ccmode == 3
+host: 20390 ms simulated, 1055 blits, render 0.8% of real time (host CPU)

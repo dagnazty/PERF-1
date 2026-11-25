@@ -1,0 +1,34 @@
+  ok piece == 0
+  ok lane0 == 4369
+  ok par0 == 35
+  ok edited == 1
+  ok piece == 1
+  ok par5 == 124
+  ok par2 == 80
+  ok par71 == 2
+  ok par48 == 1
+  ok pool == 1709
+  ok lane5 == 2120
+  ok pats0_0 == 4369
+  ok pats5_0 == 0
+  ok piece == 2
+  ok par1 == 60
+  ok par72 == 2
+  ok lane0 == 39321
+  ok pad_level == 98 (>5)
+  ok piece == 0
+  ok par0 == 35
+  ok lane0 == 4373
+  ok piece == 1
+  ok pats0_0 == 4369
+  ok lane0 == 4373
+  ok piece == 9
+  ok par5 == 118
+  ok piece == 0
+  ok par0 == 35
+  ok lane0 == 4373
+  ok piece == 0
+  ok par0 == 45
+  ok lane0 == 4369
+  ok edited == 0
+host: 20115 ms simulated, 1271 blits, render 0.8% of real time (host CPU)

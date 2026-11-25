@@ -1,0 +1,16 @@
+  ok par77 == 0
+  ok view == 19
+  ok view == 20
+  ok par77 == 1
+  ok view == 20
+  ok edited == 1
+  ok par78 == 50
+  ok par79 == 40
+  ok par80 == 50
+  ok par81 == 0
+  ok par81 == 1
+  ok par78 == 80
+  ok par77 == 0
+  ok par78 == 80
+  ok view == 34
+host: 3334 ms simulated, 218 blits, render 0.8% of real time (host CPU)

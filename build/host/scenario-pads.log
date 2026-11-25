@@ -1,0 +1,23 @@
+  ok fxpage == 18
+  ok fxpage == 26
+  ok minpads == 0
+  ok minch == 0
+  ok minpads == 1
+  ok chordroot == 5
+  ok chordroot == 9
+  ok drumglow0 == 1
+  ok padnote0 == 57
+  ok padnote0 == 0
+  ok padnote18 == 84
+  ok padnote18 == 0
+  ok sec == 1
+  ok trkmute == 15
+  ok entrkmute == 15
+  ok entrkmute == 0
+  ok fxpage == 26
+  ok minch == 2
+  ok chordroot == 9
+  ok chordroot == 5
+  ok minpads == 1
+  ok minch == 2
+host: 19950 ms simulated, 1012 blits, render 0.7% of real time (host CPU)

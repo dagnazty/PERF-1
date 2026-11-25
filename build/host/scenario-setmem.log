@@ -1,0 +1,6 @@
+  ok fxpage == 18
+  ok fxpage == 31
+  ok keyset == 2
+  ok keyset == 2
+  ok saver == 1
+host: 17486 ms simulated, 962 blits, render 0.8% of real time (host CPU)

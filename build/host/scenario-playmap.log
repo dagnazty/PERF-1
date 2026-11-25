@@ -1,0 +1,13 @@
+  ok rsvalid == 1
+  ok rsvalid == 0
+  ok playing == 1
+  ok playing == 0
+  ok playing == 1
+  ok view == 0
+  ok view == 3
+  ok view == 0
+  ok par5 == 123
+  ok par5 == 121
+  ok view == 34
+  ok view == 0
+host: 6350 ms simulated, 402 blits, render 0.7% of real time (host CPU)

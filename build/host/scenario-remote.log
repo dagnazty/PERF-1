@@ -1,0 +1,32 @@
+  ok playing == 1
+  ok remote == 0
+  ok remote == 0
+  ok playing == 1
+  ok playing == 0
+  ok remote == 1
+  ok playing == 0
+  ok view == 0
+  ok remotelink == 0
+  ok peak -180.0 dBFS (max -80)
+  ok lastout == 12547199
+  ok lastout == 12545151
+  ok lastout == 12545024
+  ok lastout == 10432612
+  ok lastout == 9383936
+  ok lastout == 12539969
+  ok lastout == 12539199
+  ok view == 0
+  ok playing == 0
+  ok remotelink == 1
+  ok litbtn == 64
+  ok litkeys == 1
+  ok litkeys == 0
+  ok remotelink == 0
+  ok litbtn == 0
+  ok lastout == 12547072
+  ok remote == 0
+  ok playing == 0
+  ok view == 0
+  ok playing == 1
+  ok peak -13.3 dBFS (min -40)
+host: 8140 ms simulated, 164 blits, render 0.6% of real time (host CPU)

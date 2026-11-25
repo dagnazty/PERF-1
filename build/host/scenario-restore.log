@@ -1,0 +1,12 @@
+  ok saved == 1
+  ok dirty == 0
+  ok rsvalid == 1
+  ok rsstate == 2
+  ok storelock == 1
+  ok storelock == 1
+  ok storelock == 0
+  ok rsstate == 0
+  ok rsvalid == 0
+  ok rsstate == 0
+  ok storelock == 0
+host: 6020 ms simulated, 363 blits, render 0.7% of real time (host CPU)

@@ -1,0 +1,80 @@
+# An M-VAVE SMC-Mixer on MIDI IN (Notes: SMC, 2026-11-14), as the maker's sends: control changes on channel 1. The faders (CC 40-47) are the tracks'
+# levels, each strip's top button (20-27) its track's mute, a knob (34) the mood (a button on the same number, 127 then 0, is not a turn), the bottom
+# row stop (60), play (61) and START SET (62). The mode is kept through a power cycle.
+seed 0
+wait 3000
+expect playing 1
+press HOME
+wait 900
+release HOME
+wait 100
+turn SELECT 8
+wait 100
+expect fxpage 26
+spin K1 4
+wait 200
+expect minpads 4
+shot midiin_smc.png
+tap FX
+wait 300
+# fader 1 (the kick) to the top, then the middle; fader 2 (the hats, closed and open) to the bottom; fader 8 (the pluck) to the top
+midi B0 28 7F
+wait 100
+expect par49 100
+midi B0 28 40
+wait 100
+expect par49 50
+midi B0 29 00
+wait 100
+expect par58 0
+expect par61 0
+midi B0 2F 7F
+wait 100
+expect par98 100
+# strip 1's top button: the kick muted, and again: back; strip 8's: the pluck
+midi B0 14 7F
+midi B0 14 00
+wait 100
+expect trkmute 1
+midi B0 14 7F
+midi B0 14 00
+wait 100
+expect trkmute 0
+midi B0 1B 7F
+midi B0 1B 00
+wait 100
+expect trkmute 128
+midi B0 1B 7F
+midi B0 1B 00
+wait 100
+expect trkmute 0
+# the knob on 34: the mood; strip 7's second button sends 34 too (127, then 0): not a turn
+midi B0 22 40
+wait 100
+expect mood 50
+midi B0 22 7F
+midi B0 22 00
+wait 100
+expect mood 50
+midi B0 22 42
+wait 100
+expect mood 52
+# the bottom row: stop, play, START SET (the auto-DJ on)
+midi B0 3C 7F
+midi B0 3C 00
+wait 300
+expect playing 0
+midi B0 3D 7F
+midi B0 3D 00
+wait 300
+expect playing 1
+expect djon 0
+midi B0 3E 7F
+midi B0 3E 00
+wait 1500
+expect djon 1
+expect playing 1
+wait 9000
+reboot
+wait 3000
+expect minpads 4

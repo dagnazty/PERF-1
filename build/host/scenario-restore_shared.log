@@ -1,0 +1,11 @@
+  ok tempo == 128
+  ok tempo == 132
+  ok par6 == 43
+  ok saved == 1
+  ok rsvalid == 1
+  ok rsstate == 2
+  ok saved == 1
+  ok tempo == 128
+  ok par6 == 43
+  ok parwide == 0
+host: 7722 ms simulated, 492 blits, render 0.7% of real time (host CPU)

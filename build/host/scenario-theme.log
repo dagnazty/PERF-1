@@ -1,0 +1,17 @@
+  ok playing == 1
+  ok theme == 2
+  ok dirty == 1
+  ok store_writes == 0
+  ok dirty == 0
+  ok store_writes == 1
+  ok theme == 2
+  ok saved == 1
+  ok store_writes == 2
+  ok playing == 1
+  ok theme == 3
+  ok store_writes == 3
+  ok dirty == 0
+  ok theme == 3
+  ok saved == 1
+  ok par0 == 35
+host: 12223 ms simulated, 774 blits, render 0.8% of real time (host CPU)

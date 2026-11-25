@@ -1,0 +1,22 @@
+  20 s playing: peak 0.243, rms 0.0660, bars 10
+  chord changes in 2 min: 6
+  velocity by hand, accent / soft energy: pluck 9.1, bass 11.2, acid 4.5
+  pitch bend up two semitones (1.122): plain pluck 1.122, DX pluck 1.123, bass 1.127, acid 1.122
+drum retrigger: lane 0: from silence 0.1472, on itself 0.1018 (it was at 0.1231, its peak 0.1280)
+  chords genre 9: 100 changes, home 0.33, A-B-A 0.09
+  chords genre 11: 99 changes, home 0.39, A-B-A 0.44
+  chords genre 2: 100 changes, home 0.35, A-B-A 0.45
+  chords genre 1: 99 changes, home 0.29, A-B-A 0.06
+  the walk under Am9, 8 bars: A 14 C 4 E 12 G 2
+FAIL tests/host/amb_test.c:1756: lofi's V in A minor is E major (pcs 810)
+FAIL tests/host/amb_test.c:1767: house's v in A minor is E minor (pcs 810)
+  synthwave in C major, 400 chords by root: 113 0 15 0 25 78 0 81 0 84 0 4
+  house: 19 chord changes in 40 bars
+  house loop 4: 9 7 9 7 | 9 7 9 7
+  intro: energy 0.0000 early, 209.6758 in
+  pluck steps: 28 notes in four bars
+  reggae breakdown: pad level 0.88
+  pluck on MIDI: 20 plain notes, 16 DX notes, all let go
+  MIDI maps: GM, Model:Samples, MPC Sample, SP-404
+  dubstep: drop gap, kicks 32 then 63 after the drop
+amb: 2 FAILED

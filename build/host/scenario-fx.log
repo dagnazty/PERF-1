@@ -1,0 +1,33 @@
+  ok fxon == 1
+  ok fxmask == 0
+  ok fxmask == 8388608
+  ok fxbit38 == 1
+  ok fxlock == 4096
+  ok fxmask == 4096
+  ok sec == 0
+  ok fxlock == 4096
+  ok fxmask == 8392704
+  ok fxmask == 4096
+  ok fxlock == 4096
+  ok fxlock == 557056
+  ok fxmask == 557056
+  ok fxlock == 32768
+  ok fxmask == 32768
+  ok fxlock == 0
+  ok fxmask == 0
+  ok fxlock == 577536
+  ok fxmask == 577536
+  ok fxon == 0
+  ok fxmask == 577536
+  ok fxlock == 577536
+  ok pool == 1965
+  ok pool == 1453
+  ok fxlock == 577536
+  ok fxlock == 0
+  ok fxmask == 0
+  ok fxon == 0
+  ok fxmask == 0
+  ok sec == 1
+  ok pool == 1965
+  ok peak -10.6 dBFS (max -0.5)
+host: 55520 ms simulated, 2118 blits, render 0.8% of real time (host CPU)

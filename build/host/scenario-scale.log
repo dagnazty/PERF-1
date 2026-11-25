@@ -1,0 +1,15 @@
+  ok pool == 1965
+  ok pool == 1453
+  ok pool == 1421
+  ok par72 == 6
+  ok pool == 661
+  ok pool == 1453
+  ok par71 == 11
+  ok pool == 1453
+  ok par72 == 3
+  ok pool == 2773
+  ok pool == 4053
+  ok pool == 4053
+  ok pool == 3029
+  ok dirty == 0
+host: 2261 ms simulated, 147 blits, render 0.8% of real time (host CPU)

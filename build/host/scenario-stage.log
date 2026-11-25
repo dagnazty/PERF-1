@@ -1,0 +1,12 @@
+  ok fxpage == 18
+  ok fxpage == 31
+  ok saver == 0
+  ok lights == 0
+  ok saver == 1
+  ok lights == 1
+  ok view == 0
+  ok saveron == 1
+  ok view == 36
+  ok saveron == 0
+  ok view == 0
+host: 67456 ms simulated, 4106 blits, render 0.8% of real time (host CPU)

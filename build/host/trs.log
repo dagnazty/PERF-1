@@ -1,0 +1,9 @@
+  ok   running status and a clock inside a message (4 packets)
+  ok   one-byte messages (3 packets)
+  ok   start, continue, stop (active sensing ignored) (3 packets)
+  ok   SysEx skipped, running status not resumed after it (3 packets)
+  ok   overrun: resync on the next status (1 packets)
+  ok   a missed count: the note on is whole at once (1 packets)
+  ok   and the note off after it, not a byte behind (1 packets)
+  ok   UM_EMPTY on the line: ignored (2 packets)
+trs: ok

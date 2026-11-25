@@ -1,0 +1,12 @@
+  ok piece == 0
+  ok tempo == 128
+  ok piece == 8
+  ok tempo == 137 (>132)
+  ok tempo == 137 (<140)
+  ok par48 == 1
+  ok lane0 == 4369
+  ok lane3 == 21845
+  ok lane4 == 17476
+  ok edited == 0
+  ok playing == 1
+host: 600 ms simulated, 42 blits, render 0.9% of real time (host CPU)

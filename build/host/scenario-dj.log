@@ -1,0 +1,20 @@
+  ok fxpage == 18
+  ok fxpage == 17
+  ok djlen == 0
+  ok djon == 1
+  ok piece == 0
+  ok djphase == 0
+  ok sec == 0
+  ok djphase == 1
+  ok sec == 1
+  ok djphase == 2
+  ok sec == 2
+  ok fxmask == 16777216
+  ok djphase == 0
+  ok sec == 0
+  ok fxmask == 0
+  ok djon == 0
+  ok sec == 0
+  ok djon == 1
+  ok piece == 1
+host: 85238 ms simulated, 5217 blits, render 0.8% of real time (host CPU)

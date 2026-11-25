@@ -1,0 +1,15 @@
+  ok playing == 0
+  ok view == 33
+  ok jamv == 0
+  ok lastvel == 122
+  ok lastvel == 127
+  ok view == 33
+  ok fxpage == 26
+  ok minpads == 3
+  ok lastvel == 92
+  ok sec == 1
+  ok fxk0 == 2
+  ok mood == 54
+  ok fxk2 == 100
+  ok minpads == 3
+host: 18601 ms simulated, 861 blits, render 0.8% of real time (host CPU)

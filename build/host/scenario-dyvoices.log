@@ -1,0 +1,9 @@
+  ok fxpage == 18
+  ok dyvoices == 1
+  ok dyvoices == 0
+  ok peak -12.5 dBFS (min -40)
+  ok view == 15
+  ok fxpage == 18
+  ok dyvoices == 1
+  ok peak -13.0 dBFS (min -40)
+host: 12490 ms simulated, 592 blits, render 0.8% of real time (host CPU)

@@ -1,0 +1,8 @@
+  ok playing == 1
+  ok keychord == 1
+  ok view == 33
+  ok keychord == 1
+  ok keychord == 1
+  ok playing == 0
+  ok dimkeys == 0
+host: 11862 ms simulated, 470 blits, render 0.7% of real time (host CPU)

@@ -1,0 +1,14 @@
+  ok mood == 50
+  ok moodacid == 60
+  ok view == 35
+  ok mood == 60
+  ok moodacid == 66
+  ok mood == 100
+  ok moodacid == 90
+  ok mood == 0
+  ok moodacid == 30
+  ok view == 0
+  ok mood == 0
+  ok mood == 50
+  ok moodacid == 60
+host: 12020 ms simulated, 719 blits, render 0.7% of real time (host CPU)

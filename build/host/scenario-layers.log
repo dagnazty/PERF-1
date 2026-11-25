@@ -1,0 +1,17 @@
+  ok fxpage == 35
+  ok fxs99 == 2
+  ok arm == 0
+  ok arm == 40 (>0)
+  ok entrkmute == 40 (>0)
+  ok trkmute == 0
+  ok sec == 1
+  ok arm == 0
+  ok entrkmute == 0
+  ok sec == 2
+  ok sec == 0
+  ok arm == 0
+  ok fxpage == 35
+  ok fxs99 == 0
+  ok arm == 0
+  ok entrkmute == 0
+host: 129820 ms simulated, 6720 blits, render 0.8% of real time (host CPU)

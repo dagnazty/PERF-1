@@ -1,0 +1,13 @@
+  ok par0 == 45
+  ok frozen == 0
+  ok frozen == 1
+  ok frozen == 0
+  ok par0 == 48
+  ok par0 == 45
+  ok par0 == 0
+  ok par0 == 2
+  ok par0 == 2
+  ok view == 1
+  ok par5 == 131
+  ok view == 1
+host: 7092 ms simulated, 456 blits, render 0.8% of real time (host CPU)

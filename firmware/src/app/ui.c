@@ -60,6 +60,7 @@ enum { KN_PLAIN, KN_PRESET, KN_LEN, KN_TGT, KN_PTGT, KN_NAME, KN_SEC, KN_RANGE, 
 #define FXP_SMART 35                        /* the SMART DJ page (0.16.21): the set's energy arc, the auto-DJ's own timing and choice of piece */
 #define FXP_SMIX 36                         /* the SMART MIX page (0.16.23): the journey across genres, the transitions between pieces */
 #define FXP_MIDIIN 25                       /* the MIDI IN page's place in FXP (0 ..): its panel */
+#define FXP_USBMIDI 23                      /* the USB & MIDI page's (0.16.25: its panel, the USB audio's channels) */
 #define FXP_SCREEN 30                       /* the SCREEN page (0.16.1): zoom, saver, lights, scanlines */
 #define FXP_SAMPLE 31                       /* the SAMPLE page (0.16.1): PERF's sounds one at a time, for a sampler */
 static const char *const RATE_NAME[7] = {"1/2", "1/4", "1/6", "1/8", "1/16", "1/32", "1/64"};          /* the roll's rates */
@@ -94,7 +95,7 @@ static const char *const RPP_NAME[25] = {"-12", "-11", "-10", "-9", "-8", "-7", 
 static const char *const RPG_NAME[4] = {"FULL", "3/4", "HALF", "1/4"};                              /* the repeat's gate: the part of the slice that sounds */
 static const char *const RPR_NAME[3] = {"OFF", "BEAT", "BAR"};                                      /* the repeat's slip refresh */                                       /* the USB audio's level: the master knob's, or fixed (a recording that does not move with the knob) */
 static const char *const KEYSET_NAME[5] = {"SAME", "+2", "+3", "+5", "+7"};                     /* the drop's key change, in semitones */
-static const char *const GENRE_UI_NAME[EN_NGENRE] = {"HYPNO", "LOFI", "HOUSE", "DUBSTEP", "DUB", "DNB", "BREAKS", "GARAGE", "ELECTRO", "TRAP", "DISCO", "FUNK", "REGGAE", "SYNTHWV", "AMAPI", "TRIPHOP", "INDUS", "PSY", "FOREST"};
+static const char *const GENRE_UI_NAME[EN_NGENRE] = {"HYPNO", "LOFI", "HOUSE", "DUBSTEP", "DUB", "DNB", "BREAKS", "GARAGE", "ELECTRO", "TRAP", "DISCO", "FUNK", "REGGAE", "SYNTHWV", "AMAPI", "TRIPHOP", "INDUS", "PSY", "FOREST", "TECHNO", "DETROIT", "HARD"};
 static const char *const SCQ_NAME[2] = {"AT ONCE", "NEXT BAR"};                                  /* when a scene comes */
 static const char *const DJG_NAME[5] = {"8 BARS", "16 BARS", "32 BARS", "64 BARS", "SYNC"};   /* the auto-DJ's groove (SYNC: until the chord changes) */
 static const char *const DJB_NAME[3] = {"SHORT", "HALF", "FULL"};                                /* its breakdown, against the groove */
@@ -110,7 +111,7 @@ static const uint8_t XMIX_BARS[5] = {0, 4, 8, 16, 32};
 static const char *const SMPM_NAME[4] = {"ALL", "DRUMS", "SYNTHS", "BY KEY"};                   /* the SAMPLE page: what a run plays, or a key a sound */
 static const char *const SMPG_NAME[4] = {"0.5 S", "1 S", "2 S", "4 S"};
 static const uint16_t SMP_GAP_MS[4] = {500, 1000, 2000, 4000};
-static const char *const MIN_NAME[4] = {"SCALE", "PADS", "M:S", "MPK"};
+static const char *const MIN_NAME[5] = {"SCALE", "PADS", "M:S", "MPK", "SMC"};   /* (SMC: an M-VAVE SMC-Mixer, 2026-11-14) */
 static const char *const CC_NAME[4] = {"OFF", "IN", "OUT", "IN+OUT"};
 static const char *const FT_NAME[5] = {"LOW", "HIGH", "BAND", "NOTCH", "PEAK"};
 static const char *const SQT_NAME[3] = {"ACID", "BASS", "BOTH"};   /* SCREAM's target (0.16.4) */
@@ -123,10 +124,14 @@ static const uint8_t RIDE_DEPTH[3] = {0, 15, 30};
 static const char *const SCF_NAME[2] = {"OFF", "FOLLOW"};             /* the scenes: by hand, or one for each section */
 static const char *const MVA_NAME[3] = {"OFF", "SOME", "LOTS"};        /* (0.16.20) the auto-DJ's genre moves: how often */
 static const char *const LYR_NAME[3] = {"OFF", "LIGHT", "BUSY"};       /* the groove's layers: how often one goes out for a phrase */
-static const char *const SMLEN_NAME[5] = {"15 MIN", "30 MIN", "60 MIN", "90 MIN", "ENDLESS"};   /* (0.16.21) SMART DJ: the set's length (15: 0.16.24) */
-static const uint8_t SM_MIN[5] = {15, 30, 60, 90, 0};
-static const uint8_t SM_PACE[5] = {50, 75, 100, 100, 100};   /* (0.16.24) how long its grooves and breakdowns run, percent: a short set moves faster */
+#define SM_NLEN 10u
+/* Keep the five saved set lengths at their original indices; song lengths follow them. */
+static const char *const SMLEN_NAME[SM_NLEN] = {"15 MIN", "30 MIN", "60 MIN", "90 MIN", "ENDLESS", "SONG 3M", "SONG 4M", "SONG 5M", "SONG 6M", "SONG 8M"};
+static const uint8_t SM_MIN[SM_NLEN] = {15, 30, 60, 90, 0, 3, 4, 5, 6, 8};
+static const uint8_t SM_PACE[SM_NLEN] = {50, 75, 100, 100, 100, 50, 50, 50, 50, 50};   /* grooves and breakdowns, percent */
 static const char *const SMSHAPE_NAME[4] = {"ARC", "CLIMB", "PEAK", "CHILL"};     /* its energy: warm-up, peak, wind-down; up and stay; high; low */
+static const char *const USBA_NAME[5] = {"MIX", "PARTS", "PARTS 2", "PARTS 3", "SET"};   /* (0.16.25) the USB audio: the stereo mix; six stems; the synths and their
+                                                                     * effects; the drums and theirs (2026-11-11); the mix and four stems */
 static const char *const JY_NAME[3] = {"GENRE", "NEAR", "ANY"};               /* (0.16.23) SMART MIX: the next piece from this genre, a near one, any */
 static const char *const SXM_NAME[4] = {"AUTO", "BLENDS", "CUTS", "PLAIN"};    /* how the pieces are mixed */
 static const char *const SXB_NAME[2] = {"8 BARS", "16 BARS"};                  /* a blend's length */
@@ -190,9 +195,10 @@ static const struct {
     /* the JAM page's four knobs (the UI's own: uiv 7 .. 10): not an FX page, the dial never walks to it */
     {"REPEAT", FX_RPT2, 1, {{"Pitch", KN_NAME, EN_FXS_RP_PITCH, RPP_NAME, 25}, {"Decay", KN_PLAIN, EN_FXS_RP_DECAY, 0, 0},
                             {"Gate", KN_NAME, EN_FXS_RP_GATE, RPG_NAME, 4}, {"Refresh", KN_NAME, EN_FXS_RP_REFRESH, RPR_NAME, 3}}},   /* the eight repeat keys' page (fx_page_of maps them all here) */
-    {"USB & MIDI", 63, 0, {{"Level", KN_NAME, 12, USBL_NAME, 2}, {"MIDI out", KN_PAR, P_MIDI, 0, 0}, {"MIDI map", KN_NAME, 18, EN_MAP_NAME, EN_NMAP}, {"", KN_NONE, 0, 0, 0}}},   /* (Scanlines on SCREEN, 0.16.1) */   /* the cable: the USB audio's level (the knob's, or fixed), MIDI out (it was Global's); the screen's scanlines; and where MIDI out's parts go (GM, or a sampler's own layout) */
+    {"USB & MIDI", 63, 0, {{"Level", KN_NAME, 12, USBL_NAME, 2}, {"MIDI out", KN_PAR, P_MIDI, 0, 0}, {"MIDI map", KN_NAME, 18, EN_MAP_NAME, EN_NMAP},
+                           {"Audio", KN_NAME, 28, USBA_NAME, 5}}},   /* (0.16.25) Audio: the USB audio's layout (Mix, Parts, Parts 2, Parts 3, Set; the global record's) */   /* (Scanlines on SCREEN, 0.16.1) */   /* the cable: the USB audio's level (the knob's, or fixed), MIDI out (it was Global's); the screen's scanlines; and where MIDI out's parts go (GM, or a sampler's own layout) */
     {"SET", 63, 0, {{"Rounds", KN_NAME, 15, ROUNDS_NAME, 4}, {"Ramp", KN_NAME, 16, RAMP_NAME, 5}, {"Intro", KN_NAME, 17, INTRO_NAME, 5}, {"Mix", KN_NAME, 24, XMIX_NAME, 5}}},   /* the set: rounds a piece, the tempo's climb, the intro; the mix into the next piece (0.16.1) */
-    {"MIDI IN", 63, 0, {{"Notes", KN_NAME, 20, MIN_NAME, 4}, {"Channel", KN_NAME, 19, MCH_NAME, 17}, {"USB host", KN_NAME, 21, ONOFF_NAME, 2}, {"Knob CCs", KN_NAME, 22, CC_NAME, 4}}},   /* MIDI in's notes: the scale (as before), or PADS (a pad controller plays PERF: pads_in); the channel listened to; the USB port as the host of a USB-MIDI device (not kept: every power-on is a device) */
+    {"MIDI IN", 63, 0, {{"Notes", KN_NAME, 20, MIN_NAME, 5}, {"Channel", KN_NAME, 19, MCH_NAME, 17}, {"USB host", KN_NAME, 21, ONOFF_NAME, 2}, {"Knob CCs", KN_NAME, 22, CC_NAME, 4}}},   /* MIDI in's notes: the scale (as before), or PADS (a pad controller plays PERF: pads_in); the channel listened to; the USB port as the host of a USB-MIDI device (not kept: every power-on is a device) */
     {"FILTERS", FX_SPARE14, 0, {{"Pad", KN_NAME, EN_FXS_FT_PAD, FT_NAME, 5}, {"Bass", KN_NAME, EN_FXS_FT_BASS, FT_NAME, 5}, {"Acid", KN_NAME, EN_FXS_FT_ACID, FT_NAME, 5}, {"", KN_NONE, 0, 0, 0}}},   /* the synths' filter types (0.15.15; a spare effect bit: nothing held) */
     {"FILTER", FX_TFILT, 0, {{"Type", KN_NAME, EN_FXS_TF_TYPE, FT_NAME, 5}, {"Cutoff", KN_PLAIN, EN_FXS_TF_CUT, 0, 0}, {"Reso", KN_PLAIN, EN_FXS_TF_RESO, 0, 0},
                              {"Targets", KN_NAME, EN_FXS_TF_TGT, EN_PT_NAME, EN_NPT}}},   /* (0.15.19) the punch-ins on tracks: a multimode filter on the tracks chosen */
@@ -213,7 +219,7 @@ static const struct {
                                  {"Moves", KN_NAME, EN_FXS_DJ_MOVE, MVA_NAME, 3}, {"Layers", KN_NAME, EN_FXS_DJ_LAYER, LYR_NAME, 3}}},   /* (0.16.19; a spare effect bit: nothing
                                                     * held) the mood and the scenes follow the sections, by the auto-DJ or by hand (ride_tick); (0.16.20) the auto-DJ's
                                                     * genre moves (mv_*) and the groove's layers (ar_tick) */
-    {"SMART DJ", FX_SPARE10, 0, {{"Smart", KN_NAME, EN_FXS_SD_ON, ONOFF_NAME, 2}, {"Set", KN_NAME, EN_FXS_SD_LEN, SMLEN_NAME, 5},
+    {"SMART DJ", FX_SPARE10, 0, {{"Smart", KN_NAME, EN_FXS_SD_ON, ONOFF_NAME, 2}, {"Length", KN_NAME, EN_FXS_SD_LEN, SMLEN_NAME, SM_NLEN},
                                  {"Shape", KN_NAME, EN_FXS_SD_SHAPE, SMSHAPE_NAME, 4}, {"Yield", KN_NAME, EN_FXS_SD_YIELD, ONOFF_NAME, 2}}},   /* (0.16.21; a spare effect
                                                     * bit: nothing held) the auto-DJ plans the set's energy, listens, times its sections and picks its pieces (sm_*) */
     {"SMART MIX", FX_SPARE9, 0, {{"Journey", KN_NAME, EN_FXS_SX_JOURNEY, JY_NAME, 3}, {"Mixes", KN_NAME, EN_FXS_SX_MIXES, SXM_NAME, 4},
@@ -579,6 +585,10 @@ static struct {
     uint8_t tx_next, tx_sl, jq, gn_run, jrecent[3];   /* where it goes (genre * 10 + piece + 1), or the set list's slot + 1; the piece waiting for the bar's
                                                 * last step (genre * 10 + piece + 1); pieces in a row in this genre; the last three played (+1) */
     uint32_t sm_mt;                    /* its mood's last step (ms) */
+    uint8_t jplayed[(EN_NGENRE * NPIECES + 7) / 8], jprev[(EN_NGENRE * NPIECES + 7) / 8];   /* (2026-11-19) the pieces this set has played (bit genre * 10 + piece),
+                                                * and the last set's (the power on: not kept), so a set doesn't play a piece twice or retrace the last */
+    uint8_t sm_pkp, sm_brph;           /* (2026-11-19) this set's peak (percent of the set, 62..78; 70 until a set starts) and its breath's phase (4 s units) */
+    uint32_t loud_t;                   /* (2026-11-09) the last time the output was playing or still sounding (a stop's tails): autosave's quiet */
     uint8_t dj_phase, dj_fill;         /* groove 0, breakdown 1, build 2; a fill in the bar before the breakdown */
     uint8_t dj_rounds, dj_ramp, intro; /* the SET page: rounds a piece gets (1, 2, 4, 8), the tempo's climb over them, the intro (kept in set_t.usb's bits 3 ..) */
     uint8_t dj_round;                  /* the round the piece is in (from 0) */
@@ -795,6 +805,8 @@ static void tap_tempo(void)                    /* four taps or so: the tempo fro
 static const uint8_t DJ_LEN[5] = {8, 16, 32, 64, 16};   /* the fifth: SYNC, with the drift's chord changes (16 only for the bar of the count) */
 #define DJ_G() (DJ_LEN[ui.dj_len % 5u])
 static int sm_on(void) { return ui.dj_on && (ui.fxs[EN_FXS_SD_ON] & 1u); }   /* (0.16.21) SMART DJ runs the auto-DJ */
+static int sm_song(void) { return ui.fxs[EN_FXS_SD_LEN] % SM_NLEN >= 5u; }
+static uint32_t sm_len_ms(void) { return (uint32_t)SM_MIN[ui.fxs[EN_FXS_SD_LEN] % SM_NLEN] * 60000u; }   /* 0: endless */
 static int dj_fixed(void) { return ui.dj_len != 4 && !sm_on(); }            /* the auto-DJ counts a groove of DJ_G() bars (not Sync, not Smart) */
 static void sm_groove_bar(int last_round);
 static int sm_break_len(void);
@@ -959,7 +971,7 @@ static uint8_t *uiv(int i)                     /* the PERFORM page's settings (t
            i == 5 ? &ui.saver : i == 6 ? &ui.lights : i == 7 ? &ui.jam_voice : i == 8 ? &ui.jam_mode : i == 9 ? &ui.jam_oct : i == 10 ? &ui.jam_ans :
            i == 12 ? &ui.usb_fixed : i == 13 ? &ui.fm_dy : i == 14 ? &ui.scan : i == 15 ? &ui.dj_rounds : i == 16 ? &ui.dj_ramp : i == 17 ? &ui.intro :
            i == 18 ? &ui.midi_map : i == 19 ? &ui.min_ch : i == 20 ? &ui.min_pads : i == 21 ? &ui.usb_host : i == 22 ? &ui.cc_mode :
-           i == 23 ? &glob.sl_rsv[0] : i == 24 ? &glob.sl_rsv[1] : i == 25 ? &ui.smp_mode : i == 26 ? &ui.smp_fx : i == 27 ? &ui.smp_gap : &proj.genre;   /* 23 zoom, 24 the mix (0.16.1: the global record's spare bytes) */   /* 11: the genre (proj's own); 12: the USB audio's level, 13: the voice set, 14: scanlines, 15-17 the SET page, 18 the MIDI map (kept in set_t.usb) */
+           i == 23 ? &glob.sl_rsv[0] : i == 24 ? &glob.sl_rsv[1] : i == 25 ? &ui.smp_mode : i == 26 ? &ui.smp_fx : i == 27 ? &ui.smp_gap : i == 28 ? &glob.sl_rsv[2] : &proj.genre;   /* 23 zoom, 24 the mix (0.16.1: the global record's spare bytes) */   /* 11: the genre (proj's own); 12: the USB audio's level, 13: the voice set, 14: scanlines, 15-17 the SET page, 18 the MIDI map (kept in set_t.usb) */
 }
 #define FXP_UI(k) (FXP[((k) - K_FXP) / 4].bit == 63)   /* the PERFORM page: no effect, the UI's own settings */
 static int fxp_get(int k)
@@ -1027,6 +1039,13 @@ static void fxp_set(int k, int v)
                 en_fm_set_dy(v);                 /* the DX or the DY voices: the names change at once, the patch at the next chunk */
             else if (FXP_CTL(k).idx == 23 || FXP_CTL(k).idx == 24)
                 project_globals();               /* (zoom and the mix: the global record, stored at once) */
+            else if (FXP_CTL(k).idx == 28) {     /* (0.16.25) the USB audio's layout: stored, and the port comes back with it */
+                static const char *const AS[5] = {"MIX: 2 CHANNELS", "PARTS: 6 CHANNELS", "SYNTHS + FX: 6 CH", "DRUMS + FX: 6 CH", "SET: 6 CHANNELS"};
+                project_globals();
+                plat_usb_audio(v);
+                say("USB AUDIO", AS[v % 5]);
+                ui.msg_until = plat_ms() + 2500u;
+            }
             break;
         }
         if (v != ui.fxs[FXP_CTL(k).idx]) {
@@ -1822,10 +1841,10 @@ static const char *const MV_NAME[MV_N] = {"", "NO BREAK", "LONG BREAK", "FAKE DR
 #define MG(g) (1u << (g))                      /* the genres: 0 HYPNO, 1 LOFI, 2 HOUSE, 3 DUBSTEP, 4 DUB, 5 DNB, 6 BREAKS, 7 GARAGE, 8 ELECTRO, 9 TRAP, 10 DISCO,
                                                 * 11 FUNK, 12 REGGAE, 13 SYNTHWAVE, 14 AMAPIANO, 15 TRIP-HOP, 16 INDUSTRIAL, 17 PSY, 18 FOREST */
 static const uint32_t MV_FAV[MV_N] = {0,
-    MG(0) | MG(2) | MG(8) | MG(10) | MG(11) | MG(14) | MG(16),
-    MG(17) | MG(13) | MG(0) | MG(15) | MG(2) | MG(1),
-    MG(3) | MG(9) | MG(5) | MG(7) | MG(18),
-    MG(5) | MG(3) | MG(6) | MG(18) | MG(9),
+    MG(0) | MG(2) | MG(8) | MG(10) | MG(11) | MG(14) | MG(16) | MG(19) | MG(21),
+    MG(17) | MG(13) | MG(0) | MG(15) | MG(2) | MG(1) | MG(20),
+    MG(3) | MG(9) | MG(5) | MG(7) | MG(18) | MG(21),
+    MG(5) | MG(3) | MG(6) | MG(18) | MG(9) | MG(21),
     MG(4) | MG(12) | MG(3) | MG(15) | MG(1) | MG(14)};
 #ifdef EN_HOST
 int ui_mv_force = -1;                           /* the tests: the next round's move as told (-1: the dice) */
@@ -1848,6 +1867,8 @@ static void mv_plan(void)                       /* a new round's groove: its mov
     int m, tot = 0, pick;
     ui.mv = MV_NONE;
     ui.mv_fake = ui.mv_drop2 = 0;
+    if (smart && sm_song())
+        return;                                  /* a song keeps its planned sections; extra drops and long breaks can overrun its close */
 #ifdef EN_HOST
     if (ui_mv_force >= 0) {
         ui.mv = (uint8_t)(ui_mv_force % MV_N);
@@ -2403,10 +2424,17 @@ static int sm_ss(int a, int b, uint32_t x, uint32_t span)   /* a to b as x goes 
     const float t = x >= span ? 1.0f : (float)x / (float)span, k = t * t * (3.0f - 2.0f * t);
     return a + (int)((float)(b - a) * k);
 }
+static uint32_t sm_pk(uint32_t len) { return len / 100u * (ui.sm_pkp ? ui.sm_pkp : 70u); }   /* a timed ARC's peak (ms into the set) */
+static int jy_was(const uint8_t *m, int id) { return id >= 0 && id < EN_NGENRE * NPIECES && (m[id >> 3] >> (id & 7) & 1u); }
+static void jy_mark(int id)                     /* a piece played in this set */
+{
+    if (id >= 0 && id < EN_NGENRE * NPIECES)
+        ui.jplayed[id >> 3] |= (uint8_t)(1u << (id & 7));
+}
 static int sm_target(uint32_t ms)              /* the energy the arc wants at this time into the set */
 {
-    const uint32_t len = (uint32_t)SM_MIN[ui.fxs[EN_FXS_SD_LEN] % 5u] * 60000u, cyc = 2400000u;   /* (endless: a 40-minute wave) */
-    const uint32_t p = ms % 480000u;
+    const uint32_t len = sm_len_ms(), cyc = 2400000u;   /* (endless: a 40-minute wave) */
+    const uint32_t p = (ms + 4000u * ui.sm_brph) % 480000u;
     int e, br = (int)(p < 240000u ? p : 480000u - p) / 20000 - 6;   /* the breath: -6 .. +6 over 8 minutes */
     switch (ui.fxs[EN_FXS_SD_SHAPE] & 3u) {
     case 0:                                      /* ARC */
@@ -2414,7 +2442,7 @@ static int sm_target(uint32_t ms)              /* the energy the arc wants at th
             const uint32_t q = ms % cyc;
             e = q < cyc / 2 ? sm_ss(45, 95, q, cyc / 2) : sm_ss(95, 45, q - cyc / 2, cyc / 2);
         } else {
-            const uint32_t pk = len / 10u * 7u;
+            const uint32_t pk = sm_pk(len);
             e = ms < pk ? sm_ss(30, 95, ms, pk) : sm_ss(95, 40, ms - pk, len - pk);
         }
         break;
@@ -2459,7 +2487,7 @@ static int sm_yield(void)                      /* the player is playing (and Yie
 {
     return (ui.fxs[EN_FXS_SD_YIELD] & 1u) && ui.sm_act && plat_ms() - ui.sm_act < 8000u;
 }
-static int sm_pace(void) { return SM_PACE[ui.fxs[EN_FXS_SD_LEN] % 5u]; }   /* (0.16.24) percent */
+static int sm_pace(void) { return SM_PACE[ui.fxs[EN_FXS_SD_LEN] % SM_NLEN]; }   /* (0.16.24) percent */
 static int sm_patience(void)                    /* bars of groove before it is stale: 16 at the peak, 48 at rest, at the set's pace (8 at least) */
 {
     const int b = (16 + (100 - (int)ui.sm_e) * 32 / 100) * sm_pace() / 100;
@@ -2494,8 +2522,8 @@ static void sm_outro_bar(void)                  /* the close: a bar of it */
     static const uint8_t ORDER[EN_NTRACK] = {EN_TR_ACID, EN_TR_PLUCK, EN_TR_DRONE, EN_TR_SNARE, EN_TR_KICK, EN_TR_PERC, EN_TR_HATS, EN_TR_PAD};
     int k;
     ui.ss_out++;
-    if (ui.ss_out & 1u)
-        return;                                  /* (every second bar) */
+    if (!sm_song() && (ui.ss_out & 1u))
+        return;                                  /* every second bar in a set; every bar in a short song */
     for (k = 0; k < EN_NTRACK; k++) {            /* the next part still playing goes */
         const int t = ORDER[k];
         if (!(ui.ss_m >> t & 1u) && !(ui.trk_m >> t & 1u) && ar_audible(t)) {
@@ -2520,7 +2548,7 @@ static void sm_outro_bar(void)                  /* the close: a bar of it */
         ui.ss_done = 1;
         ui.ss_out = 0;
         ui.ss_stop = plat_ms();
-        say("SET OVER", c);
+        say(sm_song() ? "SONG OVER" : "SET OVER", c);
         ui.msg_until = plat_ms() + 6000u;
     }
 }
@@ -2528,7 +2556,6 @@ static void set_piece(int i);
 static int sm_penergy(int tempo, const uint16_t *pat0);
 static int jy_pick(int e, int opening);
 static void tx_abort(void);
-static uint32_t sm_len_ms(void);
 static void set_start(void)                     /* START SET */
 {
     const int e0 = sm_target(0);
@@ -2537,7 +2564,7 @@ static void set_start(void)                     /* START SET */
     en_fxs(EN_FXS_SD_ON, 1);
     ui.set_dirty = 1;                            /* (Smart on: kept) */
     ui.dj_on = 1;
-    ui.dj_piece = 1;
+    ui.dj_piece = (uint8_t)!sm_song();
     ui.dj_phase = 0;
     ui.dj_n = 0;
     ui.dj_round = 0;
@@ -2562,7 +2589,23 @@ static void set_start(void)                     /* START SET */
     ui.jq = 0;
     ui.jrecent[0] = ui.jrecent[1] = ui.jrecent[2] = 0;
     ui.gn_run = 1;
-    if (ui.fxs[EN_FXS_SX_JOURNEY] % 3u) {        /* the journey: the opening from any genre, whose energy suits the arc's start */
+    {   /* (2026-11-19) every set its own: the dice stirred by the time it starts, the last set's pieces kept to be kept away from, none played yet,
+         * the peak somewhere from 62 % to 78 % of the set and the breath at another phase */
+        int b, any = 0;
+        ui.ar_rng = (ui.ar_rng ^ plat_ms() * 2654435761u) | 1u;
+        for (b = 0; b < (int)sizeof ui.jplayed; b++)
+            any |= ui.jplayed[b];
+        if (any)
+            for (b = 0; b < (int)sizeof ui.jplayed; b++)
+                ui.jprev[b] = ui.jplayed[b];
+        for (b = 0; b < (int)sizeof ui.jplayed; b++)
+            ui.jplayed[b] = 0;
+        ui.sm_pkp = (uint8_t)(62u + ar_dice() % 17u);
+        ui.sm_brph = (uint8_t)(ar_dice() % 120u);
+    }
+    if (sm_song())
+        bs = 0;                                  /* arrange the current piece, including its unsaved edits */
+    else if (ui.fxs[EN_FXS_SX_JOURNEY] % 3u) {   /* the journey: the opening from any genre, whose energy suits the arc's start */
         int o;
         if (en_playing)
             en_play(0);                          /* (from silence, as below; before the genre changes under it) */
@@ -2576,7 +2619,7 @@ static void set_start(void)                     /* START SET */
     }
     for (i = 0; i < NPIECES && bs; i++) {        /* the opening: the piece whose energy is nearest what the arc wants first */
         const int pe = i == proj.piece ? sm_penergy(proj.par[P_TEMPO], (const uint16_t *)en_pats[0]) : sm_penergy(proj.slot[i].par[P_TEMPO], proj.slot[i].pats[0]);
-        const int sc = (pe > e0 ? pe - e0 : e0 - pe) * 4 + (int)(ar_dice() % 8u);
+        const int sc = (pe > e0 ? pe - e0 : e0 - pe) * 2 + (int)(ar_dice() % 24u) + (jy_was(ui.jprev, proj.genre * NPIECES + i) ? 24 : 0);
         if (sc < bs) {
             bs = sc;
             best = i;
@@ -2586,8 +2629,9 @@ static void set_start(void)                     /* START SET */
         en_play(0);
     if (best != proj.piece)
         set_piece(best);
+    jy_mark(proj.genre * NPIECES + proj.piece);
     {   /* the tracks in one by one: over the SET page's intro, or a minute when it is off; a timed set's at most a tenth of it (its twentieth when off) */
-        const int own = INTRO_S[ui.intro % 5u], len_s = (int)(sm_len_ms() / 1000u), cap = len_s ? len_s / (own ? 10 : 20) : 1800;
+        const int own = INTRO_S[ui.intro % 5u], len_s = (int)(sm_len_ms() / 1000u), cap = len_s ? len_s / (own || sm_song() ? 10 : 20) : 1800;
         const int want = (own ? own : 60) < cap ? (own ? own : 60) : cap;
         if (want != own) {
             en_intro(want);
@@ -2600,7 +2644,7 @@ static void set_start(void)                     /* START SET */
     trk_send();
     en_seed(plat_ms());
     en_play(1);
-    say("SET STARTED", "00:00:00");
+    say(sm_song() ? "SONG STARTED" : "SET STARTED", "00:00:00");
 }
 /* THE PLAN (0.16.24): Smart DJ keeps the set to its clock. The close starts so that its last part leaves, and the music stops, as the set's time comes
  * (its bars: two for each part still playing, and two more; at the tempo now). A breakdown starts only if it, the build and 8 bars after the drop fit
@@ -2608,14 +2652,13 @@ static void set_start(void)                     /* START SET */
  * its drop lands on the peak, groove stale or not, and a piece that has had its rounds takes that one more drop before it mixes out; from a minute or so
  * before, no mix and no stale breakdown starts, so none is under way when that breakdown is due (sm_hold). The journey looks
  * ahead a sixth of a timed set (five minutes at most), so near the end it chooses for the end. */
-static uint32_t sm_len_ms(void) { return (uint32_t)SM_MIN[ui.fxs[EN_FXS_SD_LEN] % 5u] * 60000u; }   /* 0: endless */
 static uint32_t sm_bar_ms(void) { const int t = proj.par[P_TEMPO] < 60 ? 60 : proj.par[P_TEMPO]; return 240000u / (uint32_t)t; }
 static uint32_t sm_close_ms(void)               /* how long the close will take, from now */
 {
     int t, n = 0;
     for (t = 0; t < EN_NTRACK; t++)
         n += ar_audible(t) && !(ui.trk_m >> t & 1u);
-    return (uint32_t)(2 * (n + 1)) * sm_bar_ms();
+    return (uint32_t)((sm_song() ? 1 : 2) * (n + 1)) * sm_bar_ms();
 }
 static int sm_fits(int bars)                    /* bars of music from now end before the close */
 {
@@ -2633,7 +2676,7 @@ static uint32_t sm_peak_ms(void)                /* the next peak to aim a drop a
     if ((ui.fxs[EN_FXS_SD_SHAPE] & 3u) != 0)
         return 0;
     if (len)
-        return ui.sm_peak_n ? 0 : len / 10u * 7u;
+        return ui.sm_peak_n ? 0 : sm_pk(len);
     return (ui.sm_ms / cyc) * cyc + cyc / 2u + (ui.sm_ms % cyc >= cyc / 2u ? cyc : 0u);
 }
 static int sm_aim(void)                         /* a breakdown from the next phrase line would put its drop on the peak */
@@ -2658,7 +2701,7 @@ static int sm_hold(void)                        /* the peak's breakdown is comin
 }
 static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n counted) */
 {
-    const uint32_t idle = plat_ms() - ui.sm_act, len = (uint32_t)SM_MIN[ui.fxs[EN_FXS_SD_LEN] % 5u] * 60000u;
+    const uint32_t idle = plat_ms() - ui.sm_act, len = sm_len_ms();
     int news = 0, gain = 2;
     (void)last_round;
     if (ui.tx) {                                 /* (0.16.23) a mix under way: its bars, and nothing else */
@@ -2713,8 +2756,8 @@ static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n cou
     if (news && ui.sm_bore >= 2u)
         ui.sm_bore = (uint16_t)(ui.sm_bore - 2u * (uint16_t)news);
     {
-        const int aim = ui.dj_n % 8u == 7u && sm_aim(), hold = sm_hold(), brk = 1 + sm_break_len() + en_build_len() + 8;
-        if ((ui.dj_piece || sl_play()) && ui.dj_round >= DJ_ROUNDS[ui.dj_rounds & 3] && !aim) {   /* (0.16.23) the piece has had its rounds: no more
+        const int aim = ui.dj_n % 8u == 7u && sm_aim(), hold = sm_hold(), brk = 1 + sm_break_len() + en_build_len() + (sm_song() ? 4 : 8);
+        if (!sm_song() && (ui.dj_piece || sl_play()) && ui.dj_round >= DJ_ROUNDS[ui.dj_rounds & 3] && !aim) {   /* (0.16.23) the piece has had its rounds: no more
                                                  * breakdowns (but the peak's); on a phrase line, as it nears staleness (a blend's bars ahead), it mixes into the next
                                                  * (SMART MIX), if the mix and 8 bars after it fit before the close (0.16.24) */
             if (ui.dj_n >= 8u && ui.dj_n % 8u == 0u && !en_sec_req && !hold && ((int)ui.sm_bore + 16 >= 2 * sm_patience() || ui.dj_n >= 64u) &&
@@ -2778,7 +2821,9 @@ static int sm_pick(void)                        /* the bank's piece that mixes i
         dt = dt < 0 ? -dt : dt;
         de = sm_penergy(sl->par[P_TEMPO], sl->pats[0]) - pc - want;
         de = de < 0 ? -de : de;
-        sc = 12 * d + 2 * dt + de + (int)(ar_dice() % 6u);   /* (a little chance among the near-equal) */
+        sc = 12 * d + 2 * dt + de + (int)(ar_dice() % 24u);   /* (chance among the near-equal: 2026-11-19, it was 6 and every set went the same way) */
+        if (jy_was(ui.jplayed, proj.genre * NPIECES + i))
+            sc += 40;                            /* (played in this set already: only if the bank has nothing else that mixes) */
         if (sc < bs) {
             bs = sc;
             best = i;
@@ -2812,13 +2857,13 @@ static int sm_pick(void)                        /* the bank's piece that mixes i
 enum { TX_NONE, TX_PLAIN, TX_FILTER, TX_BASS, TX_DRUMS, TX_ECHO, TX_ROLL, TX_SPIN, TX_N };
 static const char *const TX_NAME[TX_N] = {"", "CUT", "FILTER", "BASS SWAP", "DRUMS FIRST", "ECHO OUT", "LOOP ROLL", "SPINBACK"};
 static const uint32_t TX_FAV[TX_N] = {0, 0,
-    MG(2) | MG(0) | MG(10) | MG(7) | MG(17) | MG(13) | MG(8) | MG(16) | MG(14),
-    MG(2) | MG(0) | MG(5) | MG(7) | MG(6) | MG(3) | MG(18) | MG(17),
-    MG(0) | MG(2) | MG(6) | MG(11) | MG(16) | MG(10),
+    MG(2) | MG(0) | MG(10) | MG(7) | MG(17) | MG(13) | MG(8) | MG(16) | MG(14) | MG(19) | MG(20),
+    MG(2) | MG(0) | MG(5) | MG(7) | MG(6) | MG(3) | MG(18) | MG(17) | MG(19) | MG(20) | MG(21),
+    MG(0) | MG(2) | MG(6) | MG(11) | MG(16) | MG(10) | MG(19) | MG(21),
     MG(4) | MG(12) | MG(15) | MG(1) | MG(3),
     MG(5) | MG(6) | MG(3) | MG(9) | MG(18) | MG(8),
     MG(9) | MG(5) | MG(3) | MG(11) | MG(6) | MG(1)};
-static const uint8_t GEN_E[EN_NGENRE] = {70, 20, 60, 75, 30, 85, 70, 60, 65, 65, 55, 50, 30, 45, 45, 25, 75, 85, 90};   /* each genre's energy, as the journey sees it */
+static const uint8_t GEN_E[EN_NGENRE] = {70, 20, 60, 75, 30, 85, 70, 60, 65, 65, 55, 50, 30, 45, 45, 25, 75, 85, 90, 75, 58, 92};   /* each genre's energy, as the journey sees it */
 #ifdef EN_HOST
 int ui_tx_force = -1;                           /* the tests: the transitions as told (TX_*, -1: chosen) */
 #endif
@@ -2848,8 +2893,15 @@ static void jy_eval(int g, int p, int *tempo, int *key, int *pe)   /* a piece's 
 static int jy_pick(int e, int opening)          /* the next piece (genre * 10 + piece), for energy e: -1 none */
 {
     const int mode = ui.fxs[EN_FXS_SX_JOURNEY] % 3u, gc = proj.genre;
-    int tc, kc, pc, g, p, best = -1, bs = 1 << 30, bd = 0;
+    int tc, kc, pc, g, p, best = -1, bs = 1 << 30, bd = 0, pass;
     jy_eval(gc, proj.piece, &tc, &kc, &pc);
+    for (pass = 0; pass < 2 && best < 0; pass++) {   /* (a second pass, the set's pieces forgotten, when it has played every one it may go to) */
+    if (pass) {
+        int b;
+        for (b = 0; b < (int)sizeof ui.jplayed; b++)
+            ui.jplayed[b] = 0;
+        jy_mark(gc * NPIECES + proj.piece);
+    }
     for (g = 0; g < EN_NGENRE; g++) {
         const int ge = GEN_E[g] - GEN_E[gc];
         if ((mode == 0 && g != gc) || (mode == 1 && !opening && (ge < -25 || ge > 25)))
@@ -2861,10 +2913,11 @@ static int jy_pick(int e, int opening)          /* the next piece (genre * 10 + 
                 continue;
             for (r = 0; r < 3 && ui.jrecent[r] != id + 1; r++)
                 ;
-            if (r < 3)
-                continue;                        /* (one of the last three) */
+            if (r < 3 || jy_was(ui.jplayed, id))
+                continue;                        /* (one of the last three; 2026-11-19: or any this set has played) */
             jy_eval(g, p, &t, &k, &pe);
-            sc = 2 * (pe > e ? pe - e : e - pe) + (int)(ar_dice() % 6u);
+            sc = 2 * (pe > e ? pe - e : e - pe) + (int)(ar_dice() % 24u) + (jy_was(ui.jprev, id) ? 24 : 0);   /* (chance among the near-equal, 24: it was 6
+                                                 * and every set took the same road; the last set's pieces kept away from) */
             if (!opening) {
                 d = k - kc;
                 d = d < 0 ? -d : d;
@@ -2881,6 +2934,7 @@ static int jy_pick(int e, int opening)          /* the next piece (genre * 10 + 
                 bd = d;
             }
         }
+    }
     }
     if (best >= 0 && !opening)
         ui.sm_dist = (int8_t)bd;
@@ -2938,6 +2992,8 @@ static void tx_start(void)                      /* the mix begins, on a phrase l
 {
     int nx;
     char u[16], h[20];
+    if (sm_song())
+        return;
     if (sl_play()) {                             /* the set list's next slot: its order, SMART MIX's way of getting there */
         const int sl = sl_step(ui.sl_pos, 1);
         if (sl < 0)
@@ -3079,7 +3135,7 @@ static void sm_tick(void)                       /* each frame: the set's clock, 
 {
     const uint32_t now = plat_ms();
     int want;
-    if (ui.tx && (!sm_on() || !en_playing || (en_sec != EN_SEC_GROOVE && !ui.tx_q)))
+    if (ui.tx && (!sm_on() || sm_song() || !en_playing || (en_sec != EN_SEC_GROOVE && !ui.tx_q)))
         tx_abort();
     if (ui.min_n != ui.sm_min) {                 /* MIDI in: the player too */
         ui.sm_min = ui.min_n;
@@ -3227,8 +3283,8 @@ static void genre_fx(int g)
         for (i = 0; i < 4; i++)
             fxs_put(SET[8 + i], HOUSE[i]);
         ui.fx_lock |= FXB(FX_PUMP);
-    } else if (g >= 4 && g - 4 < 15) {           /* the others: each its tape, vinyl and pump (255: as it is), and what is latched (1 vinyl, 2 tape, 4 pump, 8 phaser) */
-        static const uint8_t XFX[15][12] = {
+    } else if (g >= 4 && g - 4 < 18) {           /* the others: each its tape, vinyl and pump (255: as it is), and what is latched (1 vinyl, 2 tape, 4 pump, 8 phaser) */
+        static const uint8_t XFX[18][12] = {
             {14, 16, 22, 38, 255, 255, 255, 255, 255, 255, 255, 255},   /* dub: a worn tape (and the long echo) */
             {5, 5, 25, 20, 255, 255, 255, 255, 30, 30, 1, 0xF0},      /* dnb: a light pump, a very light tape */
             {20, 15, 60, 30, 255, 255, 255, 255, 255, 255, 255, 255}, /* breaks: tape drive, the phaser */
@@ -3243,8 +3299,11 @@ static void genre_fx(int g)
             {18, 14, 28, 40, 30, 22, 36, 36, 255, 255, 255, 255},           /* trip-hop: the vinyl and the tape, gentler than lofi's */
             {20, 10, 70, 25, 255, 255, 255, 255, 255, 255, 255, 255},       /* industrial: a hard tape drive */
             {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},   /* psy: nothing latched (the echo and the shimmer are in the piece) */
-            {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}};  /* dark forest: the same */
-        static const uint8_t XLK[15] = {2, 6, 10, 6, 8, 4, 4, 0, 2, 0, 4, 3, 2, 0, 0};
+            {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},   /* dark forest: the same */
+            {255, 255, 255, 255, 255, 255, 255, 255, 40, 40, 1, 0x70},      /* techno: the pump on the quarters */
+            {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},   /* detroit: nothing latched */
+            {20, 10, 70, 25, 255, 255, 255, 255, 45, 35, 1, 0x70}};         /* hard: a hard tape drive and the pump */
+        static const uint8_t XLK[18] = {2, 6, 10, 6, 8, 4, 4, 0, 2, 0, 4, 3, 2, 0, 0, 4, 0, 6};
         for (i = 0; i < 12; i++)
             if (XFX[g - 4][i] != 255)
                 fxs_put(SET[i], XFX[g - 4][i]);
@@ -4279,6 +4338,69 @@ static int32_t in_enc(int role)
 
 /* MIDI in (USB and the TRS jack): on the channel chosen (MIDI IN page; all by default), notes add or remove their note from the scale
  * (channel 1 only, as before), or with PADS play PERF (pads_in); clock and start / stop drive the grid */
+/* An M-VAVE SMC-Mixer (MIDI IN's Notes: SMC, 2026-11-14; over the USB host, or through a computer), as the maker's sends in its plain mode: control
+ * changes on one channel. Its eight faders (CC 40-47) are the eight tracks' levels, kick, hats, snare, perc, bass, acid, pad, pluck (the hats' closed and
+ * open, the snare's and the clap's, together); the top button of each strip (20-27) mutes its track. Its knobs (32-39, as far as they were seen: 34 and
+ * 35) are the mood, the four FX knobs, the acid's cutoff and resonance and the bass's cutoff. The bottom row (52-62): breakdown, build, drop, fill,
+ * auto-DJ, freeze, the piece before, the next piece, stop, play, START SET. The strips' second and third buttons send numbers the knobs and faders use
+ * too (32-39, 48-51), so they do nothing, and a knob's number jumping straight to an end (a button's 127, then 0) is not taken as a turn. */
+static uint8_t smc_last[8];                      /* a knob's last place + 1 (0: none yet) */
+static void smc_cc(int cc, int v)
+{
+    static const uint8_t LV[8][2] = {{P_LANE_LVL(0), 0}, {P_LANE_LVL(3), P_LANE_LVL(4)}, {P_LANE_LVL(1), P_LANE_LVL(2)}, {P_LANE_LVL(5), 0},
+                                     {P_BASS, 0}, {P_ACID, 0}, {P_PAD, 0}, {P_CM_LVL, 0}};
+    static const char *const TN[8] = {"KICK", "HATS", "SNARE", "PERC", "BASS", "ACID", "PAD", "PLUCK"};
+    if (cc >= 40 && cc <= 47) {                  /* a fader: its track's level, where the fader is */
+        const int x = (v * 100 + 63) / 127;
+        knob_set(LV[cc - 40][0], x);
+        if (LV[cc - 40][1])
+            knob_set(LV[cc - 40][1], x);
+    } else if (cc >= 20 && cc <= 27) {           /* a strip's top button: its track's mute */
+        if (v >= 64) {
+            ui.trk_m ^= (uint8_t)(1u << (cc - 20));
+            trk_send();
+            say(ui.trk_m >> (cc - 20) & 1u ? "MUTE" : "UNMUTE", TN[cc - 20]);
+        }
+    } else if (cc >= 32 && cc <= 39) {           /* a knob (not a button on the same number: that goes to an end at once) */
+        static const uint8_t AS[8] = {71, 12, 1, 74, 13, 0, 0, 0};
+        static const uint8_t P[3] = {P_AC_CUT, P_AC_RES, P_DR_CUT};
+        const int k = cc - 32, last = smc_last[k] ? smc_last[k] - 1 : -1;
+        const int d = v > last ? v - last : last - v;
+        if ((v == 0 || v == 127) && (last < 0 || d > 16))
+            return;
+        smc_last[k] = (uint8_t)(v + 1);
+        if (k < 5) {
+            cc_in(AS[k], v);
+        } else {
+            int lo, hi;
+            knob_range(P[k - 5], &lo, &hi);
+            knob_set(P[k - 5], lo + (v * (hi - lo) + 63) / 127);
+        }
+    } else if (cc >= 52 && cc <= 62 && v >= 64) {   /* the bottom row */
+        static const uint8_t PAD[6] = {8, 9, 10, 12, 14, 13};   /* (the pads' own: breakdown, build, drop, fill, auto-DJ, freeze) */
+        if (cc <= 57) {
+            pads_in(1, PADS_BASE + PAD[cc - 52], 100);
+        } else if (cc == 58 || cc == 59) {
+            if (en_playing) {
+                ui.piece_q = (uint8_t)((proj.piece + (cc == 59 ? 1 : NPIECES - 1)) % NPIECES + 1);
+                say(cc == 59 ? "NEXT PIECE" : "PIECE BEFORE", "NEXT BAR");
+            }
+        } else if (cc == 60) {
+            if (en_playing) {
+                en_play(0);
+                say("STOPPED", 0);
+            }
+        } else if (cc == 61) {
+            if (!en_playing) {
+                en_seed(plat_ms());
+                en_play(1);
+                say("PLAYING", 0);
+            }
+        } else {
+            set_start();
+        }
+    }
+}
 static void midi_in(void)
 {
     uint32_t pkt;
@@ -4298,6 +4420,9 @@ static void midi_in(void)
                 say("FREEZE", v >= 64u ? "ON" : "OFF");
                 en_freeze(v >= 64u);
             }
+        } else if (ui.min_pads == 4 && (st & 0xF0u) == 0xB0u) {
+            if (ch_ok)
+                smc_cc((int)n, (int)v);
         } else if (ui.min_pads == 3 && (st & 0xF0u) == 0xB0u)
             mpk_cc((int)n, (int)v);
         else if (ui.min_pads == 3 && (st & 0xF0u) == 0xE0u)   /* its pitch bend: on the voice the keys play (14 bits, 8192 the middle) */
@@ -4972,6 +5097,7 @@ static void input(void)
             genre_step(g - proj.genre);
         if (pc != proj.piece)
             set_piece(pc);
+        jy_mark(proj.genre * NPIECES + proj.piece);
         if (pl)
             mix_start(t0);
         if (ui.tx_q)
@@ -4981,6 +5107,8 @@ static void input(void)
         const int t = ui.piece_q - 1, t0 = proj.par[P_TEMPO], pl = en_playing;
         ui.piece_q = 0;
         set_piece(t);
+        if (sm_on())
+            jy_mark(proj.genre * NPIECES + proj.piece);
         if (pl)
             mix_start(t0);
         if (ui.tx_q)                             /* (a piece chosen by hand under a transition: it is the transition's end) */
@@ -5986,6 +6114,29 @@ static void draw_fxedit(void)
             cv_text(4, 64, &FONT_XS, "TURNED SHOWS ITS NAME AND VALUE", K_DIM);
             cv_text(4, 78, &FONT_XS, "LARGE, FOR PLAYING AT A DISTANCE.", K_DIM);
             cv_text(4, 98, &FONT_XS, "THE KNOBS SET THEM. DIAL: NEXT PAGE.", K_DIM);
+        } else if (p == FXP_USBMIDI) {           /* USB & MIDI (0.16.25): what each channel of the USB audio carries */
+            const int m = glob.sl_rsv[2] % 5u;
+            cv_text(4, 46, &FONT_XS, "AUDIO: WHAT THE USB CABLE CARRIES", K_DIM);
+            if (m == 0) {
+                cv_text(4, 62, &FONT_XS, "1-2  THE MIX, AS THE SPEAKERS", K_TEXT);
+            } else if (m == 1) {
+                cv_text(4, 62, &FONT_XS, "1 DRUMS  2 BASS  3 ACID", K_TEXT);
+                cv_text(4, 76, &FONT_XS, "4 PLUCK  5-6 PAD", K_TEXT);
+                cv_text(4, 92, &FONT_XS, "DRY: NO ECHO, REVERB OR FX", K_DIM);
+            } else if (m == 2) {                 /* (2026-11-11) the synths and their effects: the drums from another device */
+                cv_text(4, 62, &FONT_XS, "1 BASS  2 ACID  3 PLUCK  4 PAD", K_TEXT);
+                cv_text(4, 76, &FONT_XS, "5-6 ECHO + REVERB", K_TEXT);
+                cv_text(4, 92, &FONT_XS, "THE DRUMS PLAY DRY WHILE RECORDING", K_DIM);
+            } else if (m == 3) {                 /* the drums and their effects: the synths from another device */
+                cv_text(4, 62, &FONT_XS, "1 KICK  2 SNARE  3 CLAP", K_TEXT);
+                cv_text(4, 76, &FONT_XS, "4 HATS  5 PERC  6 ECHO + REVERB", K_TEXT);
+                cv_text(4, 92, &FONT_XS, "THE SYNTHS PLAY DRY WHILE RECORDING", K_DIM);
+            } else {
+                cv_text(4, 62, &FONT_XS, "1-2 THE MIX  3 DRUMS  4 BASS", K_TEXT);
+                cv_text(4, 76, &FONT_XS, "5 ACID + PLUCK  6 PAD", K_TEXT);
+                cv_text(4, 92, &FONT_XS, "3-6 DRY: NO ECHO, REVERB OR FX", K_DIM);
+            }
+            cv_text(4, 108, &FONT_XS, "A NEW LAYOUT RECONNECTS THE USB.", K_DIM);
         } else if (p == FXP_MIDIIN + 1) {        /* FILTERS: what the types do */
             cv_text(4, 46, &FONT_XS, "EACH SYNTH'S FILTER TYPE:", K_DIM);
             cv_text(4, 60, &FONT_XS, "LOW (AS BEFORE), HIGH, BAND,", K_DIM);
@@ -6029,15 +6180,15 @@ static void draw_fxedit(void)
                 plat_usb_host_diag(t);
                 cv_text(64, 92, &FONT_XS, t, K_TEXT);
             }
-            cv_text(4, 112, &FONT_XS, "USB HOST NEEDS A POWERED HUB; ITS", K_DIM);
-            cv_text(4, 126, &FONT_XS, "COMPUTER USB IS OFF WHILE IT'S ON.", K_DIM);
+            cv_text(4, 116, &FONT_XS, "USB HOST NEEDS A POWERED HUB; ITS", K_DIM);
+            cv_text(4, 128, &FONT_XS, "COMPUTER USB IS OFF WHILE IT'S ON.", K_DIM);
         } else {
             const int spare = FXP[p].bit >= FX_SPARE5 && FXP[p].bit <= FX_SPARE14;   /* (a settings page on a spare bit: FILTERS, SCREAM, AUTO FX; nothing held) */
             cv_text(4, 50, &FONT_XS, p == 16 ? "THE AUTO-DJ AND SCENES: NO EFFECT HERE." : p == 17 ? "THE UNIT'S SETTINGS: NO EFFECT HERE." :
-                                     p == 33 ? "EFFECTS PLAYED BY THEMSELVES, EACH" : p == FXP_DJMOVES ? "MOOD, SCENES: THE SECTIONS. MOVES:" : p == FXP_SMART ? "THE AUTO-DJ PLANS THE SET'S ENERGY," : p == FXP_SMIX ? "HOW SMART DJ GOES FROM PIECE TO PIECE" :
+                                     p == 33 ? "EFFECTS PLAYED BY THEMSELVES, EACH" : p == FXP_DJMOVES ? "MOOD, SCENES: THE SECTIONS. MOVES:" : p == FXP_SMART ? (sm_song() ? "ONE PIECE, INTRO TO ENDING." : "THE AUTO-DJ PLANS THE SET'S ENERGY,") : p == FXP_SMIX ? "HOW SMART DJ GOES FROM PIECE TO PIECE" :
                                      spare ? "SETTINGS, KEPT: NO KEY TO HOLD." :
                                      FXP[p].hold ? "HOLD ANY KEY TO HEAR IT." : "THE EFFECT IS ON WHILE YOU EDIT.", K_DIM);
-            cv_text(4, 64, &FONT_XS, p == 33 ? "ENDING ON A PHRASE LINE. DIAL: NEXT." : p == FXP_DJMOVES ? "THE DJ'S. LAYERS: THE GROOVE'S." : p == FXP_SMART ? "LISTENS AND PICKS. DIAL: NEXT." : p == FXP_SMIX ? "AND GENRE TO GENRE. DIAL: NEXT." : p == 16 || p == 17 || spare ? "THE KNOBS SET THEM. DIAL: NEXT PAGE." :
+            cv_text(4, 64, &FONT_XS, p == 33 ? "ENDING ON A PHRASE LINE. DIAL: NEXT." : p == FXP_DJMOVES ? "THE DJ'S. LAYERS: THE GROOVE'S." : p == FXP_SMART ? (sm_song() ? "PLAY: START SONG. DIAL: NEXT." : "LISTENS AND PICKS. DIAL: NEXT.") : p == FXP_SMIX ? "AND GENRE TO GENRE. DIAL: NEXT." : p == 16 || p == 17 || spare ? "THE KNOBS SET THEM. DIAL: NEXT PAGE." :
                                      "THE KNOBS SET IT. DIAL: NEXT PAGE.", K_DIM);
             if (p == 33 && ui.fxs[EN_FXS_AF_AMT])   /* AUTO FX: what it played last (it waits while the FX menu is open) */
                 cv_text(4, 78, &FONT_XS, ui.af_said ? EN_FX_NAME[ui.af_last[0]] : "NOTHING YET", ui.af_said ? K_ACC : K_DIM);
@@ -6054,6 +6205,8 @@ static void draw_fxedit(void)
                 cv_text(4, 82, &FONT_XS, t, K_TEXT);
                 if (!sm_on()) {
                     cv_text(4, 100, &FONT_XS, "SMART DJ OFF: SEL + PLAY STARTS A SET", K_DIM);
+                } else if (sm_song()) {
+                    cv_text(4, 100, &FONT_XS, "SONG: STAYS ON THIS PIECE", K_ACC);
                 } else if (ui.tx) {
                     j = 0;
                     for (q = ui.tx_in ? "IN: " : "OUT: "; *q; )
@@ -6093,22 +6246,22 @@ static void draw_fxedit(void)
             if (p == FXP_SMART) {                /* SMART DJ (0.16.21): the set's clock, the energy wanted and had, the groove's staleness, the last mix */
                 char t[32];
                 int j;
-                const uint32_t len = SM_MIN[ui.fxs[EN_FXS_SD_LEN] % 5u];
+                const uint32_t len = sm_len_ms();
                 const char *q;
                 if (!sm_on()) {
                     cv_text(4, 82, &FONT_XS, ui.fxs[EN_FXS_SD_ON] & 1u ? "WAITS FOR THE AUTO-DJ (GLO + F5)" : "OFF: THE AUTO-DJ AS SET", K_DIM);
                     cv_text(4, 100, &FONT_XS, "PLAY HERE (OR SEL + PLAY):", K_ACC);
-                    cv_text(4, 114, &FONT_XS, "START A SET FROM 00:00:00", K_ACC);
+                    cv_text(4, 114, &FONT_XS, sm_song() ? "START A SONG FROM 00:00:00" : "START A SET FROM 00:00:00", K_ACC);
                 } else {                         /* (0.16.22: the clock as hh:mm:ss; SET OVER when the close is done; CLOSING through it) */
                     j = 0;
-                    for (q = ui.ss_done ? "SET OVER " : ui.ss_out ? "CLOSING " : "SET "; *q; )
+                    for (q = ui.ss_done ? (sm_song() ? "SONG OVER " : "SET OVER ") : ui.ss_out ? "CLOSING " : sm_song() ? "SONG " : "SET "; *q; )
                         t[j++] = *q++;
                     sm_clock(ui.sm_ms, t + j);
                     j += 8;
                     if (len && !ui.ss_done) {
                         for (q = " OF "; *q; )
                             t[j++] = *q++;
-                        sm_clock(len * 60000u, t + j);
+                        sm_clock(len, t + j);
                         j += 8;
                     }
                     t[j] = 0;
@@ -6205,7 +6358,7 @@ static void draw_perf(void)
         char t[40] = "DJ ";
         int n = 3, len = ui.dj_phase == 0 ? (smart ? 0 : g) : ui.dj_phase == 1 ? b : en_build_len();
         if (smart) {
-            const char *q = "SMART ";
+            const char *q = sm_song() ? "SONG " : "SMART ";
             for (n = 0; *q; n++)
                 t[n] = *q++;
         }
@@ -7185,6 +7338,13 @@ static void draw_scope(int kind)
         for (s = 0, k = 0; s < 16; s += RATE[ri], k++) {
             int idx;
             const int per = 2 * n - 2, q = k % per;
+            if (st >= 6) {                       /* a composed style: its kind of line (the piece's own theme is written when it plays) */
+                static const char *const SH[4] = {"0123............", "2.......3.......", "0123454321......", "0..0..1.0...2..."};
+                const char c = SH[st > 9 ? 3 : st - 6][s];
+                if (c != '.')
+                    cv_disc(SC_X + 6 + s * 13, SC_Y + SC_H - 8 - (c - '0') * (SC_H - 22) / (n - 1), 4, col);
+                continue;
+            }
             switch (st) {
             case 1: idx = n - 1 - k % n; break;
             case 2: idx = q < n ? q : per - q; break;
@@ -8309,8 +8469,8 @@ static void voices_load(void)
 }
 int ui_restore_valid(uint32_t obj, const uint8_t *b, uint32_t len)
 {
-    if (obj == OBJ_PROJ || (obj >= OBJ_G1 && obj <= OBJ_G18)) {   /* a genre's pieces (the original genre's may still be the old bank) */
-        const int g = obj == OBJ_PROJ ? 0 : (int)(obj - OBJ_G1) + 1;
+    if (obj == OBJ_PROJ || (obj >= OBJ_G1 && obj <= OBJ_G18) || (obj >= OBJ_G19 && obj <= OBJ_G21)) {   /* a genre's pieces (the original genre's may still be the old bank) */
+        const int g = obj == OBJ_PROJ ? 0 : obj >= OBJ_G19 ? (int)(obj - OBJ_G19) + 19 : (int)(obj - OBJ_G1) + 1;
         if (obj >= OBJ_NOBJ || g >= EN_NGENRE || len < 20u)
             return 0;
         if (rd32(b) == IMG_MAGIC)
@@ -8391,7 +8551,7 @@ static void settings_save(void)
     s.pm_tgt = ui.pm_tgt;
     s.gx_pat = ui.gx_pat;
     s.usb = (uint16_t)(ui.usb_fixed | (!ui.fm_dy) << 1 | ui.scan << 2 |   /* (bit 1: the DX set chosen; DY is the default since 0.14.21, so older settings read as DY) */ (ui.dj_rounds & 7) << 3 | (ui.dj_ramp & 7) << 6 | (ui.intro & 7) << 9 | (ui.midi_map & 7) << 12 | (ui.min_pads == 1) << 15);
-    s.viz = (uint8_t)((ui.viz >= VZ_TRIP ? 7u : ui.viz) | (ui.min_pads == 2) << 3 | (ui.cc_mode & 3) << 4 | (ui.min_pads == 3) << 6 | ui.centre_imp << 7);   /* (bits 3-6 free before 0.15.22: older records read 0) */
+    s.viz = (uint8_t)((ui.viz >= VZ_TRIP ? 7u : ui.viz) | (ui.min_pads == 2 || ui.min_pads == 4) << 3 | (ui.cc_mode & 3) << 4 | (ui.min_pads == 3 || ui.min_pads == 4) << 6 | ui.centre_imp << 7);   /* (bits 3-6 free before 0.15.22: older records read 0) */
     if (plat_store_save(OBJ_SET, &s, sizeof s) == 0) {
         set_disk = s;
         set_have = 1;
@@ -8457,7 +8617,7 @@ static void settings_load(void)
                 else if (FXP[p].c[c].idx == 19)
                     fxp_set(k, (s.uiv[11] & 0x1Fu) <= 16u ? s.uiv[11] & 0x1Fu : 0);
                 else if (FXP[p].c[c].idx == 20)
-                    fxp_set(k, (s.viz >> 6 & 1u) ? 3 : (s.viz >> 3 & 1u) ? 2 : s.usb >> 15 & 1);   /* (M:S in set_t.viz's bit 3, 0.15.22; MPK bit 6, 0.15.23) */
+                    fxp_set(k, (s.viz >> 6 & 1u) ? ((s.viz >> 3 & 1u) ? 4 : 3) : (s.viz >> 3 & 1u) ? 2 : s.usb >> 15 & 1);   /* (SMC: both bits, 2026-11-14) */   /* (M:S in set_t.viz's bit 3, 0.15.22; MPK bit 6, 0.15.23) */
                 else if (FXP[p].c[c].idx == 22)
                     fxp_set(k, s.viz >> 4 & 3u);
             } else if (kind == KN_TGT) {
@@ -8483,6 +8643,16 @@ static void settings_load(void)
 static void autosave(void)
 {
     uint32_t now = plat_ms();
+    if (en_playing || en_out_peak > 0.0005f)
+        ui.loud_t = now;                         /* (the output still sounding: playing, or a stop's tails ringing out) */
+    if (plat_usb_recording() && now - ui.loud_t < 1500u)
+        return;                                  /* (2026-11-09) a recording over USB, the music sounding: nothing written now. A flash write turns the interrupts off a
+                                                  * millisecond or more at a time (an erase's slices, each page), the USB audio's 1 ms packets go missing, and the
+                                                  * recording crackles and stutters (the speakers ride it out: their audio is 11.6 ms ahead). It was heard in the first
+                                                  * seconds of a recording with the auto-DJ (its settings, written a moment after it starts), then, held while it played,
+                                                  * at the stop (the tails still ringing in the recording). What waits is written when the recording stops, or when the
+                                                  * output has been silent (under -66 dB) for 1.5 s: the host fills a missing packet with what it had a quarter second
+                                                  * before, silence too. A store asked for (SAVE) still goes at once. */
     if (ui.vox_dirty && !ui.btn && !ui.keys && !ui.store_wait && now - ui.act_t >= (en_playing ? 2 * GLOB_QUIET : GLOB_QUIET)) {
         ui.vox_dirty = 0;
         quiet_write(3);                          /* the player's DX7 voices: kept (playing: faded) */

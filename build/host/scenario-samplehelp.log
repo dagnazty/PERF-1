@@ -1,0 +1,22 @@
+  ok playing == 1
+  ok fxpage == 32
+  ok sampledry == 1
+  ok samplerun == 0
+  ok samplerun == 1
+  ok playing == 0
+  ok samplecur == -1
+  ok samplecur == 0
+  ok samplecur == 1
+  ok samplecur == 6
+  ok samplerun == 0
+  ok samplecur == -1
+  ok samplecur == 0
+  ok samplerun == 0
+  ok samplecur == 6
+  ok samplecur == -1
+  ok samplecur == 0
+  ok sampledry == 0
+  ok sampledry == 1
+  ok fxon == 0
+  ok sampledry == 0
+host: 19925 ms simulated, 729 blits, render 0.7% of real time (host CPU)

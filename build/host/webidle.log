@@ -1,0 +1,8 @@
+two ports open after use ....................................... ok
+still open 2 s later ........................................... ok
+traffic keeps them open (3 s after the last message) ........... ok
+busy (an install, a write, the live status): kept for 10 s ..... ok
+quiet and not busy: both closed, the page told ................. ok
+nothing more to close: told once ............................... ok
+opened again on the next use ................................... ok
+web idle tests passed

@@ -1,0 +1,151 @@
+# A three-minute song: the current edited piece, even with a set list enabled.
+# Intro, breakdown/build/drop, the arc's peak, and a timed close. No journey or mixes.
+seed 0
+wait 3000
+tap GLO
+tap GLO
+spin K2 1
+spin K1 1
+spin K2 1
+spin K2 2
+spin K3 4
+spin K4 1
+wait 100
+expect seton 1
+expect pieceid 0
+setpar 0 73
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K2 3
+wait 100
+expect fxs101 5
+expect smpace 50
+shot song_ready.png
+tap PLAY
+wait 1000
+expect playing 1
+expect djon 1
+expect fxs100 1
+expect smsec <3
+expect pieceid 0
+expect introk <20
+expect par0 73
+shot song_start.png
+tap FX
+wait 100
+# New-pieces on by hand still cannot override song mode.
+press GLO
+tapkey 26
+release GLO
+waitfor introk 100 25000
+expect smsec >15
+expect smsec <21
+expect pieceid 0
+expect tx 0
+waitfor sec 1 100000
+expect pieceid 0
+expect tx 0
+waitfor sec 2 60000
+waitfor sec 0 30000
+waitfor djround >0 5000
+expect pieceid 0
+expect tx 0
+waitfor smpeakat >0 120000
+expect smpeakat >100
+expect smpeakat <130
+expect pieceid 0
+waitfor ssout >0 90000
+expect smsec >130
+waitfor ssdone 1 60000
+wait 100
+expect playing 0
+expect smsec >175
+expect smsec <185
+expect pieceid 0
+expect tx 0
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+shot song_over.png
+# The last song option survives a reboot, with no new stored fields.
+spin K2 4
+wait 8000
+expect fxs101 9
+reboot
+wait 3000
+expect fxs101 9
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+spin K2 -2
+wait 100
+expect fxs101 7
+# SEL + PLAY also starts a fresh five-minute song.
+tap FX
+press SEL
+tap PLAY
+release SEL
+wait 1000
+expect smsec <3
+expect ssdone 0
+expect pieceid 0
+# Pause outside the Smart DJ page, then resume without resetting the clock.
+tap PLAY
+wait 5000
+expect playing 0
+expect smsec <3
+tap PLAY
+wait 60000
+expect playing 1
+expect smsec >55
+expect smsec <65
+expect pieceid 0
+expect tx 0
+waitfor ssdone 1 260000
+wait 100
+expect playing 0
+expect smsec >295
+expect smsec <305
+expect pieceid 0
+expect tx 0
+# Existing set length indices stay unchanged.
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+spin K2 -7
+wait 100
+expect fxs101 0
+expect smpace 50
+spin K2 2
+wait 100
+expect fxs101 2
+expect smpace 100
+# At 70 BPM, the short song must still fit a build/drop before its close.
+setpar 5 70
+spin K2 3
+wait 100
+tap PLAY
+wait 1000
+tap FX
+waitfor djround >0 160000
+waitfor ssdone 1 90000
+wait 100
+expect playing 0
+expect smsec >175
+expect smsec <185
+expect pieceid 0
+expect tx 0

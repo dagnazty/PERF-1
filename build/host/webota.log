@@ -1,0 +1,12 @@
+PERF-1 0.16.13 on: FM-1_700, then the whole identity: FM-1_7001613 ... ok
+PERF-1 0.16.13 on: FM-1_700, then the whole identity: asks with 01 ... ok
+PERF-1 before 0.16.13: the whole identity to the plain query: FM-1_7001612  ok
+PERF-1 before 0.16.13: the whole identity to the plain query: never asks with 01  ok
+AMB-1 / HYP-1: FM-1_700, no answer to 01: FM-1_700 ................... ok
+AMB-1 / HYP-1: FM-1_700, no answer to 01: asks with 01 ............... ok
+the stock firmware: FM-1_015, never asked with 01: FM-1_015 .......... ok
+the stock firmware: FM-1_015, never asked with 01: never asks with 01  ok
+the update loader: ota-FM-1_015, never asked with 01: ota-FM-1_015 ... ok
+the update loader: ota-FM-1_015, never asked with 01: never asks with 01  ok
+HS_FULL decodes to 00 59 11, length 1, body 01, checksum FE .......... ok
+web ota tests passed

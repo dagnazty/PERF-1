@@ -1,0 +1,18 @@
+  ok view == 0
+  ok view == 35
+  ok trkmute == 3
+  ok pool == 1453
+  ok trksolo == 2
+  ok trkmute == 0
+  ok trksolo == 0
+  ok scenes == 1
+  ok trkmute == 0
+  ok trkmute == 1
+  ok fxk1 == 25
+  ok djon == 1
+  ok view == 0
+  ok pool == 1965
+  ok view == 35
+  ok view == 1
+  ok view == 0
+host: 13506 ms simulated, 850 blits, render 0.8% of real time (host CPU)

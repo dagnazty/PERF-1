@@ -1,0 +1,17 @@
+  ok view == 12
+  ok view == 13
+  ok view == 14
+  ok view == 15
+  ok par98 == 50
+  ok par98 == 51
+  ok par99 == 3
+  ok par99 == 4
+  ok view == 16
+  ok par103 == 1
+  ok par104 == 3
+  ok view == 10
+  ok trkmute == 128
+  ok trksolo == 128
+  ok trkmute == 0
+  ok trksolo == 0
+host: 8566 ms simulated, 460 blits, render 0.8% of real time (host CPU)

@@ -44,6 +44,9 @@ _Static_assert(REND_FRAMES == UA_HALF, "usb.c sizes the USB audio ring band for 
 static int32_t abuf[2u * HALF_WORDS] __attribute__((aligned(4)));
 #if FELUCCA_UAC
 static int16_t usb_buf[2u * REND_FRAMES] __attribute__((section(".pool.usb"), aligned(4)));   /* the USB audio at its fixed level, when the setting asks (en_usb_out) */
+_Static_assert(EN_NST == UAC_ST_N, "USB and engine stem layouts agree");
+static int16_t stem_buf[EN_NST * REND_FRAMES] __attribute__((section(".noinit.uac"), aligned(4)));   /* (0.16.25) the stems, when the USB audio is Parts or Set (en_usb_stems):
+                                                                                                        * NOINIT (the pool keeps its 4 KB spare); each render writes it whole */
 #endif
 
 #define DBG_MAGIC 0x44424731u                       /* "DBG1": read with `fm1t memr` */
@@ -80,8 +83,10 @@ static void render_block(int32_t *o)                /* ALNK0: one half, measured
         for (k = 0; k < HALF_FRAMES; k += REND_FRAMES) {
 #if FELUCCA_UAC
             en_usb_out = en_usb_fixed && uac.feed ? usb_buf : 0;   /* the Settings' USB page says FIXED and a computer is recording: a second output at unity */
+            en_usb_stems = uac.feed && uac.mode ? stem_buf : 0;   /* (0.16.25) Parts or Set, and a computer recording: the parts apart */
+            en_usb_fxsrc = uac.mode == 2u ? 1u : uac.mode == 3u ? 2u : 0u;   /* Parts 2: the synths' effects alone; Parts 3: the drums' */
             en_render(o + 2u * k, REND_FRAMES, master_q12);
-            uac_tap(o + 2u * k, en_usb_out ? usb_buf : 0, REND_FRAMES);   /* the USB audio input: the master output, or that */
+            uac_tap6(o + 2u * k, en_usb_out ? usb_buf : 0, en_usb_stems, REND_FRAMES);   /* the USB audio input: the master output, or that; and the stems */
 #else
             en_render(o + 2u * k, REND_FRAMES, master_q12);
 #endif
@@ -171,18 +176,18 @@ void fm1_timer5_irq(void)
     if (en_dbg.in_audio)
         en_dbg.nested++;
     fm1_input_tick();
+#if FELUCCA_UAC
+    /* A 900-byte packet occupies about 600 us of a 1 ms USB frame. Polling every
+     * 500 us can miss the remaining rearm window. Service audio every 100 us,
+     * including inside the render; MIDI/control keep their existing cadence. */
+    if (sub % EN_UAC_POLL_TICKS == 0u)
+        uac_service();
+#endif
     /* 2 kHz: all USB SIE traffic lives here. This ISR now nests into the audio render (so the key
      * matrix keeps its rhythm, below); USB shares the MIDI queues with the audio ISR, so a poll that
      * falls inside the render waits for the first tick outside it, as it did before the nesting. */
     if (sub % 5u == 0u) {
         usb_due = 1;
-#if FELUCCA_UAC
-        /* the USB audio stream cannot wait for the render (one packet per 1 ms frame, a render takes
-         * up to ~11.6 ms): it runs nested too. It touches only EP4 (INDEX is set on every access) and
-         * the consumer side of its ring, and usb_poll never runs nested, so the two never interleave */
-        if (en_dbg.in_audio)
-            uac_service();
-#endif
     }
     if (usb_due && !en_dbg.in_audio) {
         usb_due = 0;
@@ -640,7 +645,7 @@ static void tel_service(void)
                 tel_hist[i] = 0;
             for (i = 0; i < 11u; i++)
                 en_prof_sm[i] = 0;
-            extra = EN_DIAG ? 2 : 0;
+            extra = EN_DIAG ? 2 : FELUCCA_UAC ? 3 : 0;
         }
         return;
     }
@@ -659,8 +664,38 @@ static void tel_service(void)
         if (usb_sysex_try(f, o) == 0) {
             for (i = 0; i < 36u; i++)
                 en_diag[i] = 0;
-            extra = 0;
+            extra = FELUCCA_UAC ? 3 : 0;
         }
+        return;
+    }
+#endif
+#if FELUCCA_UAC
+    if (extra == 3) {                               /* (0.16.25) the fourth frame (F0 7D 50 5C): the USB audio's counters, since the stream began */
+        uint32_t w[16], i, o = 4;
+        uint8_t f[4 + 16 * 5 + 2], b[16 * 4];
+        w[0] = uac.pkts;                            /* packets queued */
+        w[1] = uac.frames;                          /* frames in them */
+        w[2] = uac.underruns;                       /* the ring empty: frames repeated */
+        w[3] = uac.overruns;                        /* the ring full: frames dropped */
+        w[4] = uac.missed;                          /* an IN token found nothing queued (UnderRun) */
+        w[5] = uac.stalls;                          /* the host stopped taking packets for 20 ms */
+        w[6] = uac.starts;                          /* streams begun */
+        w[7] = uac.fill_min;                        /* the ring's lowest fill, the last window */
+        w[8] = uac.fill_lo;
+        w[9] = uac.fill_hi;
+        w[10] = uac.windows;
+        w[11] = (uint32_t)(int32_t)(uac.rs_trim * 1.0e7f);   /* the resampler's learned drift, 1e-7 */
+        w[12] = (uint32_t)uac.alt | (uint32_t)uac.go << 8 | (uint32_t)uac.flowing << 16 | (uint32_t)(uac.nch ? uac.nch : 2u) << 24 | (uint32_t)uac.mode << 28;
+        w[13] = usb.sof_seen;
+        w[14] = usb.max_gap;
+        w[15] = usb.frame_stalls;
+        for (i = 0; i < 16u; i++)
+            b[4 * i] = (uint8_t)w[i], b[4 * i + 1] = (uint8_t)(w[i] >> 8), b[4 * i + 2] = (uint8_t)(w[i] >> 16), b[4 * i + 3] = (uint8_t)(w[i] >> 24);
+        f[0] = 0xF0, f[1] = 0x7D, f[2] = 0x50, f[3] = 0x5C;
+        o += ota_pack7(b, sizeof b, f + o);
+        f[o++] = 0xF7;
+        if (usb_sysex_try(f, o) == 0)
+            extra = 0;
         return;
     }
 #endif
@@ -791,6 +826,9 @@ static void fm1_main(void)
     en_core2_attach(fm1_core1_submit, fm1_core1_join, fm1_core1_fence, fm1_core1_alive);   /* the reverb runs on CPU1 while it is online */
 #endif
     project_start(plat_seed());                     /* a piece at random, a little changed */
+#if FELUCCA_UAC
+    uac_mode_set(project_usb_audio());              /* (0.16.25) the USB audio's layout as it was left (Mix, Parts, Parts 2, Parts 3, Set): before USB starts, so the host sees it at once */
+#endif
     project_apply();
     audio_init();
     usb_start();

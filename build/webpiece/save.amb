@@ -1,0 +1,14 @@
+seed 0
+wait 3000
+tap GLO
+tap HOME
+wait 100
+spin K1 4
+spin K2 3
+wait 200
+expect tempo 132
+tap GLO
+tap SAVE
+wait 500
+expect saved 1
+dumpobj 0 build/webpiece/bank0.bin

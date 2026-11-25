@@ -1,0 +1,12 @@
+loadobj 0 build/webpiece/bank_new.bin
+loadobj 4 build/webpiece/glob_new.bin
+seed 0
+reboot
+wait 2000
+expect setsl0 4
+expect setsl1 23
+expect setsl3 182
+expect setsl2 0
+expect seton 1
+expect mix 2
+expect saved 8

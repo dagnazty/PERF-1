@@ -1,0 +1,11 @@
+  ok keyset == 2
+  ok saved == 1
+  ok rsvalid == 1
+  ok rsstate == 2
+  ok storelock == 0
+  ok keyset == 2
+  ok rsvalid == 1
+  ok rsstate == 2
+  ok storelock == 0
+  ok saved == 1
+host: 21545 ms simulated, 1217 blits, render 0.8% of real time (host CPU)

@@ -1,0 +1,10 @@
+  ok frozen == 1
+  ok frozen == 0
+  ok par45 == 1
+  ok par0 == 25
+  ok playing == 0
+  ok pad_level == 0 (<1)
+  ok par0 == 45
+  ok par45 == 0
+  ok playing == 1
+host: 65011 ms simulated, 1500 blits, render 0.6% of real time (host CPU)

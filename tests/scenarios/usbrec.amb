@@ -1,0 +1,47 @@
+# No flash write while the USB audio is recorded and the music sounds (2026-11-09). A write turns the interrupts off a millisecond or more at a time, the
+# USB audio's 1 ms packets go missing and the recording crackles and stutters; it was heard in a recording's first seconds with the auto-DJ, whose settings
+# are written a moment after it starts. A setting changed while recording waits; it is written when the recording stops, or when the music has stopped
+# and fallen silent.
+seed 0
+wait 3000
+expect playing 1
+expect store_writes 0
+# recording: a DJ setting changed (DJ MOVES' Mood), left alone far past the usual moment: nothing written
+usbrec 1
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 3
+wait 100
+expect fxpage 35
+spin K1 1
+wait 50
+expect fxs96 1
+tap FX
+wait 20000
+expect store_writes 0
+# the recording stops: written
+usbrec 0
+waitfor store_writes 1 15000
+# recording again, a setting changed: waits; the music stopped: not while its tails ring on in the recording (they did, at the stop), but once the output
+# has been silent a moment (a missing packet's stand-in is silence too)
+usbrec 1
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 3
+wait 100
+expect fxpage 35
+spin K1 1
+wait 50
+expect fxs96 2
+tap FX
+wait 15000
+expect store_writes 1
+tap PLAY
+wait 500
+expect playing 0
+expect store_writes 1
+waitfor store_writes 2 30000

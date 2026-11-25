@@ -1,0 +1,3 @@
+  ok fxbank == 1
+  ok fxbank == 0
+host: 12890 ms simulated, 537 blits, render 0.8% of real time (host CPU)

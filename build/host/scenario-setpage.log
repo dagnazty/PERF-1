@@ -1,0 +1,7 @@
+  ok fxpage == 18
+  ok fxpage == 25
+  ok playing == 1
+  ok playing == 0
+  ok playing == 1
+  ok playing == 1
+host: 11111 ms simulated, 679 blits, render 0.7% of real time (host CPU)

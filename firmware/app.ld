@@ -32,6 +32,8 @@ SECTIONS
     _cpu1_ustack_top = _cpu1_stacks_lo + 4096;
     _cpu1_sstack_top = _cpu1_stacks_lo + 8192;
     ASSERT(_cpu1_stacks_hi <= 0x01C06000, "RAM code and CPU1 stacks overflow RAMTEXT")
+    .rt_bss (NOLOAD) : { . = ALIGN(4); _rtb_start = .; *(.rt_bss*) . = ALIGN(4); _rtb_end = .; } > RAMTEXT   /* (0.16.25: the USB stems' third ring) */
+    ASSERT(_rtb_end <= 0x01C06000, "RAMTEXT's buffers overflow into the RAM-run debug window")
     .data : { . = ALIGN(4); _data_start = .; *(.data*) *(.sdata*) . = ALIGN(4); _data_end = .; } > RAM AT > XIP
     _data_load = LOADADDR(.data);
     .bss (NOLOAD) : { _bss_start = .; *(.bss*) *(.sbss*) *(COMMON) . = ALIGN(4); _bss_end = .; } > RAM

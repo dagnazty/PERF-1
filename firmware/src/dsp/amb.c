@@ -90,7 +90,7 @@ static const en_param_t PARAMS[P_NPARAMS] = {
     [P_COND] = {"Cond", 0, 7, 0},           [P_COND1] = {"Cond", 0, 7, 0},        [P_COND2] = {"Cond", 0, 7, 0},          [P_COND3] = {"Cond", 0, 7, 0},
     [P_COND4] = {"Cond", 0, 7, 0},          [P_COND5] = {"Cond", 0, 7, 0},
     [P_AC_LOCK] = {"Frozen", 0, 1, 0},
-    [P_BL_MODE] = {"Mode", 0, 15, 0},       [P_BL_LEN] = {"Length", 0, 100, 50},  [P_BL_MOVE] = {"Move", 0, 100, 30},  [P_BL_GLIDE] = {"Glide", 0, 100, 0},
+    [P_BL_MODE] = {"Mode", 0, 25, 0},       [P_BL_LEN] = {"Length", 0, 100, 50},  [P_BL_MOVE] = {"Move", 0, 100, 30},  [P_BL_GLIDE] = {"Glide", 0, 100, 0},
 };
 const en_param_t *en_param_info(int i) { return (i >= 0 && i < P_NPARAMS) ? &PARAMS[i] : &PARAMS[0]; }
 int en_par_global(int p) { return p == P_TUNE || p == P_MIDI || p == P_THEME; }
@@ -101,8 +101,9 @@ int en_par_sticky(int p) { return en_par_global(p) || (p >= P_DD_CHANGE && p <= 
 volatile uint16_t en_pats[EN_NPAT][EN_NLANE];
 volatile uint8_t en_mod[EN_NLANE][16];          /* a piece's step tricks, a byte a lane step: ratchet (bits 0-2), push (3-5), level (6-7); 0: none (the UI edits) */
 
-#define EN_NBLFIG 9                             /* the bass line's figures by name (modes 7 ..; the table BL_FIG is with the bass line) */
-static const char *const BL_FIG_NAME[EN_NBLFIG] = {"Octaves", "Two-step", "One-drop", "Log drum", "Skippy", "Funk", "Big beat", "Dub", "Gallop"};
+#define EN_NBLFIG 19                            /* the bass line's figures by name (modes 7 ..; the table BL_FIG is with the bass line) */
+static const char *const BL_FIG_NAME[EN_NBLFIG] = {"Octaves", "Two-step", "One-drop", "Log drum", "Skippy", "Funk", "Big beat", "Dub", "Gallop",
+                                                   "Deep", "Jack", "Bounce", "Log roll", "Log skip", "Roller", "Stepper", "Tresillo", "808 run", "Rave"};   /* (2026-11-11: ten more, the genres' second and third lines) */
 
 /* the pieces: each the defaults above with a few changed (a parameter, its value; -1 ends), its own
  * kit's sound (the lanes) among them. Numbered on the screen; the names are for reading here. */
@@ -162,7 +163,7 @@ static const int16_t PL_10[] = {LOFI_BASE, P_TEMPO, 94, P_ROOT, 8, P_MODE, 4, P_
 #define HOUSE_BASE P_CH_LOOP, 2, P_CM_VU, 60, P_GHOST, 25, P_HUMAN, 10,  P_CM_LOOP, 1, P_BL_MODE, 4, P_BL_LEN, 40, P_BL_MOVE, 25, P_PADTONE, 6, P_PAD, 52, P_BRIGHT, 40, P_CHORD, EN_CH_7TH, P_VOICING, 0, P_ACID, 38, P_AC_WAVE, 4, P_AC_CUT, 45, \
     P_AC_RES, 40, P_AC_ENV, 40, P_AC_DENS, 45, P_AC_LEN, 16, P_AC_MUT, 25, P_BASS, 70, P_DR_INST, 9, P_DR_CUT, 40, P_PULSE, 80, \
     KIT(1), P_DRIVE, 35, P_SWING, 12, P_ECHO, 30, P_ETIME, 3, P_REVERB, 30, P_SIZE, 50, P_EVOLVE, 45, P_MOTION, 50, P_PATTERN, 0, \
-    LV(0), 90, LV(2), 72, LV(3), 50, LV(4), 55, LV(5), 45, P_PL_CHO, 35, P_RV_DAMP, 30, P_RV_PRE, 60, P_MC_RATIO, 3, P_MC_THR, 45, P_MC_MAKE, 35
+    LV(0), 90, LV(2), 82, LV(3), 65, LV(4), 68, LV(5), 52, P_PL_CHO, 35, P_RV_DAMP, 30, P_RV_PRE, 60, P_MC_RATIO, 3, P_MC_THR, 45, P_MC_MAKE, 35
 static const int16_t PH_01[] = {HOUSE_BASE, P_TEMPO, 122, P_ROOT, 9, P_MODE, 1, -1};
 static const int16_t PH_02[] = {HOUSE_BASE, P_TEMPO, 124, P_ROOT, 0, P_MODE, 5, P_PADTONE, 4, P_DR_INST, 10, P_AC_WAVE, 9, -1};
 static const int16_t PH_03[] = {HOUSE_BASE, P_TEMPO, 120, P_ROOT, 5, P_MODE, 1, P_PADTONE, 0, P_CHORD, EN_CH_9TH, -1};
@@ -180,7 +181,7 @@ static const char *const HOUSE_NAME[EN_NPIECES] = {"H01", "H02", "H03", "H04", "
 #define DUB_BASE P_CH_LOOP, 1, P_CM_VU, 40, P_BL_MODE, 2, P_BL_LEN, 85, P_BL_MOVE, 10, P_BL_GLIDE, 20, P_PADTONE, 7, P_PAD, 32, P_BRIGHT, 25, P_CHORD, EN_CH_4THS, P_VOICING, 1, P_ACID, 42, P_AC_WAVE, 14, P_AC_CUT, 55, \
     P_AC_RES, 60, P_AC_ENV, 60, P_AC_DENS, 40, P_AC_LEN, 8, P_AC_MUT, 30, P_BASS, 85, P_DR_INST, 4, P_DR_CUT, 40, P_DR_RES, 55, \
     P_DL_RATE, 0, P_DL_SHAPE, 1, P_DL_DEPTH, 85, P_DL_DEST, 0, P_PULSE, 85, KIT(9), P_DRIVE, 60, P_SWING, 0, P_ECHO, 45, P_ETIME, 3, \
-    P_REVERB, 45, P_SIZE, 70, P_EVOLVE, 35, P_MOTION, 40, P_PATTERN, 0, LV(0), 95, LV(1), 70, LV(3), 40, LV(4), 45, P_PL_CHO, 30, P_RV_DAMP, 65, P_RV_PRE, 80, P_MC_RATIO, 4, P_MC_THR, 40, P_MC_MAKE, 40
+    P_REVERB, 45, P_SIZE, 70, P_EVOLVE, 35, P_MOTION, 40, P_PATTERN, 0, LV(0), 95, LV(1), 80, LV(2), 72, LV(3), 55, LV(4), 55, P_PL_CHO, 30, P_RV_DAMP, 65, P_RV_PRE, 80, P_MC_RATIO, 4, P_MC_THR, 40, P_MC_MAKE, 40
 static const int16_t PD_01[] = {DUB_BASE, P_TEMPO, 140, P_ROOT, 4, P_MODE, 2, -1};
 static const int16_t PD_02[] = {DUB_BASE, P_TEMPO, 140, P_ROOT, 5, P_MODE, 5, P_DR_INST, 9, P_DL_RATE, 1, P_DL_SHAPE, 0, -1};
 static const int16_t PD_03[] = {DUB_BASE, P_TEMPO, 142, P_ROOT, 2, P_MODE, 2, P_DR_INST, 11, P_DL_SHAPE, 3, -1};
@@ -197,33 +198,33 @@ static const char *const DUB_NAME[EN_NPIECES] = {"D01", "D02", "D03", "D04", "D0
  * drum patterns from their classic masks (kick, snare, clap as the ghosts, hat, open, perc), the piece choosing which comes first */
 static const int16_t X_DUBR[] = {P_CM_VU, 45, P_GHOST, 0, P_HUMAN, 25, P_PULSE, 78, P_DRIVE, 15, P_SWING, 12, P_BASSOCT, -1, P_PAD, 40, P_ACID, 22, P_BASS, 92, P_AC_DENS, 15, P_AC_LEN, 12, P_ECHO, 72, P_ETIME, 3, P_REVERB, 45, P_SIZE, 65,
     KIT(8), P_PATTERN, 0, P_EVOLVE, 25, P_PL_CHO, 15, P_RV_DAMP, 55, P_BL_MODE, 1, P_BL_LEN, 85, P_BL_MOVE, 8, P_BL_GLIDE, 30, P_MC_RATIO, 2, P_MC_THR, 50, P_MC_MAKE, 38, -1};
-static const int16_t X_DNB[] = {P_CH_LOOP, 1, P_BL_MODE, 1, P_CM_VU, 40, P_GHOST, 40, P_HUMAN, 10, P_PULSE, 78, P_DRIVE, 40, P_SWING, 5, P_BASSOCT, -1, P_DE_TRIG, 2, P_PAD, 36, P_ACID, 42, P_BASS, 82, P_AC_DENS, 40, P_AC_LEN, 12, P_ECHO, 35, P_REVERB, 40,
-    KIT(12), DE(0), 20, P_PATTERN, 0, P_EVOLVE, 40, P_PL_CHO, 45, P_RV_TYPE, 1, P_RV_X, 25, P_RV_DAMP, 40, P_MC_RATIO, 3, P_MC_THR, 45, P_MC_MAKE, 30, -1};
+static const int16_t X_DNB[] = {P_CH_LOOP, 1, P_BL_MODE, 1, P_CM_VU, 40, P_GHOST, 40, P_HUMAN, 10, P_PULSE, 78, P_DRIVE, 50, P_SWING, 5, P_BASSOCT, -1, P_DE_TRIG, 2, P_PAD, 36, P_ACID, 42, P_BASS, 82, P_AC_DENS, 40, P_AC_LEN, 12, P_ECHO, 35, P_REVERB, 40,
+    KIT(12), DE(0), 20, LV(1), 86, LV(3), 75, LV(4), 62, P_PATTERN, 0, P_EVOLVE, 40, P_PL_CHO, 45, P_RV_TYPE, 1, P_RV_X, 25, P_RV_DAMP, 40, P_MC_RATIO, 3, P_MC_THR, 45, P_MC_MAKE, 30, -1};
 static const int16_t X_BREAKS[] = {P_BL_MODE, 6, P_CM_VU, 30, P_GHOST, 70, P_HUMAN, 25, P_PULSE, 80, P_DRIVE, 70, P_SWING, 14, P_PAD, 40, P_ACID, 55, P_BASS, 70, P_AC_RES, 70, P_AC_ENV, 65, P_AC_DENS, 55, P_ECHO, 40, P_REVERB, 30,
-    KIT(4), P_PATTERN, 0, P_EVOLVE, 45, P_PL_CHO, 20, P_RV_TYPE, 2, P_RV_X, 35, P_MC_RATIO, 4, P_MC_THR, 42, P_MC_MAKE, 35, -1};
+    KIT(4), LV(1), 88, LV(3), 72, LV(4), 60, P_PATTERN, 0, P_EVOLVE, 45, P_PL_CHO, 20, P_RV_TYPE, 2, P_RV_X, 35, P_MC_RATIO, 4, P_MC_THR, 42, P_MC_MAKE, 35, -1};
 static const int16_t X_GARAGE[] = {P_CH_LOOP, 2, P_BL_MODE, 6, P_BL_MOVE, 30, P_CM_VU, 50, P_GHOST, 45, P_HUMAN, 20, P_PULSE, 70, P_DRIVE, 25, P_SWING, 64, P_PAD, 42, P_ACID, 42, P_BASS, 70, P_AC_DENS, 45, P_AC_LEN, 12, P_ECHO, 40, P_REVERB, 40,
-    P_KIT_KICK, 1, P_KIT_SNARE, 5, P_KIT_HAT, 1, P_KIT_PERC, 5, P_PATTERN, 0, P_EVOLVE, 35, P_PL_CHO, 40, P_RV_DAMP, 45, P_MC_RATIO, 2, P_MC_THR, 50, P_MC_MAKE, 40, -1};
+    P_KIT_KICK, 1, P_KIT_SNARE, 5, P_KIT_HAT, 1, P_KIT_PERC, 5, LV(1), 80, LV(2), 75, LV(3), 70, LV(4), 60, P_PATTERN, 0, P_EVOLVE, 35, P_PL_CHO, 40, P_RV_DAMP, 45, P_MC_RATIO, 2, P_MC_THR, 50, P_MC_MAKE, 40, -1};
 static const int16_t X_ELECTRO[] = {P_CH_LOOP, 1, P_CM_VU, 65, P_CM_LOOP, 1, P_BL_MODE, 3, P_BL_LEN, 30, P_BL_MOVE, 35, P_PULSE, 78, P_DRIVE, 45, P_SWING, 3, P_PAD, 40, P_ACID, 55, P_BASS, 70, P_AC_DENS, 60, P_AC_LEN, 12, P_ECHO, 45, P_REVERB, 30,
     KIT(11), P_PATTERN, 0, P_EVOLVE, 40, P_PL_CHO, 40, P_RV_TYPE, 2, P_RV_X, 30, P_MC_RATIO, 3, P_MC_THR, 48, P_MC_MAKE, 30, -1};
 static const int16_t X_TRAP[] = {P_CH_LOOP, 2, P_CM_VU, 40, P_BL_MODE, 2, P_BL_LEN, 90, P_BL_MOVE, 8, P_BL_GLIDE, 25, P_PULSE, 85, P_DRIVE, 35, P_SWING, 0, P_BASSOCT, -1, P_DE_TRIG, 2, P_PAD, 40, P_ACID, 35, P_BASS, 88, P_AC_DENS, 20, P_AC_LEN, 8, P_ECHO, 40, P_REVERB, 35,
-    KIT(13), LV(0), 95, P_PATTERN, 0, P_EVOLVE, 35, P_PL_CHO, 30, P_RV_TYPE, 1, P_RV_X, 30, P_RV_DAMP, 40, P_MC_RATIO, 4, P_MC_THR, 40, P_MC_MAKE, 40, -1};
+    KIT(13), LV(0), 95, LV(1), 80, LV(2), 82, LV(3), 78, LV(4), 62, P_PATTERN, 0, P_EVOLVE, 35, P_PL_CHO, 30, P_RV_TYPE, 1, P_RV_X, 30, P_RV_DAMP, 40, P_MC_RATIO, 4, P_MC_THR, 40, P_MC_MAKE, 40, -1};
 static const int16_t X_DISCO[] = {P_CH_LOOP, 2, P_PULSE, 80, P_DRIVE, 20, P_SWING, 8, P_PAD, 50, P_ACID, 45, P_BASS, 75, P_AC_DENS, 55, P_AC_LEN, 16, P_ECHO, 25, P_REVERB, 30,
     KIT(1), P_PATTERN, 0, P_EVOLVE, 35, P_PL_CHO, 40, P_BL_MODE, 6, P_BL_LEN, 35, P_BL_MOVE, 10, P_CM_VU, 50, P_MC_RATIO, 3, P_MC_THR, 48, P_MC_MAKE, 32, -1};
 static const int16_t X_FUNK[] = {P_PULSE, 78, P_DRIVE, 25, P_SWING, 20, P_PAD, 40, P_ACID, 50, P_BASS, 78, P_AC_DENS, 60, P_AC_LEN, 16, P_AC_MUT, 20, P_ECHO, 20, P_REVERB, 20,
     KIT(4), P_PATTERN, 0, P_EVOLVE, 35, P_BL_MODE, 6, P_BL_LEN, 28, P_BL_MOVE, 25, P_CM_VU, 45, P_GHOST, 65, P_HUMAN, 25, P_MC_RATIO, 3, P_MC_THR, 48, P_MC_MAKE, 30, -1};
 static const int16_t X_REGGAE[] = {P_PULSE, 72, P_DRIVE, 15, P_SWING, 30, P_PAD, 45, P_ACID, 30, P_BASS, 85, P_AC_DENS, 35, P_AC_LEN, 16, P_ECHO, 55, P_REVERB, 35,
     KIT(8), P_PATTERN, 0, P_EVOLVE, 30, P_BL_MODE, 6, P_BL_LEN, 55, P_BL_MOVE, 15, P_CM_VU, 50, P_HUMAN, 30, P_MC_RATIO, 2, P_MC_THR, 50, P_MC_MAKE, 35, -1};
-static const int16_t X_SYNTHWAVE[] = {P_CH_LOOP, 2, P_PULSE, 78, P_DRIVE, 35, P_SWING, 0, P_PAD, 55, P_ACID, 50, P_BASS, 72, P_AC_DENS, 70, P_AC_LEN, 16, P_ECHO, 35, P_REVERB, 45, P_SIZE, 70,
+static const int16_t X_SYNTHWAVE[] = {P_CH_LOOP, 2, P_PULSE, 78, P_DRIVE, 35, P_SWING, 0, P_PAD, 55, P_ACID, 50, P_BASS, 72, P_AC_DENS, 45, P_AC_LEN, 16, P_ECHO, 35, P_REVERB, 45, P_SIZE, 70,
     KIT(11), P_PATTERN, 0, P_EVOLVE, 35, P_PL_CHO, 60, P_RV_TYPE, 2, P_RV_X, 40, P_BL_MODE, 3, P_BL_LEN, 28, P_BL_MOVE, 12, P_CM_VU, 60, P_MC_RATIO, 3, P_MC_THR, 46, P_MC_MAKE, 32, -1};
 static const int16_t X_AMAPIANO[] = {P_CH_LOOP, 1, P_PULSE, 70, P_DRIVE, 15, P_SWING, 25, P_PAD, 45, P_ACID, 40, P_BASS, 80, P_AC_DENS, 40, P_AC_LEN, 12, P_ECHO, 30, P_REVERB, 40, P_PL_CHO, 25,
-    KIT(5), P_PATTERN, 0, P_EVOLVE, 35, P_BL_MODE, 6, P_BL_LEN, 45, P_BL_MOVE, 12, P_BL_GLIDE, 35, P_CM_VU, 50, P_HUMAN, 20, P_MC_RATIO, 2, P_MC_THR, 50, P_MC_MAKE, 35, -1};
+    KIT(5), LV(1), 72, LV(2), 75, LV(3), 68, LV(4), 60, LV(5), 65, P_PATTERN, 0, P_EVOLVE, 35, P_BL_MODE, 6, P_BL_LEN, 45, P_BL_MOVE, 12, P_BL_GLIDE, 35, P_CM_VU, 50, P_HUMAN, 20, P_MC_RATIO, 2, P_MC_THR, 50, P_MC_MAKE, 35, -1};
 static const int16_t X_TRIPHOP[] = {P_CH_LOOP, 1, P_PULSE, 72, P_DRIVE, 40, P_SWING, 36,   /* (swing 36, 59 %, 0.15.13: the MPC shuffle; was 18) */ P_PAD, 50, P_ACID, 25, P_BASS, 80, P_AC_DENS, 25, P_AC_LEN, 12, P_ECHO, 45, P_REVERB, 50, P_SIZE, 70, P_RV_DAMP, 55,
     P_NOISE, 20, P_NZ_COLOR, 7, KIT(8), P_PATTERN, 0, P_EVOLVE, 30, P_BL_MODE, 1, P_BL_LEN, 75, P_BL_MOVE, 12, P_CM_VU, 55, P_CM_LOOP, 1, P_GHOST, 40, P_HUMAN, 30,
     P_MC_RATIO, 3, P_MC_THR, 45, P_MC_MAKE, 32, -1};
 /* INDUSTRIAL (0.15.14, genre 17): industrial techno, EBM and industrial breakbeat, 118-145 BPM, phrygian and minor, suspended and fourths chords; driven,
  * harsh and detuned drums (the snare a tritone up, the perc a semitone off), a gated reverb, a 3/16 echo, the tape latched */
 static const int16_t X_INDUS[] = {P_CH_LOOP, 1, P_BL_MODE, 1, P_BL_LEN, 40, P_BL_MOVE, 15, P_BL_GLIDE, 10, P_CM_VU, 40, P_GHOST, 50, P_HUMAN, 10, P_PULSE, 85, P_DRIVE, 75,
-    P_SWING, 4, P_DETUNE, 40, P_PAD, 40, P_ACID, 50, P_BASS, 80, P_AC_DENS, 55, P_AC_LEN, 16, P_AC_RES, 65, P_ECHO, 30, P_ETIME, 1, P_REVERB, 30, P_RV_TYPE, 2, P_RV_X, 30,
+    P_SWING, 4, P_DETUNE, 40, P_PAD, 40, P_ACID, 50, P_BASS, 80, P_AC_DENS, 80, P_AC_LEN, 16, P_AC_RES, 65, P_NOISE, 28, P_NZ_COLOR, 7, P_ECHO, 30, P_ETIME, 1, P_REVERB, 30, P_RV_TYPE, 2, P_RV_X, 30,
     KIT(6), TU(1), 25, TU(5), 4, TU(0), -8, P_PATTERN, 0, P_EVOLVE, 45, P_MC_RATIO, 4, P_MC_THR, 38, P_MC_MAKE, 35, -1};
 /* PSY (0.16.2, genre 18), from a YouTube commenter ("psytrance ... from cosmic psy-ambient into trance and back"): progressive, full-on and goa, 132-146 BPM,
  * the four-on-the-floor kick with the rolling bass between its beats (K-B-B-B), the 16th hats soft, the open hat off the beat, the acid as the squelching
@@ -238,8 +239,22 @@ static const int16_t X_FOREST[] = {P_CH_LOOP, 1, P_BL_MODE, 1, P_BL_LEN, 22, P_B
     P_DRIVE, 55, P_SWING, 0, P_DETUNE, 45, P_PAD, 35, P_ACID, 55, P_BASS, 72, P_AC_DENS, 85, P_AC_LEN, 16, P_AC_RES, 80, P_AC_ENV, 70, P_AC_CUT, 35, P_AC_MUT, 45,
     P_ECHO, 30, P_ETIME, 0, P_REVERB, 35, P_SIZE, 55, P_RV_TYPE, 0, P_RV_DAMP, 55, KIT(6), TU(5), 7, P_PATTERN, 0, P_EVOLVE, 60, P_MOTION, 60, P_MC_RATIO, 4, P_MC_THR, 38,
     P_MC_MAKE, 35, -1};
-static const int16_t *const XBASE[15] = {X_DUBR, X_DNB, X_BREAKS, X_GARAGE, X_ELECTRO, X_TRAP, X_DISCO, X_FUNK, X_REGGAE, X_SYNTHWAVE, X_AMAPIANO, X_TRIPHOP, X_INDUS, X_PSY, X_FOREST};
-static const uint8_t XROW[15][10][7] = {
+/* TECHNO, DETROIT, HARD (2026-11-15, genres 20-22, the maker's ask). TECHNO: peak-time, 128-138 BPM, the kick on every beat with a rumble between, the open
+ * hat off the beat, 16th hats, a short stab or bleep that repeats in place of a melody, sus and fourths chords that barely move, a 3/16 echo, the pump.
+ * DETROIT: 122-132, the 909 with a little shuffle, minor 7ths and 9ths stabbed 3-3-2 on strings and poly pads, an FM or pulse bass figure, an electric
+ * piano or bell line, warm and roomy. HARD: 145-160, the Hard kick driven, the bass on the off-beats or galloping, rave stabs, a screaming accented
+ * acid, hat rolls, phrygian, the tape driven. */
+static const int16_t X_TECHNO[] = {P_CH_LOOP, 1, P_BL_MODE, 4, P_BL_LEN, 30, P_BL_MOVE, 5, P_BL_GLIDE, 0, P_CM_VU, 45, P_CM_LOOP, 1, P_GHOST, 10, P_HUMAN, 5, P_PULSE, 88,
+    P_DRIVE, 45, P_SWING, 0, P_DETUNE, 25, P_PAD, 45, P_ACID, 45, P_BASS, 80, P_AC_DENS, 55, P_AC_LEN, 16, P_AC_RES, 60, P_ECHO, 35, P_ETIME, 1, P_REVERB, 35, P_SIZE, 60,
+    P_RV_TYPE, 1, P_RV_X, 30, KIT(2), LV(3), 65, LV(4), 70, P_PATTERN, 0, P_EVOLVE, 45, P_MOTION, 45, P_MC_RATIO, 4, P_MC_THR, 40, P_MC_MAKE, 35, -1};
+static const int16_t X_DETROIT[] = {P_CH_LOOP, 2, P_BL_MODE, 6, P_BL_LEN, 35, P_BL_MOVE, 15, P_BL_GLIDE, 0, P_CM_VU, 55, P_CM_LOOP, 1, P_GHOST, 20, P_HUMAN, 12, P_PULSE, 78,
+    P_DRIVE, 20, P_SWING, 12, P_DETUNE, 30, P_PAD, 48, P_ACID, 40, P_BASS, 74, P_AC_DENS, 40, P_AC_LEN, 16, P_ECHO, 35, P_ETIME, 1, P_REVERB, 42, P_SIZE, 70, P_PL_CHO, 45,
+    KIT(10), P_PATTERN, 0, P_EVOLVE, 40, P_MOTION, 40, P_MC_RATIO, 3, P_MC_THR, 46, P_MC_MAKE, 32, -1};
+static const int16_t X_HARD[] = {P_CH_LOOP, 1, P_BL_MODE, 4, P_BL_LEN, 25, P_BL_MOVE, 5, P_BL_GLIDE, 0, P_CM_VU, 40, P_CM_LOOP, 1, P_GHOST, 15, P_HUMAN, 5, P_PULSE, 90,
+    P_DRIVE, 80, P_SWING, 0, P_DETUNE, 40, P_PAD, 42, P_ACID, 50, P_BASS, 78, P_AC_DENS, 70, P_AC_LEN, 16, P_AC_RES, 75, P_AC_ENV, 65, P_ECHO, 25, P_ETIME, 1, P_REVERB, 28,
+    P_RV_TYPE, 2, P_RV_X, 30, KIT(6), LV(3), 65, LV(4), 68, P_PATTERN, 0, P_EVOLVE, 50, P_MOTION, 50, P_MC_RATIO, 4, P_MC_THR, 36, P_MC_MAKE, 35, -1};
+static const int16_t *const XBASE[18] = {X_DUBR, X_DNB, X_BREAKS, X_GARAGE, X_ELECTRO, X_TRAP, X_DISCO, X_FUNK, X_REGGAE, X_SYNTHWAVE, X_AMAPIANO, X_TRIPHOP, X_INDUS, X_PSY, X_FOREST, X_TECHNO, X_DETROIT, X_HARD};
+static const uint8_t XROW[18][10][7] = {
     {{70, 9, 5, 5, 0, 0, 0}, {66, 2, 1, 5, 0, 0, 0}, {72, 7, 2, 5, 0, 0, 0}, {68, 0, 5, 5, 0, 0, 0}, {74, 4, 1, 5, 0, 0, 0}, {64, 5, 5, 2, 0, 0, 0}, {76, 10, 1, 3, 0, 0, 0}, {70, 3, 2, 5, 0, 0, 0}, {66, 6, 5, 5, 0, 0, 0}, {72, 11, 1, 2, 0, 0, 0}},
     {{174, 9, 1, 3, 0, 9, 4}, {172, 2, 5, 2, 1, 1, 15}, {174, 5, 3, 3, 3, 9, 11}, {175, 4, 2, 6, 7, 4, 14}, {174, 0, 5, 4, 11, 3, 2}, {176, 7, 1, 2, 5, 9, 4}, {170, 10, 5, 3, 2, 1, 15}, {175, 6, 2, 4, 7, 13, 13}, {172, 11, 1, 2, 0, 9, 11}, {178, 3, 5, 6, 11, 2, 14}},
     {{100, 2, 1, 1, 4, 3, 2}, {110, 4, 4, 4, 14, 2, 0}, {118, 9, 5, 1, 6, 11, 3}, {125, 0, 4, 1, 4, 3, 1}, {130, 7, 2, 6, 7, 4, 14}, {104, 5, 1, 2, 10, 2, 2}, {135, 11, 5, 4, 14, 11, 13}, {120, 3, 1, 1, 6, 3, 0}, {112, 10, 4, 1, 4, 2, 6}, {128, 6, 5, 4, 13, 13, 2}},
@@ -259,8 +274,14 @@ static const uint8_t XROW[15][10][7] = {
                                                  * 03-04 progressive, 05-09 full-on and goa, 10 psychill again */
     {{150, 4, 2, 6, 7, 9, 13}, {152, 5, 2, 4, 11, 13, 14}, {155, 1, 5, 1, 23, 20, 2}, {158, 7, 2, 6, 22, 9, 27}, {160, 2, 2, 5, 7, 8, 9},
      {148, 9, 5, 4, 16, 6, 13}, {162, 6, 2, 6, 11, 9, 14}, {165, 11, 2, 1, 7, 20, 2}, {156, 8, 7, 4, 23, 13, 27}, {160, 0, 2, 6, 22, 9, 13}},   /* dark forest: 148-165 */
+    {{130, 9, 5, 4, 6, 8, 0}, {132, 2, 2, 6, 7, 9, 1}, {134, 7, 5, 5, 8, 5, 2}, {128, 4, 1, 4, 11, 4, 3}, {135, 0, 2, 1, 14, 6, 14},
+     {136, 5, 5, 6, 6, 8, 0}, {132, 11, 7, 5, 7, 9, 1}, {138, 6, 2, 4, 8, 5, 2}, {130, 1, 5, 6, 11, 4, 3}, {134, 10, 1, 5, 14, 6, 14}},   /* techno: 128-138 */
+    {{124, 2, 1, 2, 2, 6, 15}, {126, 9, 5, 3, 10, 5, 1}, {122, 5, 1, 2, 5, 10, 5}, {128, 0, 5, 3, 6, 1, 26}, {125, 7, 1, 7, 0, 0, 24},
+     {130, 4, 5, 2, 2, 6, 15}, {123, 10, 1, 3, 10, 5, 1}, {127, 3, 7, 2, 5, 10, 5}, {132, 11, 5, 5, 6, 1, 26}, {126, 6, 1, 3, 0, 0, 24}},   /* detroit: 122-132 */
+    {{145, 4, 2, 6, 14, 8, 2}, {148, 9, 5, 4, 13, 20, 3}, {150, 1, 2, 5, 7, 2, 27}, {152, 7, 2, 6, 6, 11, 13}, {155, 2, 5, 1, 11, 13, 14},
+     {146, 6, 2, 4, 14, 8, 2}, {158, 11, 7, 6, 13, 20, 3}, {150, 0, 2, 5, 7, 2, 27}, {160, 5, 5, 6, 6, 11, 13}, {154, 10, 2, 4, 11, 13, 14}},   /* hard: 145-160 */
 };
-static const uint16_t XPAT[15][6][6] = {
+static const uint16_t XPAT[18][6][6] = {
     {{0x0100, 0x0100, 0x0000, 0x4444, 0x0000, 0x0000}, {0x1111, 0x0100, 0x0000, 0x5555, 0x0000, 0x0000}, {0x2111, 0x1010, 0x0000, 0x5555, 0x0000, 0x0000}, {0x0100, 0x0100, 0x0000, 0x0000, 0x4000, 0x0000}, {0x0101, 0x0100, 0x0100, 0x4444, 0x0000, 0x2020}, {0x1111, 0x1010, 0x0000, 0x4444, 0x4040, 0x0000}},
     {{0x0401, 0x1010, 0x0000, 0x5555, 0x0000, 0x0000}, {0x0401, 0x1010, 0x8080, 0xFF7F, 0x0000, 0x4040}, {0x0405, 0x1010, 0x8080, 0xFFFF, 0x0000, 0x0000}, {0x0401, 0x1010, 0x0000, 0x4444, 0x0000, 0x8008}, {0x0409, 0x1010, 0x0000, 0x5555, 0x0000, 0x4080}, {0x4041, 0x0100, 0x0100, 0x5555, 0x1000, 0x0000}},
     {{0x2445, 0x1010, 0x8A80, 0xDF7F, 0x2080, 0x0000}, {0x4181, 0x1010, 0x0000, 0x51D5, 0x0400, 0x0000}, {0x0C83, 0x1010, 0x0000, 0x0000, 0x5555, 0x0000}, {0x0501, 0x9090, 0x0000, 0x5555, 0x0000, 0x0000}, {0x4405, 0x1010, 0x1010, 0x5555, 0x8000, 0x0080}, {0x0005, 0xF510, 0x1000, 0x0155, 0x0000, 0x0000}},
@@ -282,13 +303,22 @@ static const uint16_t XPAT[15][6][6] = {
     {{0x1111, 0x0000, 0x1010, 0xEEEE, 0x4444, 0x5A5A}, {0x1111, 0x1010, 0x0000, 0xFFFF, 0x0000, 0x2492}, {0x1111, 0x0000, 0x0000, 0xEEEE, 0x4444, 0xB6DB},
      {0x1111, 0x8010, 0x1010, 0xAAAA, 0x4444, 0x6D6D}, {0x1111, 0x0000, 0x1010, 0xFFFF, 0x4040, 0x9249}, {0x1111, 0x1012, 0x0000, 0xEEEE, 0x4444, 0xDB6D}},   /* dark forest: the
                                                  * same kick under every-16th hats and a perc in threes (3 against 4), glitching */
+    {{0x1111, 0x0000, 0x0000, 0x0000, 0x4444, 0x0000}, {0x1111, 0x0000, 0x1010, 0xFFFF, 0x4444, 0x0000}, {0x1111, 0x0000, 0x1010, 0xBBBB, 0x4444, 0x2408},
+     {0x1111, 0x0000, 0x0000, 0xFFFF, 0x4444, 0x9249}, {0x1111, 0x1010, 0x0000, 0xAAAA, 0x4444, 0x0820}, {0x1151, 0x0000, 0x1010, 0xFFFF, 0x4444, 0x4924}},   /* techno: the kick on
+                                                 * every beat, the open hat off it; the first the kick and the open hat alone, then 16th hats, a clap, a perc in threes */
+    {{0x1111, 0x0000, 0x1010, 0x4444, 0x0000, 0x0000}, {0x1111, 0x0000, 0x1010, 0xFFFF, 0x4444, 0x0000}, {0x1111, 0x1010, 0x0000, 0xDDDD, 0x4444, 0x2020},
+     {0x1111, 0x0000, 0x1010, 0x5555, 0x4040, 0x0A0A}, {0x1191, 0x0000, 0x1010, 0xFFFF, 0x4444, 0x8208}, {0x1111, 0x1010, 0x1010, 0x7777, 0x4444, 0x2222}},   /* detroit: the 909,
+                                                 * the clap on 2 and 4, shuffled hats, a conga or rim between */
+    {{0x1111, 0x0000, 0x0000, 0xFFFF, 0x4444, 0x0000}, {0x1111, 0x0000, 0x1010, 0xEEEE, 0x4444, 0x9249}, {0x1111, 0x1010, 0x0000, 0xFFFF, 0x4444, 0x2222},
+     {0x5111, 0x0000, 0x1010, 0xAAAA, 0x4444, 0x0808}, {0x1111, 0x0000, 0x1010, 0xFFFF, 0x4444, 0x6DB6}, {0x1111, 0x1010, 0x1010, 0xEEEE, 0x4444, 0xB6DB}},   /* hard: relentless,
+                                                 * every-16th hats, the open hat off the beat, the perc in threes */
 };
 /* psy's slow pieces (01, 02, 10: psy-ambient, psychill): a downtempo beat instead (the kick on 1 and 3 or a slow four, the snare on 2 and 4, eighth hats) */
 static const uint16_t PSY_DOWN[6][6] = {
     {0x0101, 0x1010, 0x0000, 0x5555, 0x0000, 0x0820}, {0x0901, 0x1010, 0x0000, 0x5555, 0x4000, 0x0000}, {0x1111, 0x0000, 0x1010, 0x4444, 0x0000, 0x2020},
     {0x0121, 0x1010, 0x0000, 0xDDDD, 0x0000, 0x0808}, {0x0101, 0x0000, 0x1010, 0x5555, 0x0040, 0x8080}, {0x1111, 0x1010, 0x0000, 0x5555, 0x4444, 0x0000}};
 static int psy_slow(int g, int i) { return g == 17 && (i == 0 || i == 1 || i == 9); }
-static const char *const XNAME[15][10] = {
+static const char *const XNAME[18][10] = {
     {"V01", "V02", "V03", "V04", "V05", "V06", "V07", "V08", "V09", "V10"},
     {"N01", "N02", "N03", "N04", "N05", "N06", "N07", "N08", "N09", "N10"},
     {"B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10"},
@@ -304,6 +334,9 @@ static const char *const XNAME[15][10] = {
     {"I01", "I02", "I03", "I04", "I05", "I06", "I07", "I08", "I09", "I10"},
     {"Y01", "Y02", "Y03", "Y04", "Y05", "Y06", "Y07", "Y08", "Y09", "Y10"},
     {"O01", "O02", "O03", "O04", "O05", "O06", "O07", "O08", "O09", "O10"},
+    {"K01", "K02", "K03", "K04", "K05", "K06", "K07", "K08", "K09", "K10"},
+    {"M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10"},
+    {"X01", "X02", "X03", "X04", "X05", "X06", "X07", "X08", "X09", "X10"},
 };
 static void x_pats(int g, int i, uint16_t pats[EN_NPAT][EN_NLANE])
 {
@@ -383,7 +416,7 @@ static const char *const PIECE_NAME[EN_NPIECES] = {"01", "02", "03", "04", "05",
 
 const char *en_piece_name(int i) { return PIECE_NAME[(unsigned)i < EN_NPIECES ? i : 0]; }
 static const int16_t *const *const GENRE_PIECES[EN_NGENRE] = {PIECES, LOFI_PIECES, HOUSE_PIECES, DUB_PIECES};
-static const char *const GENRE_NAME[EN_NGENRE] = {"HYPNO", "LOFI", "HOUSE", "DUBSTEP", "DUB", "DNB", "BREAKS", "GARAGE", "ELECTRO", "TRAP", "DISCO", "FUNK", "REGGAE", "SYNTHWV", "AMAPI", "TRIPHOP", "INDUS", "PSY", "FOREST"};
+static const char *const GENRE_NAME[EN_NGENRE] = {"HYPNO", "LOFI", "HOUSE", "DUBSTEP", "DUB", "DNB", "BREAKS", "GARAGE", "ELECTRO", "TRAP", "DISCO", "FUNK", "REGGAE", "SYNTHWV", "AMAPI", "TRIPHOP", "INDUS", "PSY", "FOREST", "TECHNO", "DETROIT", "HARD"};
 const char *en_genre_name(int g) { return GENRE_NAME[(unsigned)g < EN_NGENRE ? g : 0]; }
 const char *en_piece_name_g(int g, int i)
 {
@@ -420,11 +453,48 @@ static const struct { uint8_t pad[5], drone[5], acid[5], pluck[5], kick[3], snar
                                                  * 909 and Electro snares, Techno and Minimal hats, the Acid perc */
     {{7, 11, 23, 22, 16}, {9, 13, 20, 8, 6}, {13, 14, 2, 27, 9}, {6, 10, 8, 33, 11}, {6, 2, 10}, {11, 6, 4}, {5, 11, 2}, {11, 6, 5}},   /* dark forest (0.16.2): Dark,
                                                  * Hollow, Air, Chapel, Ooh; Sub, Metal, Gnarl, Rumble, FM; Laser, Fold, Driven, Hyper, Bleep; Gong, Bleep, Digital, DX Tubular, Glass; the Hard kick */
+    {{6, 7, 8, 11, 14}, {8, 9, 5, 4, 6}, {0, 1, 2, 3, 14}, {10, 8, 4, 11, 27}, {2, 10, 2}, {10, 2, 5}, {2, 5, 10}, {2, 3, 5}},   /* techno (2026-11-15): Stabs, Dark, Dub,
+                                                 * Hollow, Rave; Rumble, Sub, Pulse, Reese, FM; Saw, Square, Driven, Sync, Fold; Bleep, Digital, Bell, Glass, DX Sync Lead; Techno and 909 kicks */
+    {{2, 10, 5, 6, 0}, {6, 5, 10, 1, 0}, {15, 1, 5, 26, 24}, {12, 4, 5, 8, 26}, {10, 1, 7}, {10, 11, 1}, {10, 1, 11}, {11, 10, 3}},   /* detroit: Strings, Poly, Warm, Stabs,
+                                                 * Rhodes; FM, Pulse, Square, Warm, Saws; Soft, Square, PWM, Mini, Super; DX Tine EP, Bell, Vibes, Digital, DX Glass Pad; 909, House, 808 */
+    {{14, 13, 7, 6, 11}, {8, 20, 2, 11, 13}, {2, 3, 27, 13, 14}, {10, 8, 27, 6, 33}, {6, 2, 9}, {6, 10, 4}, {2, 6, 2}, {6, 3, 6}},   /* hard: Rave, Hits, Dark, Stabs, Hollow;
+                                                 * Rumble, Gnarl, Grit, Hoover, Metal; Driven, Sync, Hyper, Laser, Fold; Bleep, Digital, DX Sync Lead, Gong, DX Tubular; Hard, Techno, Heavy */
 };
-static const uint8_t PLUCK_RATE[EN_NGENRE] = {2, 2, 2, 0, 0, 3, 2, 2, 3, 0, 2, 3, 0, 2, 3, 0, 3, 3, 3};   /* the pluck's rate by genre: 1/8 (2), 1/16 (3), 1/4 (0) */
+static const uint8_t PLUCK_RATE[EN_NGENRE] = {2, 2, 2, 0, 0, 3, 2, 2, 3, 0, 2, 3, 0, 3, 3, 0, 3, 3, 3, 3, 3, 3};   /* (synthwave 1/16, 2026-11-13: its arpeggio) */   /* the pluck's rate by genre: 1/8 (2), 1/16 (3), 1/4 (0) */
 /* pieces 6-10's pad: the palette shifted by PAD_K[g] from pieces 1-5's (0.16.7: it was 2 for all, which gave 1 and 9, 3 and 6, 4 and 7 one pad over the
  * same mode and chord kind: the audit's "twins"; each genre's shift chosen by tests/host/gtwin.c, SEARCH=1, for the fewest pairs too alike) */
-static const uint8_t PAD_K[EN_NGENRE] = {2, 4, 2, 4, 4, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 4, 4, 2, 0};
+static const uint8_t PAD_K[EN_NGENRE] = {2, 4, 2, 4, 4, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 4, 4, 2, 0, 2, 2, 2};
+/* THE MELODY BY GENRE (2026-11-13, the maker's ask: industrial more industrial, synthwave more synthwave). Until now every genre's pluck and lead played
+ * the same way (the defaults: density 45, decay 45, two octaves, no leaps, motif 60; the lead's slide 30, accent 50, one octave), only their sounds and
+ * the pluck's rate differing. Each genre now has how its melody is played: the pluck's three styles (a piece takes one by its number; it was any of the
+ * six), its density, decay, range, leaps, motif and octave; the lead's slide, accent, decay (-1: the piece's own), range and octave. */
+static const struct { uint8_t st[3], dens, dec, range, leap, motif; int8_t oct; uint8_t slide, acc; int8_t adec; uint8_t arange; int8_t aoct; uint8_t lvl; } MELO[EN_NGENRE] = {   /* (lvl: the pluck's level; at 50 in every genre it sat 20-30 dB under the mix in most, tests/host/glevel) */
+    {{0, 0, 0}, 45, 45, 2, 0, 60, 0, 30, 50, -1, 1, 0, 50},     /* (hypno: not used, the original pieces keep theirs) */
+    {{7, 2, 6}, 35, 60, 1, 10, 70, 0, 35, 50, -1, 1, 0, 58},    /* lofi: a sparse, lazy line that rings (its lead's slide and decay are the pieces' own) */
+    {{9, 5, 6}, 50, 35, 1, 10, 70, 0, 20, 55, -1, 1, 0, 64},    /* house: short notes skipping through the chord */
+    {{7, 1, 9}, 30, 55, 1, 20, 75, 0, 55, 70, -1, 1, 0, 62},    /* dubstep: a few dark notes, falling; the lead gliding, accented */
+    {{7, 3, 6}, 25, 65, 1, 0, 70, 0, 30, 45, -1, 1, 0, 74},     /* dub: a melodica's few long notes for the echo */
+    {{8, 4, 6}, 45, 35, 2, 15, 65, 0, 40, 60, -1, 2, 0, 52},    /* DnB: quick and wide */
+    {{9, 3, 8}, 50, 30, 2, 20, 60, 0, 45, 75, -1, 2, 0, 72},    /* breaks: stabs and an acid line with bite */
+    {{5, 9, 6}, 45, 30, 1, 15, 70, 0, 25, 55, -1, 1, 0, 60},    /* garage: short organ-like thirds */
+    {{0, 9, 8}, 75, 25, 2, 10, 80, 0, 15, 60, -1, 2, 0, 60},    /* electro: a machine's arpeggio, short, repeating */
+    {{9, 5, 7}, 40, 60, 1, 0, 85, 1, 60, 50, -1, 1, 0, 70},     /* trap: a bell figure up high, simple, coming back each bar; the lead sliding */
+    {{8, 5, 6}, 60, 35, 2, 20, 70, 0, 20, 60, -1, 2, 0, 70},    /* disco: running lines with octave jumps */
+    {{9, 3, 6}, 65, 20, 1, 15, 75, 0, 25, 75, -1, 1, 0, 68},    /* funk: a clavinet's short, busy, accented riff */
+    {{6, 2, 7}, 30, 55, 1, 0, 75, 0, 30, 40, -1, 1, 0, 76},     /* reggae: a few notes, laid back */
+    {{0, 2, 8}, 95, 30, 2, 0, 0, 0, 55, 40, 65, 2, 1, 74},      /* synthwave: the arpeggio, every sixteenth up (or up and down) two octaves, never resting; the lead an
+                                                             * octave up, singing: long notes that slide */
+    {{6, 5, 8}, 40, 50, 2, 15, 70, 0, 35, 50, -1, 1, 0, 55},    /* amapiano: piano fills, unhurried */
+    {{7, 1, 6}, 25, 70, 1, 10, 75, 0, 50, 35, 60, 1, 0, 72},    /* trip-hop: sparse, long, falling */
+    {{9, 4, 1}, 35, 25, 1, 30, 85, -1, 10, 85, 25, 1, 0, 64},   /* industrial: metal struck an octave down, jarring leaps, the same figure again and again as a machine
+                                                             * does; the lead short, hard-accented, no slide */
+    {{0, 8, 4}, 70, 25, 2, 20, 60, 0, 35, 70, -1, 2, 0, 52},    /* psy: fast short arpeggios, the squelch accented */
+    {{3, 4, 8}, 75, 15, 3, 35, 40, 0, 45, 80, -1, 3, 0, 55},    /* dark forest: dense, tiny, leaping over three octaves, seldom the same twice */
+    {{9, 4, 0}, 40, 20, 1, 10, 85, 0, 15, 70, -1, 1, 0, 68},    /* techno: a short stab, the same few notes round and round */
+    {{6, 8, 5}, 55, 40, 2, 15, 70, 0, 25, 55, -1, 1, 0, 64},    /* detroit: an electric piano or bell line, melodic, over two octaves */
+    {{9, 4, 1}, 45, 15, 1, 25, 90, 0, 10, 85, 25, 1, 0, 66},    /* hard: a tiny bleep hammered; the lead short and hard-accented, no slide */
+};
+/* (2026-11-15: a genre's three styles now take in the composed ones, 6 Call, 7 Long, 8 Run, 9 Riff, so its pieces' hooks are of different kinds) */
 static void vary(int g, int i, int16_t *par)
 {
     const int pw = g * 3 + i, h = i / 5;
@@ -433,9 +503,32 @@ static void vary(int g, int i, int16_t *par)
     par[P_CM_RATE] = PLUCK_RATE[g];
     if (g == 0)
         return;                                 /* the original pieces keep their pad, drone, acid and kit */
+    par[P_CM_STYLE] = MELO[g].st[i % 3];        /* the melody as the genre plays it (MELO) */
+    par[P_CM_DENS] = MELO[g].dens;
+    par[P_CM_DEC] = MELO[g].dec;
+    par[P_CM_RANGE] = MELO[g].range;
+    par[P_CM_LEAP] = MELO[g].leap;
+    par[P_CM_MOTIF] = MELO[g].motif;
+    par[P_CM_OCT] = MELO[g].oct;
+    par[P_CM_LVL] = MELO[g].lvl;
+    if (g != 1)
+        par[P_AC_SLIDE] = MELO[g].slide;
+    par[P_AC_ACC] = MELO[g].acc;
+    if (MELO[g].adec >= 0)
+        par[P_AC_DEC] = MELO[g].adec;
+    par[P_AC_RANGE] = MELO[g].arange;
+    par[P_AC_OCT] = MELO[g].aoct;
     par[P_PADTONE] = PALETTE[g].pad[(i + PAD_K[g] * h) % 5];
     par[P_DR_INST] = PALETTE[g].drone[(i * 2 + g + 2 * h) % 5];
     par[P_AC_WAVE] = PALETTE[g].acid[(i * 3 + pw + 2 * h) % 5];
+    {   /* (2026-11-11) the bass line: three lines a genre, a piece taking one by its number (house, dubstep, DnB, breaks, garage, trap, amapiano: they
+         * had one each, the same in all ten pieces) */
+        static const uint8_t BL3[EN_NGENRE][3] = {[2] = {4, 17, 16}, [3] = {2, 2, 23}, [5] = {1, 21, 22}, [6] = {6, 12, 25}, [7] = {6, 8, 18},
+                                                  [9] = {2, 24, 2}, [14] = {6, 19, 20},
+                                                  [19] = {4, 1, 15}, [20] = {6, 16, 17}, [21] = {4, 15, 2}};   /* techno: off-beat, the rumble, Gallop; detroit: its riff, Deep, Jack; hard: off-beat, Gallop, with the kick */
+        if (BL3[g][0])
+            par[P_BL_MODE] = BL3[g][i % 3];
+    }
     par[P_KIT_KICK] = PALETTE[g].kick[(i + g) % 3];
     par[P_KIT_SNARE] = PALETTE[g].snare[(i * 2 + g + i / 3) % 3];
     par[P_KIT_HAT] = PALETTE[g].hat[(i + 2 * g + i / 9) % 3];
@@ -470,6 +563,8 @@ void en_piece_g(int g, int i, int16_t *par, uint16_t *pool)
     if (psy_slow(g, i)) {                       /* psy-ambient, psychill: the bass held, the pluck in eighths, the acid thin, a wide shimmer, the pad up */
         par[P_BL_MODE] = 0;
         par[P_CM_RATE] = 2;
+        par[P_CM_DENS] = 40;                    /* (the melody slow too: MELO's is the trance's) */
+        par[P_CM_DEC] = 60;
         par[P_AC_DENS] = 35;
         par[P_ACID] = 40;
         par[P_PAD] = 60;
@@ -545,7 +640,30 @@ void en_piece_mods_g(int g, int i, uint8_t mod[EN_NLANE][16])
             mod[5][s] = (uint8_t)(2u << 6);                 /* amapiano: the shakers soft */
         if (g == 18 && (s & 3) == 2)
             mod[5][s] = (uint8_t)(3u << 6);                 /* dark forest: the perc accented off the beat */
+        if ((g == 19 || g == 20) && (s & 3) == 2)
+            mod[4][s] = (uint8_t)(3u << 6);                 /* techno, detroit: the open off-beat hat accented */
+        if ((g == 19 || g == 20) && (s & 1))
+            mod[3][s] = (uint8_t)(2u << 6);                 /* and the 16th hats between soft */
+        if (g == 21 && (s & 3) == 0)
+            mod[0][s] = (uint8_t)(3u << 6);                 /* hard: every kick accented */
+        /* (2026-11-11) the seven genres' feel */
+        if ((g == 5 || g == 6) && s != 4 && s != 12)
+            mod[2][s] = (uint8_t)(1u << 6);                 /* DnB, breaks: the clap lane off the backbeat is the break's ghost notes */
+        if (g == 3 || g == 9) {
+            if (s == 8)
+                mod[1][s] = mod[2][s] = (uint8_t)(3u << 6); /* dubstep, trap: the half-time snare and clap on 3, accented */
+            if (s == 0)
+                mod[0][s] = (uint8_t)(3u << 6);             /* and the one */
+        }
+        if (g == 3 && (s & 1))
+            mod[3][s] = (uint8_t)(2u << 6);                 /* dubstep: the off-beat hats soft */
+        if (g == 2 && (s & 3) == 2)
+            mod[4][s] = (uint8_t)(3u << 6);                 /* house: the open off-beat hat accented, as disco's */
+        if (g == 14)
+            mod[1][s] = (uint8_t)(1u << 3);                 /* amapiano: the rim a touch late */
     }
+    if ((g == 5 || g == 6) && (i & 1))                  /* DnB, breaks, every other piece: the ghost before the one dragged (x2) */
+        mod[2][15] |= 1u;
     if (g == 18) {                                      /* dark forest: the perc's last 16th of beats 2 and 4 in triplets, the backbeat on 4 a flam */
         mod[5][7] = 2u;
         mod[5][15] = 2u;
@@ -555,7 +673,7 @@ void en_piece_mods_g(int g, int i, uint8_t mod[EN_NLANE][16])
         mod[1][15] = 2u;
         mod[5][13] = 1u;
     }
-    if (g == 9 || g == 16 || g == 18) {                 /* trap's (and industrial's, dark forest's) hat rolls (0.15.13: two a piece, on steps its hats play; x3 on step 8 never sounded) */
+    if (g == 9 || g == 16 || g == 18 || g == 21) {                 /* trap's (and industrial's, dark forest's) hat rolls (0.15.13: two a piece, on steps its hats play; x3 on step 8 never sounded) */
         static const uint8_t ROLL[5][2] = {{14, 3}, {6, 2}, {10, 1}, {12, 4}, {14, 7}};   /* step, ratchet: x4, x3, x2, x6, swell 4 */
         const int a = i % 5, b = (i + 2) % 5;
         mod[3][ROLL[a][0]] = (uint8_t)(mod[3][ROLL[a][0]] & ~7u) | ROLL[a][1];
@@ -1024,22 +1142,25 @@ static const uint8_t EN_TRIM[EN_NGENRE][10] = {   /* (median -15.3 dBFS; a piece
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* HYPNO */
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* LOFI */
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* HOUSE */
-    {0, 0, 4, 2, 0, 2, 0, 0, 1, 3},   /* DUBSTEP */
+    {0, 0, 6, 0, 0, 4, 0, 0, 4, 3},   /* DUBSTEP */
     {0, 0, 0, 0, 0, 0, 1, 0, 0, 0},   /* DUB */
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* DNB */
-    {0, 2, 0, 0, 3, 0, 0, 1, 0, 0},   /* BREAKS */
+    {0, 1, 0, 0, 3, 0, 1, 1, 0, 0},   /* BREAKS */
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* GARAGE */
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* ELECTRO */
-    {0, 2, 0, 3, 0, 0, 0, 2, 0, 0},   /* TRAP */
+    {0, 3, 0, 3, 1, 0, 0, 4, 0, 0},   /* TRAP */
     {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},   /* DISCO */
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* FUNK */
     {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},   /* REGGAE */
-    {0, 0, 0, 0, 0, 0, 2, 0, 0, 2},   /* SYNTHWV */
+    {0, 0, 0, 0, 0, 0, 1, 0, 0, 1},   /* SYNTHWV */
     {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},   /* AMAPI */
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* TRIPHOP */
-    {0, 5, 3, 0, 3, 3, 0, 5, 3, 0},   /* INDUS */
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},   /* PSY */
-    {4, 0, 0, 4, 0, 0, 4, 0, 0, 4},   /* FOREST */
+    {0, 5, 3, 0, 3, 3, 0, 5, 3, 1},   /* INDUS */
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* PSY */
+    {4, 0, 0, 4, 1, 0, 4, 0, 0, 4},   /* FOREST */
+    {0, 0, 1, 0, 0, 3, 0, 0, 1, 1},   /* TECHNO */
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   /* DETROIT */
+    {4, 1, 2, 5, 1, 3, 5, 2, 2, 5},   /* HARD */
 };
 static float trim_to = 1.0f, trim_k = 1.0f;
 void en_trim(int g, int piece)
@@ -1048,6 +1169,9 @@ void en_trim(int g, int piece)
     trim_to = fm_exp2f(-0.0830482f * (float)h);   /* (half dB: 2^(-h / 2 / 20 * log2 10)) */
 }
 static int32_t intro_len, intro_t;              /* the intro's length and how far it is, samples (0 length: none) */
+static uint8_t play_wait;                       /* (2026-11-09) Play with an intro, waiting: this block every track fades to nothing (a stop's tails, 5 ms), the next
+                                                 * the sequencer starts with them silent, so the intro opens from nothing: before, the first beat sounded at full for
+                                                 * ~20 ms (the tracks' gains still the last play's, ramping down) and the tails were cut under it, a pop on every set */
 volatile float en_drift_bars = 99.0f;
 
 /* -------------------------------------------------------------- state --- */
@@ -1961,6 +2085,9 @@ static const struct { uint8_t tonic, cad_every, cad_to, back, hr, dom; ch_edge_t
     {5, 4, 1, 1, 2, 0, {{0, 1, 9}, {1, 0, 9}, {0, 6, 4}, {6, 0, 4}, {0, 4, 3}, {4, 1, 3}, {0, 0, 0}, {0, 0, 0}}},    /* industrial: the grind between i and the flat II */
     {5, 8, 1, 1, 8, 0, {{0, 1, 8}, {1, 0, 10}, {0, 6, 4}, {6, 0, 5}, {0, 5, 3}, {5, 0, 4}, {0, 0, 0}, {0, 0, 0}}},    /* psy: home held 8 bars, the flat II and back */
     {6, 8, 1, 1, 8, 0, {{0, 1, 10}, {1, 0, 10}, {0, 3, 3}, {3, 0, 4}, {0, 6, 2}, {6, 0, 3}, {0, 0, 0}, {0, 0, 0}}},   /* dark forest: i and the flat II, barely moving */
+    {6, 8, 6, 1, 8, 0, {{0, 6, 6}, {6, 0, 8}, {0, 1, EB2 | 6}, {1, 0, EB2 | 9}, {0, 5, 3}, {5, 0, 5}, {0, 0, 0}, {0, 0, 0}}},    /* techno: home held 8 bars, VII or the flat II and back */
+    {3, 4, 6, 1, 4, 0, {{0, 3, 6}, {3, 0, 6}, {0, 6, 6}, {6, 5, 5}, {5, 0, 6}, {0, 5, 4}, {0, 0, 0}, {0, 0, 0}}},    /* detroit: minor vamps, i-IV and i-VII-VI */
+    {6, 8, 1, 1, 8, 0, {{0, 1, EB2 | 9}, {1, 0, EB2 | 10}, {0, 6, 4}, {6, 0, 5}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}}},    /* hard: home, the flat II */
 };
 /* synthwave in a major mode (0.16.7, the audit's 2b): I-vi-IV-V, the decade's own loop, in place of its minor i-VI-III-VII edges */
 static const ch_edge_t SYN_MAJ[8] = {{0, 5, 8}, {5, 3, 8}, {3, 4, 8}, {4, 0, 8}, {0, 3, 4}, {4, 5, 3}, {0, 0, 0}, {0, 0, 0}};
@@ -2442,12 +2569,15 @@ static const struct { uint8_t kick, hat, build, pad, kret, snare, bass, ft, fl; 
     {0, 0, 4, 60, 0, 0, 0, 0, SF_PBUILD}, {0, 0, 4, 90, 1, 0, 0, 0, SF_GAP}, {0, 0, 4, 80, 0, 0, 0, 0, SF_PBUILD}, {0, 0, 2, 60, 0, 0, 0, 0, SF_PBUILD},
     {0, 1, 4, 50, 1, 0, 0, 0, SF_ROLL | SF_HROLL | SF_GAP},   /* industrial: the hats grind on through the break, the kick back for the build's last bar */
     {0, 0, 8, 90, 0, 0, 0, 0, SF_ROLL | SF_GAP},               /* psy: the break all pad and atmosphere, 8 bars of build, the gap before the drop */
-    {0, 1, 4, 70, 1, 0, 0, 0, SF_ROLL | SF_HROLL | SF_GAP}};   /* dark forest: the hats glitch on through the break */
+    {0, 1, 4, 70, 1, 0, 0, 0, SF_ROLL | SF_HROLL | SF_GAP},    /* dark forest: the hats glitch on through the break */
+    {0, 1, 8, 80, 1, 0, 0, 0, SF_KDROP | SF_HROLL},            /* techno: the hats on through the break, 8 bars of build, the kick out before every 8th bar */
+    {0, 1, 8, 90, 1, 0, 0, 0, SF_KDROP},                       /* detroit: the same, the strings rising */
+    {0, 1, 4, 60, 1, 0, 0, 0, SF_ROLL | SF_HROLL | SF_GAP | SF_KDROP}};   /* hard: a short build, rolls, the gap */
 /* (0.15.13, from the genre research: breaks and funk break to the drums alone; house, dubstep, DnB, trap, disco and synthwave cut the mix for the beat
  * before the drop; lofi, dub, reggae, amapiano and trip-hop build on the perc, not with a snare roll; garage's triplet fill is on the rim) */
 /* the fills each genre may use (0.15.13): bit k is fill kind k (0 the ramp, 1-5 FILLS, 6 a triplet roll on the last beat): house and disco ramp and rush,
  * dub and reggae drag and breathe, trap and dubstep roll */
-static const uint8_t FILL_OK[EN_NGENRE] = {0x3F, 0x16, 0x07, 0x49, 0x14, 0x7F, 0x7E, 0x5A, 0x3F, 0x64, 0x87, 0x9E, 0x14, 0x87, 0x12, 0x16, 0x70, 0x47, 0x7E};   /* (bit 7: a tom fill, the perc
+static const uint8_t FILL_OK[EN_NGENRE] = {0x3F, 0x16, 0x07, 0x49, 0x14, 0x7F, 0x7E, 0x5A, 0x3F, 0x64, 0x87, 0x9E, 0x14, 0x87, 0x12, 0x16, 0x70, 0x47, 0x7E, 0x3F, 0x3F, 0x7E};   /* (bit 7: a tom fill, the perc
                                                  * falling: disco, funk, synthwave) */
 static uint8_t gap_on;                          /* the drop gap: the mix cut for the build's last beat (SF_GAP) */
 static float gap_g = 1.0f, perc_fall;           /* its gain; a tom fill's pitch, semitones under the perc's */
@@ -2858,7 +2988,7 @@ const char *EN_CM_SOUND[EN_NCMSND] = {"Pluck", "Marimba", "E.Piano", "Kalimba", 
     "(empty)", "(empty)", "(empty)", "(empty)", "(empty)", "(empty)", "(empty)", "(empty)"};
 static const char *const FM_DX_NAME[EN_NFMFACT] = {   /* (the same thirty, to put back when the DY set is switched off: en_fm_set_dy) */
     "DX Tine EP", "DX Glass Bell", "DX Round Bass", "DX Brass Sect", "DX Soft Pad", "DX Wood Bars", "DX Drawbars", "DX Nylon Pick", "DX Brass 2", "DX Solid Bass", "DX Bells", "DX Marimba", "DX Clavinet", "DX Strings", "DX Glass Pad", "DX Sync Lead", "DX Harp", "DX Kalimba", "DX Flute", "DX Steel Drum", "DX Saw Bass", "DX Tubular", "DX Steel Gtr", "DX Clean Gtr", "DX Muted Gtr", "DX Drive Gtr", "DX Slap Bass", "DX Synth Brass", "DX Sax", "DX Mute Trumpet"};
-const char *const EN_CM_STYLE[EN_NCMSTYLE] = {"Up", "Down", "Up-down", "Random", "Skip", "Thirds"};
+const char *const EN_CM_STYLE[EN_NCMSTYLE] = {"Up", "Down", "Up-down", "Random", "Skip", "Thirds", "Call", "Long", "Run", "Riff"};
 const char *const EN_CM_RATE[4] = {"1/4", "3/16", "1/8", "1/16"};   /* slowest to fastest */
 static int32_t fm_bend;                          /* a keyboard's bend on the DX pluck, as a Q24 log (fm6's pitch; hb_tick sets it) */
 #include "fm6.inc"
@@ -2902,14 +3032,145 @@ static int cm_i, cm_alt;
 static uint8_t cm_f[32], cm_g[32], cm_ix[32], cm_vl[32];   /* the pluck's loop (deja vu): a slot heard (f), its gate, its place in the chord's tones (octave leap in bit 7 and 6: up, down), its velocity */
 static uint32_t cm_k;                           /* the slot the next note is in */
 static uint8_t cm_sync;                         /* a captured loop: its slot 0 is the next bar's first step */
-/* THE MOTIF (after Tuna's motif engine, GPL-3.0): the first bar of an 8-bar phrase is kept as an idea, which sixteenths sounded and each note's step
- * up or down the chord's ladder from the one before; the bars after develop it as a composer would: the same figure from where the line is
- * (a sequence), upside down (an inversion), with its last interval drawn afresh (a new ending), and, after the half, at its own pitch again (the
- * restatement). Deja vu lies on top of it. P_CM_MOTIF is how often a bar develops rather than invents; a kept idea opens the next phrase too. */
-static uint16_t mo_play;                        /* the idea's rhythm: bit s, sixteenth s sounded */
-static int8_t mo_k[16];                         /* its intervals: ladder steps from the note before (the first: 0) */
-static int8_t mo_last;                          /* its last sounding step, -1: none */
-static uint8_t mo_valid, mo_rec, mo_on, mo_inv, mo_alt, mo_restate, mo_first, mo_idx0, mo_prev;   /* kept; being recorded; this bar develops it: inverted, re-ended, restated; the bar's first note is to come; the idea's first rung; the last rung played */
+/* THE THEME (the motif of 0.14.9, after Tuna's motif engine, GPL-3.0; a piece's own since 2026-11-15). A piece has two themes, each one, two or four bars:
+ * which sixteenths sound and each note's step up or down the chord's ladder from the one before, in half rungs (an odd place is the scale's note above a
+ * rung: a passing note). They are kept for the whole piece, so it has a hook: the first opens every phrase of eight bars and comes again after the half,
+ * the second takes the third phrase of four (A A B A), a breakdown all but silences it and the drop brings the first back from its first bar. Between
+ * the statements a bar develops it as a composer would (P_CM_MOTIF: how often): the same figure from where the line is (a sequence), upside down (an
+ * inversion), with its last interval drawn afresh (a new ending). The arpeggio styles' themes are what their first bar or two played; the composed
+ * styles (Call, Long, Run, Riff) write theirs (mo_make). A new piece, a regrow or another style forgets them. Deja vu lies on top. */
+#define CMS_CALL 6                              /* the composed styles: a call and its answer */
+#define CMS_LONG 7                              /* a few long notes, by step */
+#define CMS_RUN 8                               /* a run up the scale and back, passing notes between the chord's */
+#define CMS_RIFF 9                              /* a syncopated bar on two or three notes, again and again */
+typedef struct { uint16_t play[4]; int8_t k[64]; int8_t last; uint8_t valid, len, idx0; } mo_t;   /* the bars' rhythms; the intervals; the last bar's last sounding step; its length in bars; its first note's place */
+static mo_t mo[2] EN_POOL;
+static int16_t mo_h;                            /* the line's place now, in half rungs */
+static uint16_t mo_sig = 0xFFFF;
+static uint8_t mo_ti, mo_j, mo_bar, mo_ph, mo_sec, mo_any, mo_rec, mo_on, mo_inv, mo_alt, mo_restate, mo_first;   /* the theme playing and its bar; the bar of the phrase and the phrase; the section last seen; a note recorded; being recorded; this bar plays it: inverted, re-ended, at its own pitch; its first note is to come */
+static void mo_reset(void)
+{
+    mo[0].valid = mo[1].valid = 0;
+    mo_rec = mo_on = mo_bar = mo_ph = 0;
+}
+static int irand(int n);
+static int mo_step(int st)                      /* the theme's next place: from where the line is (the first note of a restatement: the theme's own) */
+{
+    const mo_t *t = &mo[mo_ti];
+    int k = t->k[mo_j * 16 + st];
+    if (mo_inv)
+        k = -k;
+    if (mo_alt && mo_j == t->len - 1 && st == t->last)
+        k = 2 * (irand(5) - 2);
+    if (!mo_first)
+        mo_h = (int16_t)(mo_h + k);
+    else if (mo_restate)
+        mo_h = t->idx0;
+    mo_first = 0;
+    return mo_h;
+}
+static void mo_make(mo_t *t, int style, int ri)  /* a composed theme, on the Rate's grid, as full as Density says */
+{
+    static const uint8_t RATE[4] = {4, 3, 2, 1};
+    const int r = RATE[ri], g = r == 3 ? 5 : 16 / r, down = frand() < 0.3f, sg = down ? -1 : 1;
+    const float dens = (float)par[P_CM_DENS] * 0.01f;
+    int i, m, c = 0, k;
+    for (i = 0; i < 64; i++)
+        t->k[i] = 0;
+    t->play[0] = t->play[1] = t->play[2] = t->play[3] = 0;
+#define MO_AT(bar, q, kk) (t->play[bar] |= (uint16_t)(1u << ((q) * r)), t->k[(bar) * 16 + (q) * r] = (int8_t)(kk))
+    switch (style) {
+    case CMS_CALL: {                             /* a few notes rising (or falling) and a rest; the answer the same rhythm, back down the way it came to where it began */
+        int8_t kv[6];
+        int off;
+        t->len = 2;
+        m = 2 + (int)(dens * (float)g * 0.5f + frand() * 1.5f);
+        m = m > 6 ? 6 : m;
+        m = m > g - 1 ? g - 1 : m;
+        for (i = 1; i < m; i++) {
+            const float x = frand();
+            kv[i] = (int8_t)(sg * (x < 0.6f ? 2 : x < 0.75f ? 4 : x < 0.9f ? -2 : 1));
+            c += kv[i];
+        }
+        if (c & 1)                               /* (the call ends on a chord's note) */
+            kv[m - 1] = (int8_t)(kv[m - 1] + sg);
+        off = m < g - 1 && frand() < 0.3f;       /* (the answer a step late, some times) */
+        for (i = 0; i < m; i++) {
+            MO_AT(0, i, i ? kv[i] : 0);
+            MO_AT(1, i + off, i ? -kv[m - i] : 0);
+        }
+        t->idx0 = (uint8_t)(down ? 8 + 2 * irand(2) : 2 * irand(2));
+        break;
+    }
+    case CMS_LONG:                               /* four bars, a note a bar (a second at the half, by Density), a rung or two at a time; half the time the last comes home */
+        t->len = 4;
+        for (i = 0; i < 4; i++) {
+            k = (frand() < 0.75f ? 2 : 4) * (frand() < 0.5f ? -1 : 1);
+            if (c + k > 6 || c + k < -6)
+                k = -k;
+            if (i == 0)
+                k = 0;
+            else if (i == 3 && frand() < 0.5f)
+                k = -c;
+            MO_AT(i, 0, k);
+            c += k;
+            if (frand() < dens * 0.6f) {
+                k = frand() < 0.5f ? -2 : 2;
+                MO_AT(i, g / 2, k);
+                c += k;
+            }
+        }
+        t->idx0 = (uint8_t)(2 * (1 + irand(3)));
+        break;
+    case CMS_RUN:                                /* a bar up the scale, a bar back: half rungs (the chord's note, the passing note, the next), a skip now and then */
+        t->len = 2;
+        m = (int)((float)g * (0.45f + 0.55f * dens) + 0.5f);
+        m = m < 3 ? 3 : m > g ? g : m;
+        for (i = 0; i < m; i++) {
+            k = i ? sg * (frand() < 0.12f ? 2 : 1) : 0;
+            MO_AT(0, i, k);
+            c += k;
+        }
+        for (i = 0; i < m; i++) {
+            k = -sg * (frand() < 0.12f ? 2 : 1);
+            if (i == m - 1 && ((c + k) & 1))     /* (it ends on a chord's note) */
+                k -= sg;
+            MO_AT(1, i, k);
+            c += k;
+        }
+        t->idx0 = (uint8_t)(down ? 10 : 2 * irand(2));
+        break;
+    default:                                     /* the riff: the one, and a few of the grid's other places; mostly the same note, a rung away now and then */
+        t->len = 1;
+        m = 2 + (int)(dens * (float)g * 0.45f + frand() * 2.0f);
+        m = m > g - 1 ? g - 1 : m;
+        MO_AT(0, 0, 0);
+        for (i = 1; i < m;) {
+            const int q = 1 + irand(g - 1);
+            if (!(t->play[0] >> (q * r) & 1u)) {
+                const float x = frand();
+                MO_AT(0, q, x < 0.5f ? 0 : x < 0.7f ? 2 : x < 0.9f ? -2 : 4);
+                i++;
+            }
+        }
+        t->idx0 = (uint8_t)(2 * irand(3));
+        break;
+    }
+#undef MO_AT
+    t->last = -1;
+    for (i = 0; i < 16; i++)
+        if (t->play[t->len - 1] >> i & 1u)
+            t->last = (int8_t)i;
+    t->valid = 1;
+}
+static int cm_above(int note)                   /* the scale's note above this one: a passing note */
+{
+    int d;
+    for (d = 1; d <= 3; d++)
+        if (pool >> (((note + d - par[P_ROOT]) % 12 + 12) % 12) & 1u)
+            return note + d;
+    return note + 2;
+}
 volatile float en_cm_level;
 
 static void cm_trigger(int note, float vel)     /* a note: the next voice, its decay as the Decay knob has it */
@@ -2917,8 +3178,9 @@ static void cm_trigger(int note, float vel)     /* a note: the next voice, its d
     const int voice = cm_alt ^= 1;
     en_cm_note = (uint8_t)note;                 /* (for the screen: the sigil's rune at this note) */
     en_cm_count++;
-    const float dec = 0.1f * fm_exp2f((float)par[P_CM_DEC] * 0.045f);   /* the time to silence: 0.1 .. 2.2 s */
-    const float dk = (float)par[P_CM_DEC] * 0.01f, key_s = 0.12f + 1.6f * dk * dk;   /* a DX voice's key time */
+    const float lg = par[P_CM_STYLE] == 7 ? 2.2f : 1.0f;   /* (the Long style's notes ring, or are held, 2.2 times as long) */
+    const float dec = lg * 0.1f * fm_exp2f((float)par[P_CM_DEC] * 0.045f);   /* the time to silence: 0.1 .. 2.2 s */
+    const float dk = (float)par[P_CM_DEC] * 0.01f, key_s = lg * (0.12f + 1.6f * dk * dk);   /* a DX voice's key time */
     cm_midi_on(note, (uint32_t)fm_clampf(40.0f + 87.0f * vel, 1.0f, 127.0f), (int32_t)((par[P_CM_SND] >= CM_NPLAIN ? key_s : dec) * EN_SR));
     if (par[P_CM_SND] >= CM_NPLAIN) {            /* a DX voice: the key is down for as long as the Decay knob says (the patch's own envelopes do the rest) */
         fm_note_on(note, vel, (int32_t)(key_s * EN_SR));
@@ -3002,7 +3264,7 @@ static void cm_step(int st, int32_t sw)         /* a sixteenth of the counter-me
 {
     static const uint8_t RATE[4] = {4, 3, 2, 1};   /* sixteenths between notes, by the Rate knob */
     const int ri = par[P_CM_RATE] < 0 ? 0 : par[P_CM_RATE] > 3 ? 3 : par[P_CM_RATE];
-    int arp[12], n = 0, note, idx, slot, replay, leap = 0;
+    int arp[12], n = 0, note, idx, slot, replay, leap = 0, pass = 0, hh = 0, themed;
     float dens = (float)par[P_CM_DENS] * 0.01f, vel;
     if (st == 0 && cm_sync) {                   /* a captured loop starts with the bar */
         cm_k = 0;
@@ -3011,34 +3273,68 @@ static void cm_step(int st, int32_t sw)         /* a sixteenth of the counter-me
     }
     if (st == 0)
         cm_publish();
-    if (st == 0) {                              /* the motif, bar by bar through the phrase of eight */
-        const uint32_t ph = bars & 7u;
-        const int use = par[P_CM_MOTIF];
-        if (mo_rec) {
-            mo_valid = (uint8_t)(mo_play != 0);
+    if (st == 0) {                              /* the theme, bar by bar through the phrase of eight */
+        const int use = par[P_CM_MOTIF], style = par[P_CM_STYLE], made = style >= CMS_CALL;
+        const int sig = made ? style | ri << 4 | par[P_CM_DENS] << 6 : style;
+        mo_t *t;
+        int b;
+        if (sig != mo_sig) {                    /* another style (a composed one: another rate or density too): new themes, from the top */
+            mo_sig = (uint16_t)sig;
+            mo_reset();
+        }
+        if (sec != mo_sec) {                    /* the drop: the first theme, from its first bar */
+            if (sec == SEC_GROOVE) {
+                mo_bar = mo_ph = 0;
+                mo_rec = 0;
+            }
+            mo_sec = (uint8_t)sec;
+        }
+        b = mo_bar;
+        if (b == 0)
+            mo_ti = (uint8_t)((mo_ph & 3) == 2);   /* the third phrase of four: the second theme (A A B A) */
+        mo_bar = (uint8_t)((mo_bar + 1) & 7);
+        if (!mo_bar)
+            mo_ph++;
+        t = &mo[mo_ti];
+        if (mo_rec && ++mo_j >= t->len) {       /* the idea's bars all heard: kept */
+            t->valid = mo_any;
             mo_rec = 0;
         }
-        if (!use) {
-            mo_on = 0;
-        } else if (ph == 0) {                   /* the phrase's first bar: a new idea (most times), or the kept one opens it again */
-            if (!mo_valid || frand() * 100.0f < 70.0f) {
-                mo_play = 0;
-                mo_last = -1;
-                mo_rec = 1;
+        if (!mo_rec) {
+            if (!use && !made) {
                 mo_on = 0;
-            } else {
-                mo_on = 1;
-                mo_inv = mo_alt = 0;
-                mo_restate = 1;
+            } else if (b == 0 && !t->valid) {   /* the piece's theme is not there yet: a composed style writes it, an arpeggio's is what its first bar (or two) plays */
+                if (made) {
+                    mo_make(t, style, ri);
+                } else {
+                    t->play[0] = t->play[1] = t->play[2] = t->play[3] = 0;
+                    t->last = -1;
+                    t->len = (uint8_t)(frand() < 0.5f ? 1 : 2);
+                    mo_any = mo_j = mo_on = 0;
+                    mo_rec = 1;
+                }
             }
-        } else {
-            mo_restate = (uint8_t)(ph == 4);     /* after the half: the answer restates it at its pitch */
-            mo_on = (uint8_t)(mo_valid && (mo_restate || frand() * 100.0f < (float)use));
-            mo_inv = (uint8_t)(mo_on && !mo_restate && frand() < 0.2f);
-            mo_alt = (uint8_t)(mo_on && !mo_restate && frand() < 0.3f);
+            if (!mo_rec && (use || made)) {
+                if (!t->valid) {
+                    mo_on = 0;
+                } else {
+                    const int rep = b / t->len;
+                    mo_j = (uint8_t)(b % t->len);
+                    if (mo_j == 0) {             /* the theme begins again: as it is (the phrase's opening, and its answer after the half), or developed */
+                        const int plain = rep == 0 || (t->len == 1 ? b == 4 : t->len == 2 ? rep == 2 : 1);
+                        const int dev = !plain && style != CMS_RIFF && frand() * 100.0f < (float)use;
+                        mo_restate = (uint8_t)!dev;
+                        mo_on = (uint8_t)(plain || dev || made);
+                        mo_inv = (uint8_t)(dev && frand() < 0.2f);
+                        mo_alt = (uint8_t)((dev && frand() < 0.3f) || (t->len == 4 && rep == 1 && frand() < 0.5f) ||
+                                           (style == CMS_RIFF && (b & 3) == 3 && frand() * 100.0f < (float)use));   /* (a riff: only its ending turns, each fourth bar) */
+                        mo_first = 1;
+                    }
+                }
+            }
         }
-        mo_first = 1;
     }
+    themed = mo_on && !mo_rec;
     /* on the bar's grid, whatever has gone before (a stop, a new piece): every 2nd, 1st, 4th sixteenth; the dotted eighth 0 3 6 9 12 each bar */
     if (RATE[ri] == 3 ? (st % 3 != 0 || st > 12) : st % RATE[ri])
         return;
@@ -3049,6 +3345,7 @@ static void cm_step(int st, int32_t sw)         /* a sixteenth of the counter-me
     slot = (int)(cm_k++ % (4u << (par[P_CM_LOOP] < 0 ? 0 : par[P_CM_LOOP] > 3 ? 3 : par[P_CM_LOOP])));
     en_cm_pos = (uint8_t)(slot & 15);
     replay = par[P_CM_VU] > 0 && cm_f[slot] && frand() * 100.0f < (float)par[P_CM_VU];
+    n = cm_ladder(arp);                         /* the chord's tones over the octaves, low to high */
     if (replay) {
         if (!cm_g[slot] || (sec == SEC_BREAK && frand() >= 0.4f))
             return;
@@ -3056,31 +3353,40 @@ static void cm_step(int st, int32_t sw)         /* a sixteenth of the counter-me
         int sound;
         if (sec == SEC_BREAK)
             dens *= 0.4f;
-        if (mo_on && !mo_rec)                   /* the motif's rhythm */
-            sound = mo_play >> st & 1u;
+        if (themed)                             /* the theme's rhythm */
+            sound = mo[mo_ti].play[mo_j] >> st & 1u;
         else
             sound = frand() < (cm_i == 0 ? fm_minf(dens + 0.3f, 1.0f) : dens);
+        if (sound && themed) {                  /* the theme's next note, heard or not (the line goes on under a breakdown, where the hook all but goes) */
+            hh = mo_step(st);
+            if (sec == SEC_BREAK && frand() >= 0.3f)
+                sound = 0;
+        }
         cm_f[slot] = 1;
         cm_g[slot] = (uint8_t)sound;
         if (!sound)
             return;
     }
-    n = cm_ladder(arp);                         /* the chord's tones over the octaves, low to high */
     if (replay) {
         idx = (cm_ix[slot] & 15) % n;
         leap = cm_ix[slot] & 32 ? 1 : cm_ix[slot] & 64 ? -1 : 0;
+        pass = cm_ix[slot] >> 4 & 1;
         vel = (float)cm_vl[slot] * (1.0f / 255.0f);
-    } else if (mo_on && !mo_rec) {              /* the motif's intervals, from where the line is (restated: from the idea's own first rung); inverted, they go the other way; re-ended, the last is drawn afresh */
-        int k = mo_k[st];
-        if (mo_inv)
-            k = -k;
-        if (mo_alt && st == mo_last)
-            k = irand(5) - 2;
-        idx = mo_first ? (mo_restate ? mo_idx0 : mo_prev) : mo_prev + k;
-        idx = ((idx % n) + n) % n;
-        mo_first = 0;
+    } else if (themed) {                        /* the theme's place on the ladder, in half rungs (an odd one: the scale's note above the rung, a passing note). A style's
+                                                 * arpeggio wraps round the ladder as it always did; a composed theme turns back at its ends, so a run stays a run */
+        int h = hh;
+        if (par[P_CM_STYLE] >= CMS_CALL) {
+            const int top = 2 * n - 2, per = 2 * top;
+            h = top > 0 ? ((h % per) + per) % per : 0;
+            if (h > top)
+                h = per - h;
+        } else {
+            h = ((h % (2 * n)) + 2 * n) % (2 * n);
+        }
+        idx = h >> 1;
+        pass = h & 1;
         vel = 0.75f + 0.25f * frand();
-        cm_ix[slot] = (uint8_t)(idx | 128);
+        cm_ix[slot] = (uint8_t)(idx | 128 | pass << 4);
         cm_vl[slot] = (uint8_t)(vel * 255.0f);
     } else {
         switch (par[P_CM_STYLE]) {
@@ -3105,15 +3411,24 @@ static void cm_step(int st, int32_t sw)         /* a sixteenth of the counter-me
         cm_ix[slot] = (uint8_t)(idx | (leap > 0 ? 32 : leap < 0 ? 64 : 0) | 128);
         cm_vl[slot] = (uint8_t)(vel * 255.0f);
     }
-    if (mo_rec) {                               /* the idea, as it sounds (deja vu's notes too) */
-        mo_k[st] = (int8_t)(mo_play ? idx - (int)mo_prev : 0);
-        if (!mo_play)
-            mo_idx0 = (uint8_t)idx;
-        mo_play |= (uint16_t)(1u << st);
-        mo_last = (int8_t)st;
+    {
+        const int h = 2 * idx + pass;
+        if (mo_rec) {                           /* the idea, as it sounds (deja vu's notes too) */
+            mo_t *t = &mo[mo_ti];
+            t->k[mo_j * 16 + st] = (int8_t)(mo_any ? h - mo_h : 0);
+            if (!mo_any)
+                t->idx0 = (uint8_t)h;
+            mo_any = 1;
+            t->play[mo_j] |= (uint16_t)(1u << st);
+            if (mo_j == t->len - 1)
+                t->last = (int8_t)st;
+        }
+        if (!themed)
+            mo_h = (int16_t)h;
     }
-    mo_prev = (uint8_t)idx;
     note = arp[idx] + 12 * leap;
+    if (pass)
+        note = cm_above(note);
     while (note > 100)
         note -= 12;
     while (note < 36)
@@ -3136,14 +3451,15 @@ static void cm_step(int st, int32_t sw)         /* a sixteenth of the counter-me
  * takes the first again), so a figure of four hits plays the same each bar. Move is how often a note goes up an octave, to the fifth or to the
  * scale note below the root instead. The fifth is the perfect fifth unless the chord has an altered one (bl_fifth; a 9th, Dub or Fourths chord
  * leaves the fifth out of its voicing, and the line used to take the chord's third tone, the seventh, for it). A breakdown plays none. */
-static const uint16_t BL_ROOT[EN_NGENRE] = {0x1111, 0x0421, 0x1111, 0x0401, 0x0501, 0x0441, 0x1121, 0x0449, 0x5555, 0x2401, 0x5555, 0x4529, 0x0149, 0x5555, 0x2449, 0x0401, 0x0405, 0xEEEE, 0xEEEE};
+static const uint16_t BL_ROOT[EN_NGENRE] = {0x1111, 0x0421, 0x1111, 0x0401, 0x0501, 0x0441, 0x1121, 0x0449, 0x5555, 0x2401, 0x5555, 0x4529, 0x0149, 0x5555, 0x2449, 0x0401, 0x0405, 0xEEEE, 0xEEEE, 0xCCCC, 0x0949, 0xCCCC};   /* (techno, hard: the rumble, the two sixteenths before each kick) */
 typedef struct { uint16_t mask; int8_t iv[4]; } bl_fig_t;
 static const bl_fig_t BL_RIFF[EN_NGENRE] = {
     {0x5555, {0, 0, 12, 0}},  {0x0421, {0, 7, 5, 0}},   {0x4444, {0, 0, 12, 0}},  {0x0401, {0, 0, -2, 0}},  {0x0501, {0, 0, 7, 5}},
     {0x0441, {0, 0, 7, 5}},   {0x1121, {0, 0, 12, 7}},  {0x0449, {0, 7, 0, 12}},  {0x5555, {0, 0, 12, 0}},  {0x2401, {0, 0, 12, 7}},
     {0x5555, {0, 12, 0, 12}}, {0x0509, {0, 12, 7, 0}},  {0x0149, {0, 0, 7, 5}},   {0x5555, {0, 0, 12, 0}},  {0x2449, {0, 0, 7, 0}},   {0x0401, {0, 0, -2, 0}},
     {0x1249, {0, 1, 0, -2}},                     /* industrial: the dotted 3-3-3-3-4 grind on root, flat II, root, flat VII */
-    {0xEEEE, {0, 0, 0, 12}}, {0xEEEE, {0, 0, 1, 0}}};   /* psy: K-B-B-B, an octave drifting across the beats; dark forest: the flat II through it */
+    {0xEEEE, {0, 0, 0, 12}}, {0xEEEE, {0, 0, 1, 0}},
+    {0x4C4C, {0, 0, 0, -2}}, {0x0949, {0, 0, 7, 10}}, {0x4C4C, {0, 0, 1, 0}}};   /* techno; detroit: 1, a-of-1, and-of-2, 3, a-of-3 up to the fifth and the seventh; hard */   /* psy: K-B-B-B, an octave drifting across the beats; dark forest: the flat II through it */
 static const bl_fig_t BL_FIG[EN_NBLFIG] = {      /* the figures by name (the bass line's modes 7 ..): see BL_FIG_NAME */
     {0x5555, {0, 12, 0, 12}},                   /* Octaves: eighths, root and octave (disco) */
     {0x0441, {0, 0, 12, 0}},                    /* Two-step: 1, and-of-2, and-of-3 (garage, drum and bass) */
@@ -3154,6 +3470,17 @@ static const bl_fig_t BL_FIG[EN_NBLFIG] = {      /* the figures by name (the bas
     {0x1121, {0, 0, 12, 7}},                    /* Big beat: 1, e-of-2, 3, 4 */
     {0x0501, {0, 0, 7, 5}},                     /* Dub: 1, 3, and-of-3 */
     {0x7777, {0, 0, 0, 12}},                    /* Gallop: three sixteenths a beat, an octave moving through them */
+    /* (2026-11-11) the genres' second and third lines (vary: a genre's pieces take three lines in turn, not one) */
+    {0x4449, {0, 7, 0, 12}},                    /* Deep: 1, a-of-1, and-of-2, and-of-3, and-of-4, the fifth and the octave in it (deep house) */
+    {0x44C4, {0, 0, 12, 0}},                    /* Jack: the off-beats, an octave pickup on the a-of-2 (house) */
+    {0x0909, {0, 12, 0, 7}},                    /* Bounce: 1, a-of-1, 3, a-of-3, root and octave, root and fifth (garage's organ bass) */
+    {0x1249, {0, 0, 12, 0}},                    /* Log roll: every third sixteenth, 3-3-3-3-4 (amapiano) */
+    {0x8449, {0, 0, 7, 12}},                    /* Log skip: 1, a-of-1, and-of-2, and-of-3, the last sixteenth up an octave into the one (amapiano) */
+    {0x1449, {0, 0, 12, 0}},                    /* Roller: 1, a-of-1, and-of-2, and-of-3, 4 (drum and bass, rolling) */
+    {0x0D01, {0, 0, 7, 12}},                    /* Stepper: 1, then 3, and-of-3, a-of-3 climbing (drum and bass, the answer to the snare) */
+    {0x4949, {0, 0, 0, 12}},                    /* Tresillo: 3-3-2 twice a bar, each note a new wobble (dubstep) */
+    {0x2089, {0, 0, 12, 0}},                    /* 808 run: 1, a-of-1, a-of-2, e-of-4 (trap: the 808 off the kick, with its glide) */
+    {0x0A45, {0, 12, 0, 7}},                    /* Rave: 1, and-of-1, and-of-2, e-of-3, a-of-3 (breaks) */
 };
 static int bl_fit(int n)
 {
@@ -3302,7 +3629,7 @@ static void flx_tick(int st);
 static uint64_t fx_on;
 /* The pad's comping: the steps of the bar its stabs fall on. Comp 2 .. 8 chooses one; Auto takes the genre's (hypnotic: the off-beats, as ever). */
 static const uint16_t COMP_MASK[7] = {0x4444, 0x1111, 0x4949, 0x0041, 0x2448, 0x0401, 0x5555};   /* off-beat, on-beat, 3-3-2, Charleston, syncopated, sparse, eighths */
-static const uint16_t COMP_GENRE[EN_NGENRE] = {0x4444, 0x0041, 0x4949, 0x0401, 0x4444, 0x0408, 0x0A48, 0x2448, 0x2222, 0x0401, 0x4545, 0x2448, 0x4444, 0x0401, 0x2448, 0x0401, 0x1249, 0x0101, 0x0001};
+static const uint16_t COMP_GENRE[EN_NGENRE] = {0x4444, 0x0041, 0x4949, 0x0401, 0x4444, 0x0408, 0x0A48, 0x2448, 0x2222, 0x0401, 0x4545, 0x2448, 0x4444, 0x0401, 0x2448, 0x0401, 0x1249, 0x0101, 0x0001, 0x2448, 0x4949, 0x0101};
 static uint16_t comp_mask(void)
 {
     const int c = par[P_PAD_COMP];
@@ -3311,8 +3638,8 @@ static uint16_t comp_mask(void)
 static int comp_hit(int st) { return comp_mask() >> st & 1; }
 
 /* The genre's ghost notes: steps where a soft snare (or kick) may sound that the pattern does not have, with the chance Ghosts gives (at 100: six in ten). */
-static const uint16_t GHOST_SN[EN_NGENRE] = {0, 0x8480, 0x0200, 0, 0, 0x8200, 0xC288, 0x0408, 0, 0, 0, 0x8A48, 0, 0, 0, 0x8280, 0x8A20, 0, 0x0420};
-static const uint16_t GHOST_KK[EN_NGENRE] = {0, 0x4400, 0, 0, 0, 0, 0x2200, 0, 0, 0, 0, 0x2200, 0, 0, 0, 0x4400, 0x0880, 0, 0};
+static const uint16_t GHOST_SN[EN_NGENRE] = {0, 0x8480, 0x0200, 0, 0, 0x8200, 0xC288, 0x0408, 0, 0, 0, 0x8A48, 0, 0, 0, 0x8280, 0x8A20, 0, 0x0420, 0, 0x0200, 0};
+static const uint16_t GHOST_KK[EN_NGENRE] = {0, 0x4400, 0, 0, 0, 0, 0x2200, 0, 0, 0, 0, 0x2200, 0, 0, 0, 0x4400, 0x0880, 0, 0, 0, 0, 0};
 
 /* THE PHRASE. Chain: from the bar line the pattern is the chain's next (the bars of 1 2 / 1 1 1 2 / 1 1 2 3 / the Amen's 1 1 3 4 / 1 2 1 3 / 1 2 3 4 / 1 2 3 2 / 1 1 1 5 /
  * all six), so a piece has a phrase of its own and drum drift's changes give way to it. Slice: the drum steps read in another order (halves swapped, a beat stuttered,
@@ -4113,7 +4440,7 @@ static void apply(int p, int v)
             for (q = 0; q < 32; q++)
                 cm_f[q] = 0;
             cm_k = 0;
-            mo_valid = mo_on = mo_rec = 0;      /* (and the motif: a new piece, a new idea) */
+            mo_reset();                         /* (and the themes: a new piece, a new hook) */
         }
         cm_publish();
         break;
@@ -4236,6 +4563,8 @@ static void regrow(void)                        /* a new piece: a fresh acid lin
     pad_handoff();
     bass_to(chord_pcs[0]);
     bass.rest = 0;
+    if (!par[P_CM_LOCK])
+        mo_reset();
     if (!par[P_AC_LOCK])                        /* a frozen line is the piece's own (project_apply loaded it) */
         ac_regrow();
     else
@@ -4423,6 +4752,10 @@ void en_init(void)
     fm_init();
     fm_reset();
     master_dyn_reset();
+    mo_reset();                                 /* (the pluck's themes: none yet) */
+    mo_sig = 0xFFFF;
+    mo_sec = 0;
+    mo_h = 0;
     pad_ring_clear(0, PAD_R);
     pad_ctr = 0;
     for (i = 0; i < CM_MN; i++)
@@ -5252,6 +5585,8 @@ static void fx_control(uint32_t n)              /* once a chunk: what the held e
             float tgt = (!(mute >> t & 1u) && (!solo || (solo >> t & 1u))) ? gate_f[t] : 0.0f, d = (float)n * (1.0f / 220.0f);
             if (k < 1.0f && IN_AT[t])
                 tgt *= fm_clampf((k * 100.0f - (float)IN_AT[t]) * (1.0f / 14.0f), 0.0f, 1.0f);
+            if (play_wait)
+                tgt = 0.0f;                     /* (Play with an intro, waiting: everything out first) */
             trk_g[t] = trk_g1[t];
             trk_g1[t] = trk_g[t] + fm_clampf(tgt - trk_g[t], -d, d);
         }
@@ -6011,10 +6346,15 @@ static void drain(void)
         case C_PLAY:
             if (a && !en_playing) {
                 intro_t = 0;                     /* the intro from the start */
-                play_start(1);
+                if (intro_len <= 0)
+                    play_start(1);
+                else if (!play_wait)
+                    play_wait = 2;               /* (the start after a block of fading: en_render) */
+            } else if (!a) {
+                play_wait = 0;
+                if (en_playing)
+                    play_stop();
             }
-            else if (!a && en_playing)
-                play_stop();
             break;
         case C_NEXT:
             if (en_playing)
@@ -6959,6 +7299,7 @@ static void render_noise(uint32_t n)            /* into its own buffer: the pump
 }
 
 /* a hat: the metal and noise, high-passed (Chamberlin SVF, its corner the lane's tune); little echo */
+static float dr_sg = 1.0f;                      /* the drums' sends: 0 while Parts 2's stems are taken (en_usb_fxsrc 1) */
 static void render_hat(drum_t *v, uint32_t n, float g, float pl, float pr)
 {
     uint32_t j;
@@ -6984,8 +7325,8 @@ static void render_hat(drum_t *v, uint32_t n, float g, float pl, float pr)
         fo *= DR_FADE;
         mixl[j] += x * pl;
         mixr[j] += x * pr;
-        rsend[j] += x * 0.2f;
-        esend[j] += x * 0.08f;
+        rsend[j] += x * 0.2f * dr_sg;
+        esend[j] += x * 0.08f * dr_sg;
         amp *= v->adec;
         att += (1.0f - att) * 0.3f;
     }
@@ -7022,8 +7363,8 @@ static void render_clap(drum_t *v, uint32_t n, float g)
             ph -= 1.0f;
         mixl[j] += x * 0.95f;
         mixr[j] += x;
-        rsend[j] += x * 0.45f;
-        esend[j] += x * 0.12f;
+        rsend[j] += x * 0.45f * dr_sg;
+        esend[j] += x * 0.12f * dr_sg;
         amp *= t < 2.0f * gap ? v->inc_end : v->adec;
         t += 1.0f;
     }
@@ -7063,8 +7404,8 @@ static void render_snare(drum_t *v, uint32_t n, float g)
             ph2 -= 1.0f;
         mixl[j] += x;
         mixr[j] += x * 0.95f;
-        rsend[j] += x * 0.35f;
-        esend[j] += x * 0.1f;
+        rsend[j] += x * 0.35f * dr_sg;
+        esend[j] += x * 0.1f * dr_sg;
         amp *= v->adec;
         body *= 0.9992f;                        /* the body: ~20 ms */
         att += (1.0f - att) * 0.4f;
@@ -7102,8 +7443,8 @@ static void render_perc(drum_t *v, uint32_t n, float g)
         inc += (v->inc_end - inc) * 0.004f;
         mixl[j] += x * 0.8f;
         mixr[j] += x;
-        rsend[j] += x * 0.3f;
-        esend[j] += x * 0.25f;
+        rsend[j] += x * 0.3f * dr_sg;
+        esend[j] += x * 0.25f * dr_sg;
         amp *= v->adec;
         idx *= 0.9995f;
         att += (1.0f - att) * 0.3f;
@@ -7119,11 +7460,35 @@ static void render_perc(drum_t *v, uint32_t n, float g)
     v->on = amp > 0.0005f;
 }
 
-static void render_drums(uint32_t n)
+static int16_t *stem_cur;                       /* this chunk's part of them, or NULL */
+static inline int16_t st16(float v) { return (int16_t)(v > 32767.0f ? 32767 : v < -32768.0f ? -32768 : (int32_t)(v + (v >= 0.0f ? 0.5f : -0.5f))); }
+/* The shared drum bus is still rendered exactly once. Capture each group's addition
+ * before the kit's shared crush/pan/effects, without changing its signal path. */
+#ifdef EN_HOST
+static float stem_dr_prev[BLK];
+#else
+static float stem_dr_prev[BLK] __attribute__((section(".rt_bss.stems")));
+#endif
+static void stem_drum_take(uint32_t n, int stem, float scale)
+{
+    uint32_t j;
+    if (!stem_cur)
+        return;
+    for (j = 0; j < n; j++) {
+        const float now = (mixl[j] + mixr[j]) * 0.5f;
+        stem_cur[EN_NST * j + stem] = st16((now - stem_dr_prev[j]) * scale);
+        stem_dr_prev[j] = now;
+    }
+}
+
+static void render_drums(uint32_t n, float stem_scale)
 {
     uint32_t j;
     const float g = pulse_vol * 1.1f;
     drum_t *v;
+    if (stem_cur)
+        for (j = 0; j < n; j++)
+            stem_dr_prev[j] = (mixl[j] + mixr[j]) * 0.5f;
     v = &drum[L_KICK];                           /* kick: a sine falling fast to its note, a click, driven */
     if (v->on) {
         float ph = v->ph, inc = v->inc, amp = v->amp, att = v->att, ck = v->idx, gk = g * lane_g[L_KICK] * 1.15f, fo = v->fo, x = 0.0f;
@@ -7171,11 +7536,16 @@ static void render_drums(uint32_t n)
         v->xl = x;
         v->on = amp > 0.0005f || r1 - r2 > 0.002f;
     }
+    stem_drum_take(n, EN_ST_KICK, stem_scale);
     render_snare(&drum[L_SNARE], n, g * 0.38f * lane_g[L_SNARE]);
+    stem_drum_take(n, EN_ST_SNARE, stem_scale);
     render_clap(&drum[L_CLAP], n, g * 0.42f * lane_g[L_CLAP]);
+    stem_drum_take(n, EN_ST_CLAP, stem_scale);
     render_hat(&drum[L_HAT], n, g * 0.22f * lane_g[L_HAT], 0.75f, 1.0f);    /* a little right */
     render_hat(&drum[L_OHAT], n, g * 0.18f * lane_g[L_OHAT], 1.0f, 0.75f);  /* a little left */
+    stem_drum_take(n, EN_ST_HATS, stem_scale);
     render_perc(&drum[L_PERC], n, g * 0.3f * lane_g[L_PERC]);
+    stem_drum_take(n, EN_ST_PERC, stem_scale);
 }
 
 _Static_assert(BLK == BLK_FM, "the DX voices' buffers are a chunk long");
@@ -7224,6 +7594,8 @@ uint32_t (*en_prof_clock)(void);
 volatile uint8_t en_usb_fixed;                  /* the USB audio at a fixed level (the Settings' USB page) */
 int16_t *en_usb_out;                            /* where this render writes it (16-bit, as the USB stream is), or NULL */
 static int16_t *usb_cur;                        /* this chunk's part of en_usb_out, or NULL */
+int16_t *en_usb_stems;                          /* (0.16.25) where this render writes the stems (amb.h EN_ST_*), or NULL */
+volatile uint8_t en_usb_fxsrc;                   /* (Parts 2, 3) what feeds the effects while the stems are taken: amb.h */
 static float usb_gain;
 volatile uint32_t en_prof[EN_NPROF];
 volatile uint32_t en_prof_sm[11];
@@ -7252,7 +7624,12 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
     const float depth = fm_minf(0.55f * KK->duck, 0.85f) * fm_minf(pulse_vol * 1.5f, 1.0f) * trk_g1[TR_KICK];   /* a muted kick ducks nothing */
     const int gate = fx_on >> FX_GATE16 & 1u ? 1 : fx_on >> FX_GATE8 & 1u ? 2 : 0;
     const int odd = (int)((sixteenth - 1u) & 1u);         /* the sixteenth playing now: the second of an eighth? */
+    const float sk = 0.36f * 32421.0f * (usb_cur ? usb_gain : gain);   /* (0.16.25) a stem's scale: the mix's to the USB stream (its 0.36 below, its gain) */
+    int16_t *const st = stem_cur;
+    const int fxsrc = st ? en_usb_fxsrc : 0;     /* (Parts 2, 3) what feeds the echo and the reverb: everything, all but the drums, the drums alone */
+    const float ssg = fxsrc == 2 ? 0.0f : 1.0f;  /* (the drone's and the acid's sends: none for the drums alone) */
     int rv_c2;
+    dr_sg = fxsrc == 1 ? 0.0f : 1.0f;
     shed3 = en_shed_level >= 3;
     hb_tick(n);
     for (j = 0; j < n; j++)
@@ -7290,6 +7667,9 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
     render_cm(n);
     DT(2);
     render_fm(n);                               /* the DX voices' samples from a chunk ago (the other core's), into the fm_ buffers added below */
+    if (st)                                     /* the pluck's stem: all the mix holds so far, before its pan (mx_end) */
+        for (j = 0; j < n; j++)
+            st[EN_NST * j + EN_ST_PLUCK] = st16((mixl[j] + mixr[j]) * 0.5f * sk);
     mx_end(3, n);
     if (bus_m >> TR_CM & 1u)                    /* the plain pluck to the punch-ins' bus: it is all the mix holds so far */
         for (j = 0; j < n; j++) {
@@ -7326,6 +7706,14 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
             esend[j] += ds * 0.2f + fm_es[j] * fs;
         }
         }
+        if (st)                                 /* the pad's stem, its own stereo before its pan; the DX voices' samples to the pluck's */
+            for (j = 0; j < n; j++) {
+                const uint32_t q = (rp + j) & (PAD_R - 1);
+                int16_t *const s = st + EN_NST * j;
+                s[EN_ST_PADL] = st16(pad_ring[0][q] * sk);
+                s[EN_ST_PADR] = st16(pad_ring[1][q] * sk);
+                s[EN_ST_PLUCK] = st16((float)s[EN_ST_PLUCK] + (fm_ol[j] + fm_or[j]) * 0.5f * sk);
+            }
         pad_ctr += n;
     }
     pad_midi_flush();
@@ -7358,9 +7746,20 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
             busr[j] *= dk[j] * gg_v[j];
         }
     gate_g = gg;
+    if (st)                                     /* the pluck and the pad ducked and gated as the mix was; the vinyl with the pad (one track) */
+        for (j = 0; j < n; j++) {
+            int16_t *const s = st + EN_NST * j;
+            const float g = dk[j] * gg_v[j];
+            s[EN_ST_PLUCK] = st16((float)s[EN_ST_PLUCK] * g);
+            s[EN_ST_PADL] = st16((float)s[EN_ST_PADL] * g + nzl[j] * sk);
+            s[EN_ST_PADR] = st16((float)s[EN_ST_PADR] * g + nzr[j] * sk);
+        }
     DT(7);
     PT(4);                                      /* the merge, the sidechain */
     DT0();
+    if (fxsrc == 2)                             /* (Parts 3: the drums' effects alone; what is sent so far is the others') */
+        for (j = 0; j < n; j++)
+            rsend[j] = esend[j] = 0.0f;
     mx_begin(4, n);
     if (KK->crush > 0.0f) {                      /* breakcore: the drums crushed (what they add, held and stepped) */
         static float hl, hr;
@@ -7372,7 +7771,7 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
             bl[j] = mixl[j];
             br[j] = mixr[j];
         }
-        render_drums(n);
+        render_drums(n, sk);
         for (j = 0; j < n; j++) {
             float dl = mixl[j] - bl[j], dr = mixr[j] - br[j];
             if (++hc >= hold) {
@@ -7384,20 +7783,28 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
             mixr[j] = br[j] + dr + (hr - dr) * c;
         }
     } else {
-        if (bus_m & 0x0Fu)                      /* (the drums to the bus: the mix before them, to take out what they add) */
+        if ((bus_m & 0x0Fu) || st)              /* (the drums to the bus, or their stem: the mix before them, to take out what they add) */
             for (j = 0; j < n; j++) {
                 dsn_l[j] = mixl[j];
                 dsn_r[j] = mixr[j];
             }
-        render_drums(n);                        /* (the kick sets duck_env for the next chunk) */
+        render_drums(n, sk);                        /* (the kick sets duck_env for the next chunk) */
     }
+    if (st)                                     /* the drums' stem: what they added (crushed), before their pan */
+        for (j = 0; j < n; j++)
+            st[EN_NST * j + EN_ST_DRUMS] = st16((mixl[j] - dsn_l[j] + mixr[j] - dsn_r[j]) * 0.5f * sk);
     mx_end(4, n);
-    if (bus_m & 0x0Fu)                          /* the drums to the punch-ins' bus: what they added (crushed, through the mixer), out of the mix */
+    if ((bus_m & 0x0Fu) || st)                  /* from here dsn_ holds what the drums added (crushed, through the mixer) */
         for (j = 0; j < n; j++) {
-            busl[j] += mixl[j] - dsn_l[j];
-            busr[j] += mixr[j] - dsn_r[j];
-            mixl[j] = dsn_l[j];
-            mixr[j] = dsn_r[j];
+            const float al = mixl[j] - dsn_l[j], ar = mixr[j] - dsn_r[j];
+            if (bus_m & 0x0Fu) {                /* the drums to the punch-ins' bus, out of the mix */
+                busl[j] += al;
+                busr[j] += ar;
+                mixl[j] = dsn_l[j];
+                mixr[j] = dsn_r[j];
+            }
+            dsn_l[j] = al;
+            dsn_r[j] = ar;
         }
     DT(8);
     PT(5);                                      /* the drums */
@@ -7433,8 +7840,12 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
             tbr[j] += b * br * dg;
             tal[j] += a * al * dg;
             tar[j] += a * ar * dg;
-            rsend[j] += (b * 0.06f * bs + a * 0.15f * as) * gg_v[j];
-            esend[j] += (b * 0.04f * bs + a * 0.35f * as) * gg_v[j];
+            if (st) {                           /* their stems, before their pan */
+                st[EN_NST * j + EN_ST_BASS] = st16(b * dg * sk);
+                st[EN_NST * j + EN_ST_ACID] = st16(a * dg * sk);
+            }
+            rsend[j] += (b * 0.06f * bs + a * 0.15f * as) * gg_v[j] * ssg;
+            esend[j] += (b * 0.04f * bs + a * 0.35f * as) * gg_v[j] * ssg;
         }
     }
     duck_env = fm_flush(de);
@@ -7472,8 +7883,13 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
     const float thr = throw_amt * 0.5f, tdg = tdx_m * (float)fxs_v[EN_FXS_TD_SEND] * 0.006f;   /* (the bus is cleared each chunk, so 0 when unused) */
     for (j = 0; j < n; j++) {                   /* the echoes; the reverb's input into its line; the dry part of the mix */
         float el, er, xl, xr;
-        echoes(esend[j] * eg + thr * (mixl[j] + mixr[j]) + tdg * (busl[j] + busr[j]), &el, &er, &xl, &xr);
-        push(&dl[L_PRE], (rsend[j] * rg + (el + er + xl + xr) * 0.35f * rev_send + wash_e * 0.2f * (mixl[j] + mixr[j])) * 0.8f);
+        const float wm = fxsrc == 0 ? mixl[j] + mixr[j] : fxsrc == 1 ? mixl[j] + mixr[j] - dsn_l[j] - dsn_r[j] : dsn_l[j] + dsn_r[j];   /* (the throw's, the wash's) */
+        echoes(esend[j] * eg + thr * wm + tdg * (busl[j] + busr[j]), &el, &er, &xl, &xr);
+        push(&dl[L_PRE], (rsend[j] * rg + (el + er + xl + xr) * 0.35f * rev_send + wash_e * 0.2f * wm) * 0.8f);
+        if (st) {                               /* the effects' stems: the echoes as the mix takes them (the reverb's added below) */
+            st[EN_NST * j + EN_ST_FXL] = st16((0.75f * el + 0.15f * xl) * dk[j] * sk);
+            st[EN_NST * j + EN_ST_FXR] = st16((0.75f * er + 0.15f * xr) * dk[j] * sk);
+        }
         mixl[j] = (mixl[j] + (0.75f * el + 0.15f * xl) * dk[j]) * 0.36f;
         mixr[j] = (mixr[j] + (0.75f * er + 0.15f * xr) * dk[j]) * 0.36f;
         dk[j] *= 1.3f * 0.36f;                  /* what the tank's output is scaled by */
@@ -7504,6 +7920,14 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
     PT(7);                                      /* the wait for the reverb */
     bal_w += pt0_ - bal_a;
     DT0();
+    if (st) {                                   /* the reverb's return into the effects' stems (dk is the tank's scale, the mix's 0.36 in it) */
+        const float sf = sk * (1.0f / 0.36f);
+        for (j = 0; j < n; j++) {
+            int16_t *const s = st + EN_NST * j;
+            s[EN_ST_FXL] = st16((float)s[EN_ST_FXL] + dk[j] * rv_wl[j] * sf);
+            s[EN_ST_FXR] = st16((float)s[EN_ST_FXR] + dk[j] * rv_wr[j] * sf);
+        }
+    }
     for (j = 0; j < n; j++) {                   /* the tank's output in, the performance effects */
         float l = mixl[j] + dk[j] * rv_wl[j], r = mixr[j] + dk[j] * rv_wr[j];
         fx_master(&l, &r);
@@ -7721,6 +8145,8 @@ void en_render(int32_t *out, uint32_t n, uint32_t gain_q12)
     int32_t *const out0 = out;
     const uint32_t n0 = n;
     RT(32, drain());
+    if (play_wait && --play_wait == 0)
+        play_start(1);                          /* (Play with an intro: the tracks faded out over the block before, it starts from nothing) */
     gain = muted ? 0.0f : (float)gain_q12 * (1.0f / 4096.0f) * 2.0f;
     usb_gain = muted ? 0.0f : 1.0f;             /* the USB audio at a fixed level (en_usb_out): unity, the knob at about three quarters */
     trim_k += (trim_to - trim_k) * 0.15f;       /* the piece's level (en_trim), over about 40 ms */
@@ -7767,6 +8193,7 @@ void en_render(int32_t *out, uint32_t n, uint32_t gain_q12)
                 trk_g[t] = trk_g1[t];
         }
         usb_cur = en_usb_out ? en_usb_out + (out - out0) : 0;
+        stem_cur = en_usb_stems ? en_usb_stems + EN_NST * ((out - out0) / 2) : 0;   /* stem offset from the stereo output frame offset */
         render_chunk(out, k, gain);
         RT(35, drums_wait_step((int32_t)k));
         out += 2 * k;

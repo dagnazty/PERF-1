@@ -1,0 +1,85 @@
+  ok genre == 0
+  ok piece == 0
+  ok tempo == 128
+  ok fxlock == 0
+  ok genre == 1
+  ok piece == 0
+  ok tempo == 72
+  ok fxlock == 35651584
+  ok piece == 1
+  ok tempo == 78
+  ok saved == 2
+  ok dirty == 0
+  ok genre == 2
+  ok piece == 1
+  ok tempo == 124
+  ok fxlock == 8388608
+  ok genre == 3
+  ok piece == 1
+  ok tempo == 140
+  ok fxlock == 0
+  ok genre == 4
+  ok tempo == 66
+  ok peak -11.6 dBFS (min -40)
+  ok genre == 5
+  ok tempo == 172
+  ok peak -11.9 dBFS (min -40)
+  ok genre == 6
+  ok tempo == 110
+  ok peak -10.7 dBFS (min -40)
+  ok genre == 7
+  ok tempo == 132
+  ok peak -10.1 dBFS (min -40)
+  ok genre == 8
+  ok tempo == 120
+  ok peak -10.4 dBFS (min -40)
+  ok genre == 9
+  ok tempo == 134
+  ok peak -9.5 dBFS (min -40)
+  ok genre == 10
+  ok tempo == 120
+  ok peak -9.8 dBFS (min -40)
+  ok genre == 11
+  ok tempo == 104
+  ok peak -10.4 dBFS (min -40)
+  ok genre == 12
+  ok tempo == 72
+  ok peak -12.2 dBFS (min -40)
+  ok genre == 13
+  ok tempo == 112
+  ok peak -9.8 dBFS (min -40)
+  ok genre == 14
+  ok tempo == 110
+  ok peak -11.4 dBFS (min -40)
+  ok genre == 15
+  ok tempo == 78
+  ok peak -11.6 dBFS (min -40)
+  ok genre == 16
+  ok tempo == 132
+  ok peak -13.8 dBFS (min -40)
+  ok genre == 17
+  ok tempo == 104
+  ok peak -10.6 dBFS (min -40)
+  ok genre == 18
+  ok tempo == 152
+  ok peak -9.8 dBFS (min -40)
+  ok genre == 19
+  ok tempo == 132
+  ok peak -10.6 dBFS (min -40)
+  ok genre == 20
+  ok tempo == 126
+  ok peak -9.5 dBFS (min -40)
+  ok genre == 21
+  ok tempo == 148
+  ok peak -11.7 dBFS (min -40)
+  ok genre == 0
+  ok fxlock == 0
+  ok piece == 1
+  ok tempo == 127
+  ok genre == 1
+  ok genre == 0
+  ok tempo == 124
+  ok tempo == 81
+  ok genre == 1
+  ok tempo == 78
+host: 60154 ms simulated, 3607 blits, render 0.9% of real time (host CPU)

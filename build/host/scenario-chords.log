@@ -1,0 +1,20 @@
+  ok chordiv == 1161
+  ok view == 4
+  ok par92 == 0
+  ok par93 == 0
+  ok par92 == 3
+  ok chordiv == 1037
+  ok par92 == 1
+  ok chordiv == 137
+  ok par92 == 5
+  ok chordiv == 1037
+  ok chordiv == 1037
+  ok par92 == 6
+  ok chordiv == 1065
+  ok par93 == 1
+  ok chordiv == 1065
+  ok par150 == 2
+  ok edited == 1
+  ok par89 == 1
+  ok par89 == 0
+host: 7408 ms simulated, 481 blits, render 0.8% of real time (host CPU)

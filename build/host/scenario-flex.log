@@ -1,0 +1,12 @@
+  ok fxbank == 2
+  ok flexlast == 2
+  ok flexdone == 1
+  ok flexstate == 0
+  ok fxmaskhi == 0
+  ok flexdone == 1
+  ok flexstate == 2
+  ok flexdone == 2
+  ok flexstate == 0
+  ok flexlast == 5
+  ok flexlast == 26
+host: 22766 ms simulated, 807 blits, render 0.7% of real time (host CPU)

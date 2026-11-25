@@ -1,0 +1,43 @@
+# Every set its own road (2026-11-19): a PEAK set, Endless, Journey ANY. The set plays no piece twice; START SET again begins another set
+# that keeps away from the pieces the last one played (only a few of the same, by chance at most), its peak somewhere from 62 % to 78 %.
+seed 0
+wait 3000
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K2 2
+spin K3 2
+wait 50
+expect fxs101 4
+expect fxs102 2
+spin SELECT 1
+wait 100
+expect fxpage 37
+spin K1 1
+wait 50
+expect fxs104 2
+tap FX
+wait 200
+# the first set: five pieces, none twice
+press SEL
+tap PLAY
+release SEL
+wait 500
+expect djon 1
+expect jplayed 1
+expect smpkp >61
+expect smpkp <79
+waitfor jplayed 5 3000000
+expect jovl 0
+# the second: another road
+press SEL
+tap PLAY
+release SEL
+wait 500
+expect jplayed 1
+waitfor jplayed 5 3000000
+expect jovl <3

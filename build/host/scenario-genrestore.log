@@ -1,0 +1,20 @@
+  ok genre == 1
+  ok piece == 2
+  ok edited == 4
+  ok par0 == 44
+  ok saved == 4
+  ok dirty == 0
+  ok edited == 0
+  ok genre == 2
+  ok saved == 0
+  ok genre == 1
+  ok saved == 4
+  ok par0 == 44
+  ok genre == 0
+  ok genre == 1
+  ok saved == 4
+  ok piece == 2
+  ok par0 == 44
+  ok saved == 0
+  ok saved == 0
+host: 9969 ms simulated, 623 blits, render 0.8% of real time (host CPU)

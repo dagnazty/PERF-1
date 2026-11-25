@@ -1,0 +1,32 @@
+  ok pat == 0
+  ok pool == 1453
+  ok par48 == 2
+  ok pool == 1453
+  ok patnext == 2
+  leds: buttons SEL HOME PLAY | white ..#............. black ...........
+  ok pat == 2
+  ok pool == 1453
+  ok view == 0
+  ok piece == 0
+  ok piece == 2
+  ok piece == 0
+  ok piece == 0
+  ok view == 34
+  ok par48 == 2
+  ok lane0 == 20753
+  ok pats4_0 == 20753
+  ok pats4_1 == 4112
+  ok pats4_3 == 43690
+  ok lane0 == 0
+  ok seqlane == 0
+  ok lane0 == 20753
+  ok seqlane == 0
+  ok seqlane == 1
+  ok par48 == 0
+  ok lane0 == 4369
+  ok view == 34
+  ok fxmask == 0
+  ok par48 == 0
+  ok fxpage == 16
+  ok fxon == 1
+host: 9450 ms simulated, 611 blits, render 0.8% of real time (host CPU)
