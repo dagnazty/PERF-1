@@ -26,6 +26,7 @@
  *   smskip MIN                   SMART DJ's set clock on by MIN minutes
  *   usbrec 0/1                   a computer recording the USB audio (automatic flash writes wait while the music plays)
  *   txforce N                    SMART MIX's transitions as N (ui.c TX_*), -1 chosen
+ *   djpair A B                   put the current piece and its next set-list slot at tempos A and B
  *   battery N                    the battery divider's reading, 0..1023 (default: none)
  *   storefuzz SEED               fill the project object with random damage (for the sanitizer runs)
  *   bank76 P N                   write a bank as the firmware before styles did (76 settings a piece),
@@ -1149,8 +1150,29 @@ int main(int argc, char **argv)
         } else if (!strcmp(cmd, "smskip")) {         /* smskip MIN (0.16.21): SMART DJ's set clock on by MIN minutes (its arc, without the hour) */
             ui.sm_ms += (uint32_t)atoi(a) * 60000u;
         } else if (!strcmp(cmd, "txforce")) {        /* txforce N (0.16.23): SMART MIX's transitions as N (ui.c TX_*: 1 cut, 2 filter, 3 bass swap, 4 drums first,
-                                                    * 5 echo out, 6 loop roll, 7 spinback), -1 chosen */
+                                                    * 5 echo out, 6 loop roll, 7 spinback, 8 half-time), -1 chosen */
             ui_tx_force = atoi(a);
+        } else if (!strcmp(cmd, "djpair")) {         /* synthetic two-piece set list with a shared quarter pulse */
+            const int next = (proj.piece + 1) % NPIECES;
+            static const int lane[] = {P_PATTERN, P_TIME, P_SLICE, P_CHAIN, P_COND, P_DD_CHANGE, P_DD_MUTATE,
+                                      P_LLEN, P_DENS, P_PROB, P_PULSE, P_LANE_LVL(0)};
+            static const int val[] = {0, 0, 0, 0, 0, 0, 0, 16, 50, 100, 80, 100};
+            unsigned k;
+            memset(glob.sl, 0, sizeof glob.sl);
+            glob.sl_on = 1;
+            glob.sl[0] = (uint8_t)(proj.genre * NPIECES + proj.piece + 1);
+            glob.sl[1] = (uint8_t)(proj.genre * NPIECES + next + 1);
+            ui.sl_pos = 0;
+            ui_param_set(P_TEMPO, atoi(a));
+            proj.slot[next].par[P_TEMPO] = (int16_t)atoi(b);
+            for (k = 0; k < sizeof lane / sizeof lane[0]; k++) {
+                ui_param_set(lane[k], val[k]);
+                proj.slot[next].par[lane[k]] = (int16_t)val[k];
+            }
+            for (k = 0; k < EN_NPAT; k++) {
+                en_pats[k][0] = 0x1111u;
+                proj.slot[next].pats[k][0] = 0x0101u;
+            }
         } else if (!strcmp(cmd, "mvforce")) {        /* mvforce N (0.16.20): the auto-DJ's next rounds play move N (ui.c MV_*: 1 no break, 2 long break, 3 fake drop,
                                                     * 4 double drop, 5 riddim; 0 none), -1 the dice again */
             ui_mv_force = atoi(a);
