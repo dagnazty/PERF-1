@@ -574,6 +574,8 @@ static struct {
     uint32_t sm_dd, sm_min;            /* drum drift's changes, MIDI in's count, as last seen */
     uint32_t sm_act;                   /* the player's last move (ms): input, MIDI in */
     int8_t sm_dist;                    /* the last piece it chose: how far its key was on the circle of fifths (-1: none chosen yet) */
+    uint16_t sm_moves, tx_recent;     /* performed round shapes and completed handoffs, newest first */
+    uint8_t sm_shape, sm_steer;       /* current round's realized shape; transient Perform request */
     uint8_t sm_go;                     /* the phrase's last bar was stale: its fill asked, the breakdown on the line */
     uint8_t sm_base;                   /* what this music usually has (a slow average of the measure, over the set): sm_has is against it */
     uint8_t sm_lay, sm_peak_n, sm_aimed;   /* (0.16.24) the DJ's own mutes last bar (a change is news); peaks aimed at so far; a breakdown aimed at the peak, its drop to come */
@@ -581,7 +583,7 @@ static struct {
     uint8_t ss_m, ss_out, ss_done, ss_intro;   /* (0.16.22) THE SET: the close's mutes; its bars so far (0: not closing); the set is over; an intro of a
                                                 * minute lent for the opening (the SET page's put back once it is in) */
     uint32_t ss_stop;                  /* when the close stopped the music (ms): its mutes let go a moment later */
-    uint8_t tx, tx_last, tx_bar, tx_out, tx_in, tx_k, tx_m, tx_q;   /* (0.16.23) SMART MIX: the transition under way (TX_*), the last one; its outgoing
+    uint8_t tx, tx_bar, tx_out, tx_in, tx_k, tx_m, tx_q;   /* (0.16.23) SMART MIX: the transition under way (TX_*); its outgoing
                                                 * bars so far and in all; its incoming bars in all (0: still outgoing) and so far; its mutes; the next piece queued */
     uint8_t tx_next, tx_sl, jq, gn_run, jrecent[3];   /* where it goes (genre * 10 + piece + 1), or the set list's slot + 1; the piece waiting for the bar's
                                                 * last step (genre * 10 + piece + 1); pieces in a row in this genre; the last three played (+1) */
@@ -814,7 +816,8 @@ static int sm_break_len(void);
 static int sm_pick(void);
 static int sm_yield(void);
 static int sm_patience(void);
-static void tx_start(void);
+static int tx_start(void);
+enum { DJ_STEER_AUTO, DJ_STEER_HOLD, DJ_STEER_NEXT };
 static void tx_bar_step(void);
 static void tx_swapped(int old);
 static uint64_t tx_fx_now(void);
@@ -1837,7 +1840,7 @@ static void mix_tick(void)                       /* each frame: the glide, by th
  *   DOUBLE DROP 8 bars into the groove a fill, one bar of breakdown, and the drop again: the same round goes on (DnB, dubstep, breaks, forest, trap)
  *   RIDDIM      halfway through the groove, four bars of the drums and the bass alone, an echo throw going in (dub, reggae, dubstep, trip-hop, lofi, amapiano)
  * The genre's own sections still decide what a breakdown keeps and how long a build takes. DOUBLE DROP and RIDDIM need a groove of 16 bars or more. */
-enum { MV_NONE, MV_NOBREAK, MV_LONG, MV_FAKE, MV_DOUBLE, MV_RIDDIM, MV_N };
+enum { MV_NONE, MV_NOBREAK, MV_LONG, MV_FAKE, MV_DOUBLE, MV_RIDDIM, MV_N, MV_NORMAL = MV_N };
 static const char *const MV_NAME[MV_N] = {"", "NO BREAK", "LONG BREAK", "FAKE DROP", "DOUBLE DROP", "RIDDIM"};
 #define MG(g) (1u << (g))                      /* the genres: 0 HYPNO, 1 LOFI, 2 HOUSE, 3 DUBSTEP, 4 DUB, 5 DNB, 6 BREAKS, 7 GARAGE, 8 ELECTRO, 9 TRAP, 10 DISCO,
                                                 * 11 FUNK, 12 REGGAE, 13 SYNTHWAVE, 14 AMAPIANO, 15 TRIP-HOP, 16 INDUSTRIAL, 17 PSY, 18 FOREST */
@@ -1868,7 +1871,7 @@ static void mv_plan(void)                       /* a new round's groove: its mov
     int m, tot = 0, pick;
     ui.mv = MV_NONE;
     ui.mv_fake = ui.mv_drop2 = 0;
-    if (smart && sm_song())
+    if (smart && (sm_song() || ui.sm_steer != DJ_STEER_AUTO))
         return;                                  /* a song keeps its planned sections; extra drops and long breaks can overrun its close */
 #ifdef EN_HOST
     if (ui_mv_force >= 0) {
@@ -1878,16 +1881,22 @@ static void mv_plan(void)                       /* a new round's groove: its mov
 #endif
     /* (0.16.21) SMART DJ: the energy decides, not the knob: a move in one round in ten at rest, six in ten at the peak, none while the player plays;
      * and the kind that suits the moment: a long breakdown low, no breakdown and riddims in the middle, fake and double drops high */
-    if (smart ? sm_yield() || ar_dice() % 100u >= (uint32_t)(10 + e / 2) : !amt || ar_dice() % 100u >= CH[amt])
+    if (smart ? sm_yield() || ar_dice() % 100u >= (uint32_t)(10 + e / 2 + dj_recency(ui.sm_moves, MV_NORMAL)) : !amt || ar_dice() % 100u >= CH[amt])
         return;
     if (smart && (ui.dj_piece || sl_play()) && ui.dj_round >= DJ_ROUNDS[ui.dj_rounds & 3])
         return;                                  /* (0.16.23: the piece has had its rounds: this groove mixes out, it keeps no move) */
     for (m = 1; m < MV_N; m++) {
         const int own = MV_FAV[m] >> gb & 1u;
-        int x = m == ui.mv_last || ((m == MV_DOUBLE || m == MV_RIDDIM) && g < 16) ? 0 : own ? 4 : amt == 2 ? 1 : 0;
+        int x = (!smart && m == ui.mv_last) || ((m == MV_DOUBLE || m == MV_RIDDIM) && g < 16) ? 0 : own ? 4 : amt == 2 ? 1 : 0;
         if (smart)
             x *= m == MV_LONG ? (e < 50 ? 3 : 0) : m == MV_FAKE || m == MV_DOUBLE ? (e >= 70 ? 3 : e >= 50 ? 1 : 0) :
                  m == MV_NOBREAK ? (e >= 55 ? 2 : 0) : 1;
+        if (smart && x) {
+            const int recent = dj_recency(ui.sm_moves, (unsigned)m);
+            x = x * 8 / (8 + recent * 3);
+            if (!x)
+                x = 1;                          /* soft preference: the right move can still recur */
+        }
         w[m] = (uint8_t)x;
         tot += w[m];
     }
@@ -1897,7 +1906,12 @@ static void mv_plan(void)                       /* a new round's groove: its mov
         pick -= w[m];
     ui.mv = ui.mv_last = (uint8_t)m;
 }
-static void mv_say(void) { say("DJ MOVE", MV_NAME[ui.mv % MV_N]); }
+static void mv_say(void)
+{
+    if (sm_on())
+        ui.sm_shape = ui.mv;
+    say("DJ MOVE", MV_NAME[ui.mv % MV_N]);
+}
 static void mv_groove_bar(int g)                /* a bar of the groove (dj_n counted): a double drop's fill and breakdown, a riddim's bars */
 {
     if (ui.mv_fx && en_bars >= ui.mv_fx_end)
@@ -1916,6 +1930,8 @@ static void mv_groove_bar(int g)                /* a bar of the groove (dj_n cou
         ui.mv_m = (uint8_t)(1u << EN_TR_PAD | 1u << EN_TR_ACID | 1u << EN_TR_PLUCK);
         ui.mv_fx = FX_THROW;
         ui.mv_fx_end = en_bars + 4u;
+        if (sm_on())
+            ui.sm_shape = MV_RIDDIM;
         ui.mv = MV_NONE;                         /* (done for the round) */
         trk_send();
         say("DJ MOVE", "RIDDIM");
@@ -1946,6 +1962,13 @@ static void dj_bar(void)                       /* a new bar (while playing) */
     const int last_round = ui.dj_round + 1 >= rounds;   /* the piece's last round: the next piece follows its drop */
     const int b = dj_brk_now();
     if (ph != ui.dj_phase) {                   /* the engine moved on (the DJ's request, or SAVE): so does the count */
+        if (ph == 1 && sm_on() && !ui.sm_shape)
+            ui.sm_shape = MV_NORMAL;
+        if (ph == 0 && !ui.mv_keep) {
+            if (sm_on() && !sm_song() && ui.sm_shape)
+                ui.sm_moves = (uint16_t)dj_remember(ui.sm_moves, ui.sm_shape);
+            ui.sm_shape = 0;
+        }
         if (ph == 0 && !ui.mv_keep)
             ui.dj_round++;                     /* back in the groove: a round done (a double drop's: the same round goes on) */
         if (ph == 1 && (ui.mv == MV_NOBREAK || ui.mv == MV_LONG))
@@ -1963,7 +1986,10 @@ static void dj_bar(void)                       /* a new bar (while playing) */
         ui.dj_n = 0;
         return;
     }
-    ui.dj_n++;
+    if (ph == 0 && sm_on() && ui.dj_n >= 71u && !ui.tx)
+        ui.dj_n = 64;                           /* retain phrase phase through an arbitrarily long hold */
+    else
+        ui.dj_n++;
     if (ph == 0 && ui.dj_ramp && !ui.mx_bars) {   /* the ramp: the tempo climbs over the piece's rounds of groove; turned by hand, it climbs on from there (not while the mix glides) */
         const int bpm = RAMP_BPM[ui.dj_ramp % 5u], total = rounds * g, prog = (ui.dj_round < rounds ? ui.dj_round : rounds - 1) * g + (int)ui.dj_n;
         int t;
@@ -1984,7 +2010,7 @@ static void dj_bar(void)                       /* a new bar (while playing) */
             else
                 mv_plan();
         }
-        if (!ui.ss_out && !ui.tx)
+        if (!ui.ss_out && !ui.tx && (ui.sm_steer == DJ_STEER_AUTO || ui.mv_rid))
             mv_groove_bar(sm_on() ? 16 : g);     /* (no move in the close or under a mix) */
     }
     if (ph == 0 && sm_on()) {                  /* SMART DJ: it breaks when the groove has gone stale, on a phrase line */
@@ -2586,7 +2612,8 @@ static void set_start(void)                     /* START SET */
     ui.sm_dist = -1;
     ui.sm_recent[0] = ui.sm_recent[1] = ui.sm_recent[2] = 0;
     tx_abort();                                  /* (0.16.23: SMART MIX's journey from the start: no mix under way, no piece played yet, the first in its genre) */
-    ui.tx_last = 0;
+    ui.tx_recent = ui.sm_moves = 0;
+    ui.sm_shape = ui.sm_steer = 0;
     ui.jq = 0;
     ui.jrecent[0] = ui.jrecent[1] = ui.jrecent[2] = 0;
     ui.gn_run = 1;
@@ -2713,6 +2740,7 @@ static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n cou
     if (ui.ss_out || (len && ui.sm_ms + sm_close_ms() >= len && !ui.ss_done)) {   /* the set's time is nearly up: the close (it ends on the time), nothing else */
         if (!ui.ss_out) {
             ui.mv = MV_NONE;
+            ui.sm_steer = DJ_STEER_AUTO;
             ui.sm_go = 0;
         }
         sm_outro_bar();
@@ -2754,9 +2782,10 @@ static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n cou
         if (!ui.sm_act || idle > 60000u)
             gain++;                              /* left alone a minute: more initiative */
     }
-    ui.sm_bore = (uint16_t)(ui.sm_bore + (uint16_t)gain);
-    if (news && ui.sm_bore >= 2u)
-        ui.sm_bore = (uint16_t)(ui.sm_bore - 2u * (uint16_t)news);
+    {
+        const int stale = (int)ui.sm_bore + gain - 2 * news;
+        ui.sm_bore = (uint16_t)(stale < 0 ? 0 : dj_min(stale, 512));
+    }
     {
         const int aim = ui.dj_n % 8u == 7u && sm_aim(), hold = sm_hold(), brk = 1 + sm_break_len() + en_build_len() + (sm_song() ? 4 : 8);
         /* Honor the fill's promised breakdown before considering another mix,
@@ -2765,6 +2794,12 @@ static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n cou
             ui.sm_go = 0;
             if (!en_sec_req)
                 en_section(EN_CMD_BREAK);
+            return;
+        }
+        if (ui.sm_steer != DJ_STEER_AUTO && !aim) {
+            if (ui.sm_steer == DJ_STEER_NEXT && ui.dj_n >= 8u && ui.dj_n % 8u == 0u && !en_sec_req &&
+                !hold && !ui.piece_q && !ui.sl_q && tx_start())
+                ui.sm_steer = DJ_STEER_AUTO;
             return;
         }
         if (!sm_song() && (ui.dj_piece || sl_play()) && ui.dj_round >= DJ_ROUNDS[ui.dj_rounds & 3] && !aim) {   /* (0.16.23) the piece has had its rounds: no more
@@ -2981,7 +3016,7 @@ static dj_option_t jy_plan(int e, int later)
             eligible[i] = 1;
             profiles[i] = jy_eval(i);
             if (jy_allowed(gc, g, mode)) {
-                const dj_edge_t edge = dj_edge(profiles[cur], profiles[i], mix, clocked, ui.tx_last, ui.sm_e, tx_favored(gc, g));
+                const dj_edge_t edge = dj_edge(profiles[cur], profiles[i], mix, clocked, ui.tx_recent, ui.sm_e, tx_favored(gc, g));
                 const int genre = g == gc ? ui.gn_run >= 3 ? 25 : ui.gn_run <= 1 ? -15 : 0 : 0;
                 upcoming++;
                 if (tx_fits(edge.style, profiles[i].bpm))
@@ -2998,7 +3033,7 @@ static dj_option_t jy_plan(int e, int later)
             int cost;
             if (!eligible[j] || j == id || !jy_allowed(g, to, mode))
                 continue;
-            cost = dj_edge(profiles[id], profiles[j], mix, clocked, beam[i].style, e, tx_favored(g, to)).cost +
+            cost = dj_edge(profiles[id], profiles[j], mix, clocked, dj_remember(ui.tx_recent, (unsigned)beam[i].style), e, tx_favored(g, to)).cost +
                    2 * dj_abs(profiles[j].energy - later) + (jy_was(ui.jprev, j) ? 12 : 0);
             if (exit < 0 || cost < exit)
                 exit = cost;
@@ -3034,7 +3069,7 @@ static void tx_title(int id, char *u)           /* "HOUSE 05" */
     u[j++] = (char)('0' + (id % NPIECES + 1) % 10);
     u[j] = 0;
 }
-static void tx_start(void)                      /* the mix begins, on a phrase line */
+static int tx_start(void)                      /* the mix begins, on a phrase line */
 {
     const int cur = proj.genre * NPIECES + proj.piece;
     const int sl = sl_play() ? sl_step(ui.sl_pos, 1) : -1;
@@ -3044,16 +3079,16 @@ static void tx_start(void)                      /* the mix begins, on a phrase l
     int nx, style;
     char u[16], h[20];
     if (sm_song())
-        return;
+        return 0;
     if (sl >= 0) {                              /* explicit set list keeps its order */
         nx = glob.sl[sl] - 1;
         next = jy_eval(nx);
-        style = dj_edge(jy_eval(cur), next, ui.fxs[EN_FXS_SX_MIXES] & 3u, en_ext, ui.tx_last,
+        style = dj_edge(jy_eval(cur), next, ui.fxs[EN_FXS_SX_MIXES] & 3u, en_ext, ui.tx_recent,
                         ui.sm_e, tx_favored(proj.genre, nx / NPIECES)).style;
     } else {
         move = jy_plan(sm_target(ahead), sm_target(len && then > len ? len : then));
         if (move.id < 0)
-            return;
+            return 0;
         nx = move.id;
         style = move.style;
         next = jy_eval(nx);
@@ -3063,10 +3098,10 @@ static void tx_start(void)                      /* the mix begins, on a phrase l
         style = ui_tx_force;
 #endif
     if (!tx_fits(style, next.bpm))
-        return;
+        return 0;
     ui.tx_sl = (uint8_t)(sl + 1);
     ui.tx_next = (uint8_t)(nx + 1);
-    ui.tx = ui.tx_last = (uint8_t)style;
+    ui.tx = (uint8_t)style;
     ui.tx_out = (uint8_t)tx_out_bars(style);
     ui.tx_bar = ui.tx_in = ui.tx_k = ui.tx_q = 0;
     ui.mv = MV_NONE;
@@ -3082,6 +3117,7 @@ static void tx_start(void)                      /* the mix begins, on a phrase l
     }
     say(h, u);
     ui.msg_until = plat_ms() + 3000u;
+    return 1;
 }
 static void tx_bar_step(void)                   /* a groove bar of the mix */
 {
@@ -3137,6 +3173,11 @@ static void tx_swapped(int old)                 /* the new piece is in (on the b
     ui.sm_bore = 0;
     ui.sm_go = 0;
     ui.mv = MV_NONE;
+    if (old >= 0)
+        ui.tx_recent = (uint16_t)dj_remember(ui.tx_recent, ui.tx); /* the planned piece actually sounded */
+    if (ui.sm_shape)
+        ui.sm_moves = (uint16_t)dj_remember(ui.sm_moves, ui.sm_shape);
+    ui.sm_shape = 0;
     ui.ar_m = 0;
     ui.ar_start = en_bars >> 4;
     ui.tx_m = 0;
@@ -3198,6 +3239,8 @@ static void sm_tick(void)                       /* each frame: the set's clock, 
 {
     const uint32_t now = plat_ms();
     int want;
+    if (!sm_on() || sm_song() || !en_playing)
+        ui.sm_steer = DJ_STEER_AUTO;
     if (ui.tx && (!sm_on() || sm_song() || !en_playing || (en_sec != EN_SEC_GROOVE && !ui.tx_q)))
         tx_abort();
     if (ui.min_n != ui.sm_min) {                 /* MIDI in: the player too */
@@ -3207,6 +3250,8 @@ static void sm_tick(void)                       /* each frame: the set's clock, 
     if (ui.act_t && (int32_t)(ui.act_t - ui.sm_act) > 0)
         ui.sm_act = ui.act_t;
     if (!sm_on()) {
+        ui.sm_moves = ui.tx_recent = 0;
+        ui.sm_shape = 0;
         ui.sm_ms = 0;                            /* (the set starts again with the auto-DJ, or SMART DJ, turned on) */
         ui.sm_now = ui.sm_base = 0;
         ui.ss_out = ui.ss_done = 0;
@@ -4696,6 +4741,27 @@ static int runner_on(void);
 static void runner_input(uint32_t btn, uint32_t keys);
 static void runner_start(void);
 
+/* Shifted octave buttons on Perform only; ordinary octave and sequencer controls stay put. */
+static void sm_steer_press(int next)
+{
+    const uint8_t mode = next ? DJ_STEER_NEXT : DJ_STEER_HOLD;
+    if (!sm_on() || sm_song() || !en_playing || ui.ss_out || ui.ss_done) {
+        say("SMART DJ", "START A SET FIRST");
+        return;
+    }
+    if (ui.sm_steer == mode) {
+        ui.sm_steer = DJ_STEER_AUTO;
+        say("SMART DJ", "AUTO");
+        return;
+    }
+    if (en_sec != EN_SEC_GROOVE || ui.tx || ui.sm_go || en_sec_req) {
+        say("SMART DJ", "WAIT FOR GROOVE");
+        return;
+    }
+    ui.sm_steer = mode;
+    ui.mv = MV_NONE;                             /* no new DJ move underneath an explicit request */
+    say(next ? "MIX NEXT PHRASE" : "HOLD THIS GROOVE", next ? "WHEN CLEAR" : "SEL + OCT- TO RELEASE");
+}
 static void input(void)
 {
     uint32_t btn = plat_buttons(), keys = plat_keys(), ch, i;
@@ -4815,6 +4881,10 @@ static void input(void)
             if ((i == B_OCTDN || i == B_OCTUP) && (btn >> B_SEL & 1u) && ui.view == V_SEQ) {
                 shift_lane(i == B_OCTUP);      /* shift: the lane cleared, or the piece's own */
                 ui.btn_used |= m | 1u << B_SEL;
+            }
+            if ((i == B_OCTDN || i == B_OCTUP) && (btn >> B_SEL & 1u) && ui.view == V_PERF && !ui.fx_menu) {
+                ui.btn_used |= m | 1u << B_SEL;
+                sm_steer_press(i == B_OCTUP);
             }
             if (i == B_PLAY)                   /* transport on the press */
                 button((int)i);
@@ -6511,6 +6581,12 @@ static void draw_perf(void)
             }
         if (!n)
             cv_text(26, 110, &FONT_XS, "NONE", K_DIM);
+        if (ui.sm_steer != DJ_STEER_AUTO) {
+            const char *status = ui.sm_steer == DJ_STEER_HOLD ? "GROOVE HELD" : "MIX QUEUED";
+            const int w = text_w(&FONT_XS, status);
+            cv_rect(228 - w, 109, w + 6, 14, K_BG);
+            cv_text(231 - w, 110, &FONT_XS, status, K_ACC);
+        }
     }
     {   /* the mood: a bar, the middle marked (the ALGORITHM dial) */
         char t[8];
@@ -6538,7 +6614,9 @@ static void draw_shift(void)
     static const char *const SQ[8] = {"WHITE KEYS   PATTERN 1-6", "BLACK KEYS   COPY HERE TO 1-6", "OCT-         CLEAR THIS LANE",
                                       "OCT+         THE LANE'S OWN", "PRESETS      PIECE, NEXT BAR", "ALGO         KIT",
                                       "SEQ          LINKS ON / OFF", "FX           EDIT PAGES"};
-    const char *const *l = ui.view == V_SEQ ? SQ : ui.fx_menu && !ui.fx_page ? FXG : GEN;
+    static const char *const PERF[8] = {"OCT-     HOLD THIS GROOVE", "OCT+     MIX NEXT PHRASE", "PRESETS  PIECE, NEXT BAR",
+                                        "ALGO     SOUND / KIT", "SEQ      LINKS ON / OFF", "FX       EDIT PAGES", "GLO      REMOTE (BROWSER)", "REC      CAPTURE (JAM)"};
+    const char *const *l = ui.view == V_PERF && !ui.fx_menu ? PERF : ui.view == V_SEQ ? SQ : ui.fx_menu && !ui.fx_page ? FXG : GEN;
     int k;
     cv_text(4, 1, &FONT_XS, "SHIFT: SEL +", K_ACC);
     for (k = 0; k < 8; k++)
@@ -7743,6 +7821,7 @@ static void draw_main(void)
                         (uint32_t)ui.dj_phase << 19 | (uint32_t)ui.dj_len << 27 | (uint32_t)en_sec << 23 | (uint32_t)en_sec_req << 25);
         h = hash(h, h32(ui.fx_mask) | ((uint32_t)ui.scene_q << 28 ^ (uint32_t)ui.mood << 8 ^ (uint32_t)ui.key_on << 16 ^ (uint32_t)(uint8_t)ui.ride << 20));
         h = hash(h, (uint32_t)ui.ar_m | (uint32_t)ui.mv_m << 8 | (uint32_t)ui.ss_m << 16 | (uint32_t)ui.tx_m << 24);   /* (what the DJ has out) */
+        h = hash(h, ui.sm_steer);
         h = hash(h, h32(ui.fx_lock) ^ (uint32_t)ui.dj_n << 20 ^ (uint32_t)en_drum_pos << 27);
         for (i = 0; i < EN_NLANE; i++)
             h = hash(h, (uint32_t)q16(en_drum_glow[i]));

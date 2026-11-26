@@ -1,0 +1,47 @@
+# Perform panel steering with a real automatic mix and a completed handoff.
+seed 0
+wait 3000
+press SEL
+tap PLAY
+release SEL
+tap HOME
+wait 600
+expect djon 1
+waitfor introk 100 90000
+press SEL
+tap OCT-
+release SEL
+expect djsteer 1
+wait 125000
+expect sec 0
+expect tx 0
+expect txrecent 0
+expect djsteer 1
+press SEL
+tap OCT-
+release SEL
+expect djsteer 0
+press SEL
+tap OCT+
+release SEL
+expect djsteer 2
+press SEL
+tap OCT+
+release SEL
+expect djsteer 0
+press SEL
+tap OCT+
+release SEL
+expect djsteer 2
+waitfor tx >0 30000
+expect djsteer 0
+expect txrecent 0
+waitfor txrecent >0 40000
+waitfor tx 0 60000
+press SEL
+tap OCT-
+release SEL
+expect djsteer 1
+tap PLAY
+wait 100
+expect djsteer 0

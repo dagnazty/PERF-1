@@ -688,6 +688,12 @@ static int expect(const char *what, const char *val)
     else if (!strcmp(what, "tx"))                 /* (0.16.23) SMART MIX: the transition under way (ui.c TX_*), in its incoming half, its mutes; the pieces in a row
                                                     * in this genre; the piece playing as genre * 10 + piece */
         got = ui.tx;
+    else if (!strcmp(what, "djsteer"))
+        got = ui.sm_steer;
+    else if (!strcmp(what, "txrecent"))
+        got = ui.tx_recent;
+    else if (!strcmp(what, "smshapes"))
+        got = ui.sm_moves;
     else if (!strcmp(what, "txin"))
         got = ui.tx_in != 0;
     else if (!strcmp(what, "txbar"))             /* the outgoing bars so far */

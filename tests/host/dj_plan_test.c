@@ -35,6 +35,17 @@ int main(void)
     assert(dj_edge(slow, no_bass, DJ_BLENDS, 0, TX_NONE, 40, 1u << TX_BASS).style != TX_BASS);
     assert(dj_energy(4, 3, 8, 60, 40, 65, 55) > dj_energy(2, 1, 4, 35, 0, 35, 30));
     assert(dj_key_dist(0, 11) == 1);
+    {
+        unsigned hist = dj_remember(0, TX_FILTER);
+        assert(dj_recency(hist, TX_FILTER) == 6);
+        hist = dj_remember(dj_remember(hist, TX_BASS), TX_FILTER);
+        assert(dj_recency(hist, TX_FILTER) == 9 && dj_recency(hist, TX_BASS) == 4);
+        hist = dj_remember(dj_remember(hist, TX_ROLL), TX_DRUMS);
+        assert(dj_recency(hist, TX_FILTER) == 3 && dj_recency(hist, TX_DRUMS) == 6);
+        assert(dj_edge(slow, slow, DJ_BLENDS, 0, 0, 40, 0).style == TX_FILTER);
+        assert(dj_edge(slow, slow, DJ_BLENDS, 0, dj_remember(0, TX_FILTER), 40, 0).style == TX_BASS);
+        assert(dj_edge(slow, fast, DJ_PLAIN, 0, hist, 65, 0).style == TX_PLAIN);
+    }
 
     for (i = 0; i < DJ_BEAM; i++)
         routes[i] = (dj_option_t){-1, 0, TX_NONE};

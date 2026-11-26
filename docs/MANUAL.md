@@ -1709,6 +1709,10 @@ Whichever you choose, Smart Mix picks the next piece and its transition together
 
 **Auto** weighs genre, energy, tempo, key and bass presence. Wide jumps or clashing keys can use a drums-first or echo-out handoff at the new tempo instead of a long glide. **Blends** and **Cuts** keep to their own styles; **Plain** changes on the bar without a transition effect. **Blend** sets how long a filter blend takes: 8 or 16 bars.
 
+Smart DJ remembers the last four rounds that played and the last four handoffs that reached their new piece. It gives recently used breakdown and drop shapes and transition styles less weight, without forcing an unsuitable move. Song mode, the chosen Mixes mode and the order of a set list still take priority.
+
+On **Perform** during a Smart DJ set, hold **SEL** and tap **OCT−** for **Hold this groove**. It pauses automatic breaks and piece changes; repeat it to return to Auto. **SEL + OCT+** cancels Hold and queues **Mix next phrase** even if the piece hasn't finished its rounds. Repeat the shortcut to cancel the queue. A mix in progress, a promised breakdown or an upcoming timed peak still gets its space, and the timed close always takes priority. These commands don't change your octave, and they don't carry into the next set.
+
 The header says each step (`MIX: FILTER` with the piece it's going to, `NOW PLAYING` as it lands), and the page shows the piece playing, the mix under way and how far through it is, or when the next mix will come. Parts a mix has taken out are struck through in blue on the Perform screen. If you start a breakdown by hand during a mix, the mix stops where it is. With the set list playing, Smart DJ follows its order and still mixes between its pieces.
 
 - **Length** is how long the set or song is: 15, 30, 60 or 90 minutes, or **endless**; the five **Song** choices keep one piece for 3, 4, 5, 6 or 8 minutes. Shorter sets move faster: in a 15-minute set grooves and breakdowns run about half as long as in an hour's set (three-quarters in a 30-minute set), blends are always 8 bars, and the opening intro is shorter.
