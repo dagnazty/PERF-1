@@ -1,0 +1,55 @@
+# A 15-minute Arc by the real Start Set controls, with Journey locked to this genre.
+# A manual kick mute blocks the phrase contrast and stays in place.
+seed 0
+wait 3000
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K2 -2
+wait 50
+expect fxs101 0
+expect smpace 50
+turn SELECT 1
+wait 100
+expect fxpage 37
+spin K1 -1
+wait 50
+expect fxs104 0
+turn SELECT -1
+wait 100
+tap PLAY
+wait 1000
+expect playing 1
+expect djon 1
+expect smsec <3
+shot set15_start.png
+tap FX
+wait 200
+# the opening: 45 s of tracks coming in
+waitfor introk 100 60000
+expect smsec >40
+expect smsec <50
+expect smpatience <41
+expect genre 0
+# Mute the kick from Perform before the same cue opportunity.
+tap HOME
+wait 500
+expect view 35
+tapkey 0
+wait 300
+expect trkmute 1
+waitfor djn 7 20000
+expect arcue 0
+expect arcueat 0
+waitfor djn 9 8000
+expect arcue 0
+expect trkmute 1
+tap PLAY
+wait 100
+expect playing 0
+expect arcue 0
+expect trkmute 1
