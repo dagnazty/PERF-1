@@ -59,8 +59,24 @@ static int dj_half_fit(dj_profile_t a, dj_profile_t b)
     return dj_hits((uint16_t)(slow.kick & anchors & 0x1111u)) >= 2;
 }
 
+/* Most recent first, packed in four nibbles. Zero means unused. */
+static unsigned dj_remember(unsigned history, unsigned item)
+{
+    return ((history << 4) | (item & 15u)) & 0xffffu;
+}
+
+static int dj_recency(unsigned history, unsigned item)
+{
+    static const int WEIGHT[4] = {6, 4, 3, 2};
+    int i, cost = 0;
+    for (i = 0; i < 4; i++, history >>= 4)
+        if ((history & 15u) == item)
+            cost += WEIGHT[i];
+    return cost;
+}
+
 static dj_edge_t dj_edge(dj_profile_t a, dj_profile_t b, int mode, int clocked,
-                         int last, int e, unsigned favored)
+                         unsigned history, int e, unsigned favored)
 {
     const int d = dj_key_dist(a.key, b.key), dt = dj_abs((int)a.bpm - b.bpm);
     const int half = !clocked && dj_half_fit(a, b);
@@ -115,8 +131,7 @@ static dj_edge_t dj_edge(dj_profile_t a, dj_profile_t b, int mode, int clocked,
         }
         if (favored & (1u << t))
             c -= 5;
-        if (t == last)
-            c += 6;
+        c += dj_recency(history, (unsigned)t);
         if (mode == DJ_AUTO && e >= 70 && !blend)
             c -= 3;
         if (c < best.cost)
