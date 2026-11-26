@@ -561,6 +561,8 @@ static struct {
     uint8_t rs_sec, rs_scene;          /* the section ride_tick saw last; the drop's scene (4) is up, the groove's (1) comes 8 bars on */
     uint32_t rs_drop, ride_t;          /* the last drop, en_bars + 1 (0: none for 16 bars); the ride's last step (ms) */
     uint8_t ar_m, ar_prev, ar_sec;     /* (0.16.20) LAYERS: the tracks the arrangement has out (sent with the player's, never in trk_m); out last phrase; the section seen */
+    uint8_t ar_cue;                  /* temporary Smart DJ contrast, separate from regular Layers */
+    uint32_t ar_cue_at;              /* bar it started, plus one (zero before the first cue) */
     uint32_t ar_bar, ar_start, ar_rng; /* the bar it last looked at, the groove's first bar (its phrase lines count from there), its dice */
     uint8_t mv, mv_last, mv_keep, mv_fake, mv_drop2, mv_rid, mv_m, mv_fx;   /* MOVES: the round's move (MV_*), the last one, a groove that is not a new round
                                                  * (after a double drop), a fake drop done (the short breakdown after it), a double drop under way,
@@ -743,7 +745,7 @@ static int mix_state(int k)
 }
 static void trk_send(void)                     /* the mutes and solos to the engine: the player's, and the arrangement's and a move's on top (0.16.20) */
 {
-    en_trk((uint32_t)(ui.trk_m | ui.ar_m | ui.mv_m | ui.ss_m | ui.tx_m), ui.trk_s);
+    en_trk((uint32_t)(ui.trk_m | ui.ar_m | ui.ar_cue | ui.mv_m | ui.ss_m | ui.tx_m), ui.trk_s);
 }
 static void knob_set(int k, int v);
 static int knob_get(int k);
@@ -816,6 +818,8 @@ static int sm_break_len(void);
 static int sm_pick(void);
 static int sm_yield(void);
 static int sm_patience(void);
+static int sm_hold(void);
+static int sm_fits(int bars);
 static int tx_start(void);
 enum { DJ_STEER_AUTO, DJ_STEER_HOLD, DJ_STEER_NEXT };
 static void tx_bar_step(void);
@@ -2363,6 +2367,62 @@ static void ar_set(uint8_t m)
         trk_send();
     }
 }
+/* Pattern density is an estimate, but do not count a lane the mix cannot
+ * hear, or a fill-only lane as an anchor for a regular phrase. */
+static unsigned ar_lane(int lane)
+{
+    static const uint8_t TRACK[EN_NLANE] = {EN_TR_KICK, EN_TR_SNARE, EN_TR_SNARE,
+                                          EN_TR_HATS, EN_TR_HATS, EN_TR_PERC};
+    const unsigned track = TRACK[lane], bit = 1u << track;
+    if ((ui.fx_mask & (FXB(FX_MDRUMS) | FXB(FX_MUTE_KICK + track))) || (ui.trk_m & bit) || (ui.trk_s && !(ui.trk_s & bit)) ||
+        !proj.par[P_PULSE] || !proj.par[P_LANE_LVL(lane)] || proj.par[P_COND + lane] == 6)
+        return 0;
+    return en_lane_mask(lane, en_lane_src[lane], proj.par[P_DENS + lane]);
+}
+static void ar_cue_set(uint8_t m)
+{
+    if (ui.ar_cue != m) {
+        ui.ar_cue = m;
+        trk_send();
+    }
+}
+static int ar_cue_ok(void)
+{
+    return sm_on() && !sm_song() && ui.sm_steer == DJ_STEER_AUTO && !sm_yield() &&
+           !ui.tx && !ui.piece_q && !ui.sl_q && !ui.scene_q && !ui.ss_out && !ui.ss_done &&
+           !ui.sm_go && !ui.sm_aimed && !en_sec_req && !ui.mv_m && ui.mv != MV_RIDDIM &&
+           !sm_hold() && sm_fits(3) && ui.dj_phase == 0 && ui.dj_n >= 7u && ui.dj_n < 63u &&
+           !((ui.dj_piece || sl_play()) && ui.dj_round >= DJ_ROUNDS[ui.dj_rounds & 3]);
+}
+static uint8_t ar_cue_pick(void)
+{
+    const unsigned kick = ar_lane(0);
+    int t, n = 0, best = -1, score = 0, hits = 0;
+    const int harmonic_return = en_drift_bars >= 1.0f && en_drift_bars <= 3.0f;
+    /* Require a continuing pulse. Preserve the kick plus another part so
+     * the contrast does not turn into a breakdown. */
+    for (t = 1; t < EN_NLANE; t++)
+        hits += dj_hits((uint16_t)ar_lane(t));
+    if (proj.par[P_COND] || proj.par[P_LLEN] < 16 || dj_hits((uint16_t)kick) < 2 || hits < 3)
+        return 0;
+    for (t = EN_TR_DRONE; t < EN_NTRACK; t++) {
+        int weight;
+        if ((ui.trk_m >> t & 1u) || !ar_audible(t))
+            continue;
+        n++;
+        /* Bass is the strongest contrast. Prefer it before a chord change
+         * or with a firmly anchored beat; otherwise prefer a texture. */
+        if (t == EN_TR_DRONE)
+            weight = harmonic_return ? 5 : (kick & 1u) && dj_hits((uint16_t)kick) >= 3 ? 4 : 1;
+        else
+            weight = t == EN_TR_PAD ? 3 : 2;
+        if (weight > score) {
+            score = weight;
+            best = t;
+        }
+    }
+    return n >= 2 ? (uint8_t)(1u << best) : 0;
+}
 static void ar_tick(void)
 {
     static const uint8_t CH[3] = {0, 40, 70}, W[EN_NTRACK] = {0, 4, 1, 4, 1, 2, 2, 2};   /* how likely each goes out (the kick: Busy's own) */
@@ -2376,11 +2436,20 @@ static void ar_tick(void)
         ui.ar_start = bar;
         ui.ar_prev = 0;
     }
+    if (ui.ar_cue && (!en_playing || ui.ar_m || ui.trk_s || (ui.trk_m & (ui.ar_cue | (1u << EN_TR_KICK))) ||
+        (ui.fx_mask & (FXB(FX_MDRUMS) | FXB(FX_MUTE_KICK))) ||
+        en_sec != EN_SEC_GROOVE || en_intro_k < 1.0f || !sm_on() || sm_song() || ui.sm_steer != DJ_STEER_AUTO || sm_yield() ||
+        ui.tx || ui.piece_q || ui.sl_q || ui.scene_q || ui.ss_out || ui.sm_go ||
+        ui.sm_aimed || en_sec_req || ui.mv_m ||
+        (en_drum_pos == 0 && ui.dj_n % 8u == 1u)))
+        ar_cue_set(0);
     if (!amt || !en_playing || en_sec != EN_SEC_GROOVE || en_intro_k < 1.0f || ui.trk_s || ui.ss_out) {
         ar_set(0);
         ui.ar_bar = bar;
-        if (!en_playing)
+        if (!en_playing) {
             ui.ar_start = bar;
+            ui.ar_cue_at = 0;
+        }
         return;
     }
     if (bar == ui.ar_bar)
@@ -2595,7 +2664,8 @@ static void set_start(void)                     /* START SET */
     ui.dj_fill = 0;
     mv_off();
     ui.mv_last = 0;
-    ui.ar_m = 0;
+    ui.ar_m = ui.ar_cue = 0;
+    ui.ar_cue_at = 0;
     ui.ss_m = 0;
     ui.ss_out = 0;
     ui.ss_done = 0;
@@ -2758,6 +2828,7 @@ static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n cou
         ui.sm_dd = en_dd_changes + en_dd_mutations;
         news++;
     }
+    /* A short contrast is not a new pattern: leave the main transition clock alone. */
     if ((uint8_t)(ui.ar_m | ui.mv_m) != ui.sm_lay) {   /* (0.16.24) a part out or back (Layers, a riddim): news too */
         ui.sm_lay = (uint8_t)(ui.ar_m | ui.mv_m);
         news++;
@@ -2816,6 +2887,19 @@ static void sm_groove_bar(int last_round)       /* a bar of the groove (dj_n cou
                 en_fill_next();
             if (aim)
                 say("SMART DJ", "AIMING AT THE PEAK");
+        } else if (ui.dj_n % 8u == 7u && !ui.ar_m && !ui.ar_cue && !ui.trk_s &&
+                   !(ui.rs_drop && en_bars - (ui.rs_drop - 1u) < 120u) && ar_cue_ok()) {
+            const uint32_t bar = en_bars >> 4;
+            /* Fit the whole cue between Layers decisions instead of
+             * suppressing one and changing the set's staleness or dice. */
+            const unsigned layers_pos = (bar - ui.ar_start) % 8u;
+            const uint8_t cue = layers_pos > 0u && layers_pos <= 5u &&
+                (!ui.ar_cue_at || bar - (ui.ar_cue_at - 1u) >= 24u) ? ar_cue_pick() : 0;
+            if (cue) {
+                ui.ar_cue_at = bar + 1u;
+                ar_cue_set(cue);
+                say("SMART DJ", cue & (1u << EN_TR_DRONE) ? "BASS CONTRAST" : "TEXTURE CONTRAST");
+            }
         }
     }
 }
@@ -3175,7 +3259,7 @@ static void tx_swapped(int old)                 /* the new piece is in (on the b
     if (ui.sm_shape)
         ui.sm_moves = (uint16_t)dj_remember(ui.sm_moves, ui.sm_shape);
     ui.sm_shape = 0;
-    ui.ar_m = 0;
+    ui.ar_m = ui.ar_cue = 0;
     ui.ar_start = en_bars >> 4;
     ui.tx_m = 0;
     ui.tx_in = 0;
@@ -6533,7 +6617,7 @@ static void draw_perf(void)
     for (i = 0; i < 8; i++) {                     /* the tracks */
         static const uint8_t LN[8] = {0, 3, 1, 5, 6, 6, 6, 6};   /* the drum lane that shows its hits (6: not a lane) */
         const int32_t x = 4 + i * 29;
-        const int auto_out = !(ui.trk_m >> i & 1u) && ((ui.ar_m | ui.mv_m | ui.ss_m | ui.tx_m) >> i & 1u);   /* (0.16.20) out by the arrangement, a move, the close or a
+        const int auto_out = !(ui.trk_m >> i & 1u) && ((ui.ar_m | ui.ar_cue | ui.mv_m | ui.ss_m | ui.tx_m) >> i & 1u);   /* (0.16.20) out by the arrangement, a move, the close or a
                                                                                                                   * transition: struck in frost */
         const int muted = (ui.trk_m >> i & 1u) || auto_out || (i < 4 && (ui.fx_mask >> (FX_MUTE_KICK + i) & 1u));
         const int soloed = ui.trk_s >> i & 1u, dim = muted || (ui.trk_s && !soloed);
@@ -7817,7 +7901,7 @@ static void draw_main(void)
         h = hash(h, (uint32_t)ui.trk_m | (uint32_t)ui.trk_s << 7 | (uint32_t)ui.scene_set << 14 | (uint32_t)ui.dj_on << 18 |
                         (uint32_t)ui.dj_phase << 19 | (uint32_t)ui.dj_len << 27 | (uint32_t)en_sec << 23 | (uint32_t)en_sec_req << 25);
         h = hash(h, h32(ui.fx_mask) | ((uint32_t)ui.scene_q << 28 ^ (uint32_t)ui.mood << 8 ^ (uint32_t)ui.key_on << 16 ^ (uint32_t)(uint8_t)ui.ride << 20));
-        h = hash(h, (uint32_t)ui.ar_m | (uint32_t)ui.mv_m << 8 | (uint32_t)ui.ss_m << 16 | (uint32_t)ui.tx_m << 24);   /* (what the DJ has out) */
+        h = hash(h, (uint32_t)(ui.ar_m | ui.ar_cue) | (uint32_t)ui.mv_m << 8 | (uint32_t)ui.ss_m << 16 | (uint32_t)ui.tx_m << 24);   /* (what the DJ has out) */
         h = hash(h, ui.sm_steer);
         h = hash(h, h32(ui.fx_lock) ^ (uint32_t)ui.dj_n << 20 ^ (uint32_t)en_drum_pos << 27);
         for (i = 0; i < EN_NLANE; i++)

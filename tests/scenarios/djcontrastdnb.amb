@@ -1,0 +1,68 @@
+# A 15-minute Arc by the real Start Set controls, with Journey locked to this genre.
+# A two-bar contrast takes out only the bass; it returns on the next phrase downbeat.
+seed 0
+wait 3680
+press GLO
+turn PRESET 5
+release GLO
+wait 300
+expect genre 5
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K2 -2
+wait 50
+expect fxs101 0
+expect smpace 50
+turn SELECT 1
+wait 100
+expect fxpage 37
+spin K1 -1
+wait 50
+expect fxs104 0
+turn SELECT -1
+wait 100
+tap PLAY
+wait 1000
+expect playing 1
+expect djon 1
+expect smsec <3
+shot set15_start.png
+tap FX
+wait 200
+# the opening: 45 s of tracks coming in
+waitfor introk 100 60000
+expect smsec >40
+expect smsec <50
+expect smpatience <41
+expect genre 5
+expect arcue 0
+waitfor arcue >0 120000
+wait 80
+expect arcue 16
+expect djn 7
+expect trkmute 0
+expect entrkmute 16
+expect sec 0
+expect tx 0
+waitfor djn 8 8000
+expect arcue 16
+expect entrkmute 16
+waitfor djn 9 8000
+wait 80
+expect arcue 0
+expect arm 0
+expect entrkmute 0
+expect trkmute 0
+expect sec 0
+waitfor smpeakat >0 700000
+expect smpeakat >500
+expect smpeakat <730
+waitfor ssdone 1 600000
+expect smsec >885
+expect smsec <915
+expect arcue 0

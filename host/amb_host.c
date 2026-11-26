@@ -642,6 +642,10 @@ static int expect(const char *what, const char *val)
     else if (!strcmp(what, "arm"))                /* (0.16.20) LAYERS: the tracks the arrangement has out (a bit a track); MOVES: the round's move, a move's mutes,
                                                     * the auto-DJ's round, the tracks the engine has muted */
         got = ui.ar_m;
+    else if (!strcmp(what, "arcue"))
+        got = ui.ar_cue;
+    else if (!strcmp(what, "arcueat"))
+        got = (int)ui.ar_cue_at;
     else if (!strcmp(what, "mv"))
         got = ui.mv;
     else if (!strcmp(what, "mvm"))
