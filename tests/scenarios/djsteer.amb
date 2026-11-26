@@ -12,7 +12,7 @@ press SEL
 tap OCT-
 release SEL
 expect djsteer 1
-wait 125000
+waitfor djn >71 300000
 expect sec 0
 expect tx 0
 expect txrecent 0

@@ -1,0 +1,50 @@
+# Mix Next waits out the no-mix window leading up to the timed peak.
+seed 0
+wait 3000
+press HOME
+wait 800
+release HOME
+wait 100
+turn SELECT 4
+wait 100
+expect fxpage 36
+spin K2 -2
+wait 50
+expect fxs101 0
+expect smpace 50
+tap PLAY
+wait 1000
+expect playing 1
+expect djon 1
+expect smsec <3
+tap FX
+wait 200
+# the opening: 45 s of tracks coming in
+waitfor introk 100 60000
+expect smsec >40
+expect smsec <50
+expect smpatience <41
+tap HOME
+wait 600
+press SEL
+tap OCT-
+release SEL
+expect djsteer 1
+waitfor smsec >560 600000
+press SEL
+tap OCT+
+release SEL
+expect djsteer 2
+waitfor smpeakat >0 140000
+expect smpeakat >595
+expect smpeakat <631
+expect txrecent 0
+waitfor tx >0 60000
+expect djsteer 0
+waitfor txrecent >0 60000
+waitfor ssout >0 300000
+waitfor ssdone 1 120000
+wait 100
+expect playing 0
+expect smsec >885
+expect smsec <915

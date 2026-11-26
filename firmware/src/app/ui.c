@@ -602,7 +602,7 @@ static struct {
     uint8_t smp_dry, smp_vc, smp_nn, smp_note[3];   /* dry now; the voice and notes held */
     int8_t smp_cur;                    /* the sound playing (-1: none) */
     uint32_t smp_t0, smp_off;          /* the run's start (0: none); when the held notes let go */
-    uint16_t dj_n;                     /* bars in the phase */
+    uint32_t dj_n;                     /* bars in the phase */
     uint64_t fx_mask;                  /* the effects held (and locked), as last sent */
     uint64_t fx_lock;                  /* the effects latched on */
     uint8_t lock_mode;                 /* (the old SAVE lock mode: gone, kept off) */
@@ -1986,10 +1986,7 @@ static void dj_bar(void)                       /* a new bar (while playing) */
         ui.dj_n = 0;
         return;
     }
-    if (ph == 0 && sm_on() && ui.dj_n >= 71u && !ui.tx)
-        ui.dj_n = 64;                           /* retain phrase phase through an arbitrarily long hold */
-    else
-        ui.dj_n++;
+    ui.dj_n++;                                 /* keep the displayed count and the phrase in step during a long hold */
     if (ph == 0 && ui.dj_ramp && !ui.mx_bars) {   /* the ramp: the tempo climbs over the piece's rounds of groove; turned by hand, it climbs on from there (not while the mix glides) */
         const int bpm = RAMP_BPM[ui.dj_ramp % 5u], total = rounds * g, prog = (ui.dj_round < rounds ? ui.dj_round : rounds - 1) * g + (int)ui.dj_n;
         int t;
@@ -6660,7 +6657,7 @@ static void draw_mix(void)
     cpu_line(c);
     cv_text(118, 1, &FONT_XS, c, K_DIM);
     if (ui.dj_on) {                            /* the auto-DJ: where it is, under the load */
-        char d[24];
+        char d[32];
         const char *pn = ui.dj_phase == 0 ? "DJ GROOVE " : ui.dj_phase == 1 ? "DJ BREAK " : "DJ BUILD ";
         int n = 0;
         while (*pn)
